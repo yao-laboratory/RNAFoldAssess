@@ -19,7 +19,7 @@ Once more prediction algoirthms are identified and support for their functionali
 
 This explains the different code files and will grow as time goes
 
-## models
+## `/models`
 
 This module contains different models to accomplish the various tasks.
 
