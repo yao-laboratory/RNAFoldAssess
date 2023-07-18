@@ -27,13 +27,13 @@ This module contains different models to accomplish the various tasks.
 
 This is all the data for a single RNA structure. It records the name, sequence, and reactivities of the structure. In the future, it may contain other informaiton that help evaluate the performance of each algoritm.
 
-### `executions.py`
+### `predictors.py`
 
 This file contains classes that encapsulate different ways in which the algorithms must be executed and evaluated. For example, the `Eterna` class calls the prediction method for EternaFold on a given sequence file. Conversely, the `SPOT_RNA` class executes the prediction algoirthm, but also converts the output `.ct` files into a secondary structure dot-brakcet string so the predictions can be evaluated.
 
-### `Prediction`
+### `Evaluator`
 
-This class contains all the data necessary to analyze a prediction's performance. As of right now it contains an `accuracy` and `p_value` attribute, and a  `metrics` attribute that describes everything one might need to know for future evaluation.
+This class contains all the data necessary to analyze a predictor's performance. As of right now it contains an `accuracy` and `p_value` attribute, and a  `metrics` attribute that describes everything one might need to know for future evaluation.
 
 ## `test_script.py`
 

@@ -18,7 +18,7 @@ eterna.execute(path_to_eternafold, seq_file_path)
 print(f"Eterna Output: {eterna.output}")
 print(f"Eterna Prediction: {eterna.get_ss_prediction()}")
 
-eterna_prediction = Prediction(datum, eterna.get_ss_prediction(), 'EternaFold')
+eterna_prediction = Evaluator(datum, eterna.get_ss_prediction(), 'EternaFold')
 print(f"Eterna evaluation: {eterna_prediction.metrics}")
 
 # testing SPOT-RNA
@@ -30,5 +30,5 @@ spot.execute(path_to_spot_rna, fasta_file_path)
 print(f"SPOT-RNA Output: {spot.output}")
 print(f"SPOT-RNA Prediction: {spot.get_ss_prediction()}")
 
-spot_prediction = Prediction(datum, spot.get_ss_prediction(), 'SPOT-RNA')
+spot_prediction = Evaluator(datum, spot.get_ss_prediction(), 'SPOT-RNA')
 print(f"SPOT-RNA evaluation: {spot_prediction.metrics}")

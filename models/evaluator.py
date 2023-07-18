@@ -1,7 +1,7 @@
 from scipy.stats import mannwhitneyu
 
 
-class Prediction:
+class Evaluator:
     def __init__(self, data_point, secondary_structure, algorithm, evaluate_immediately=True):
         self.data_point = data_point
         self.secondary_structure = secondary_structure
