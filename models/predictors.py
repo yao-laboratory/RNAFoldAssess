@@ -28,6 +28,9 @@ class SPOT_RNA:
         self.conda_env_name = conda_env_name
 
     def execute(self, spot_rna_path, fasta_file, remove_file_when_done=True):
+        # Make output directory for SPOT
+        if not os.path.exists("./spot_output"):
+            os.mkdir("./spot_output")
         spot_exec_string = f"python3 {spot_rna_path}/SPOT-RNA.py  --inputs {fasta_file}  --outputs ./spot_output"
         exec_string = f"conda activate {self.conda_env_name} && {spot_exec_string} && conda deactivate"
         # SPOT-RNA generates several files, we need the  .ct file
