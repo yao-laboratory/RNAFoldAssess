@@ -41,3 +41,26 @@ print(f"SPOT-RNA Prediction: {spot_prediction}")
 spot_evaluation = Evaluator(datum, spot.get_ss_prediction(), 'SPOT-RNA').metrics
 print(f"SPOT-RNA evaluation: {spot_evaluation}")
 predictions['SPOT-RNA'] = { 'prediction': spot_prediction, 'evaluation': spot_evaluation }
+
+# testing ContextFold
+path_to_context_fold = "../ContextFold_1_00"
+contextFold = ContextFold()
+
+contextFold.execute(path_to_context_fold, datum.sequence)
+
+cf_prediction = contextFold.get_ss_prediction()
+print(f"ContextFold Output: {contextFold.output}")
+print(f"ContextFold Prediction: {cf_prediction}")
+
+cf_evaluation = Evaluator(datum, cf_prediction, 'ContextFold').metrics
+print(f"ContextFold evaluation: {cf_evaluation}")
+predictions['ContextFold'] = { 'prediction': cf_prediction, 'evaluation': cf_evaluation }
+
+
+
+# Display predictions
+for k in predictions:
+  acc = predictions[k]['evaluation']['accuracy']
+  p = predictions[k]['evaluation']['p']
+  print(f"{k}\t- Accuracy: {round(acc, 5)}, p value: {round(p, 5)}")
+
