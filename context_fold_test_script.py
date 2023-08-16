@@ -1,5 +1,6 @@
 from models import *
 
+
 # Testing with C009C
 base_data_path = "../ss_deeplearning_data/data"
 c009c = DataPoint.factory(f'{base_data_path}/C009C.json')

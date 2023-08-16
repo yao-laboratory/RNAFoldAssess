@@ -5,7 +5,7 @@ from models import *
 predictions = {}
 
 # Testing with C009C
-base_data_path = "../ss_deeplearning_data/data"
+base_data_path = "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data"
 c009c = DataPoint.factory(f'{base_data_path}/C009C.json')
 # For now, just use one data point from C009C
 datum = c009c[0]
