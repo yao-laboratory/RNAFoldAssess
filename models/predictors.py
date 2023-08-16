@@ -77,3 +77,40 @@ class ContextFold:
         strings = self.output.split("\n")
         ss = strings[1]
         return ss
+
+
+class DeepFoldRNA:
+    # Some notes
+    # This one might not be doable, there is 500GB of data to download
+    # Also needs pytorch :(
+    # Notes
+    # Need to first run
+    # ```
+    #   source scripts/activate_conda_env.sh
+    # ```
+    #
+    # For the number of threads, run
+    # ```
+    #   export OMP_NUM_THREADS=n
+    # ```
+    #
+    # The input is a fasta file in a directory
+    def __init__(self):
+        output = ""
+
+
+class MXFold:
+    def __int__(self):
+        self.output = ""
+
+    def execute(self, path, fasta_file):
+        path_to_mx_fold = os.path.abspath(path)
+        exec_string = f"{path} {fasta_file}"
+        self.output = os.popen(exec_string).read()
+
+    def get_ss_prediction(self):
+        if self.output == "":
+            raise Exception(f"MXFold exception: no output generated")
+        strings = self.output.split("\n")
+        ss = strings[3]
+        return ss

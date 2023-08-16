@@ -56,11 +56,28 @@ cf_evaluation = Evaluator(datum, cf_prediction, 'ContextFold').metrics
 print(f"ContextFold evaluation: {cf_evaluation}")
 predictions['ContextFold'] = { 'prediction': cf_prediction, 'evaluation': cf_evaluation }
 
+# testing MXFold
+path_to_mxfold = "../mxfold/build/mxfold"
+mxfold = MXFold()
+
+mxfold.execute(path_to_mxfold, fasta_file_path)
+
+mxfold_prediction = mxfold.get_ss_prediction()
+print(f"MXFold Output: {mxfold.output}")
+print(f"MXFold Prediction: {mxfold_prediction}")
+
+mxfold_evaluation = Evaluator(datum, mxfold_prediction, 'MXFold').metrics
+print(f"MXFold evaluation: {mxfold_evaluation}")
+predictions['MXFold'] = { 'prediction': mxfold_prediction, 'evaluation': mxfold_evaluation }
 
 
 # Display predictions
 for k in predictions:
   acc = predictions[k]['evaluation']['accuracy']
   p = predictions[k]['evaluation']['p']
-  print(f"{k}\t- Accuracy: {round(acc, 5)}, p value: {round(p, 5)}")
+  tab_size = 1
+  if len(k) < 8:
+    tab_size = 2
+  tabs = "\t" * tab_size
+  print(f"{k + tabs}- Accuracy: {round(acc, 5)}, p value: {round(p, 5)}")
 
