@@ -13,7 +13,7 @@ print(f"`dataum` class: {type(datum)}")
 seq_file_path = datum.to_seq_file()
 
 # Testing EternaFold
-path_to_eternafold = path.Path("../EternaFold").abspath()
+path_to_eternafold = path.Path("../../EternaFold").abspath()
 eterna = Eterna()
 eterna.execute(path_to_eternafold, seq_file_path)
 
