@@ -39,3 +39,6 @@ This class contains all the data necessary to analyze a predictor's performance.
 
 This file simply exists to test and show examples of how to use the `executions` models and evaluations.
 
+## TODO
+
+This project has a long way to go. Currently, some of the work remains to standardize inputs and make it painfully obvious how users can add new tools.
