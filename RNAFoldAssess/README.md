@@ -19,23 +19,21 @@ Once more prediction algoirthms are identified and support for their functionali
 
 This explains the different code files and will grow as time goes
 
-## `/models`
+![image](https://github.com/yao-laboratory/RNAFoldAssess/assets/47164199/a999b571-f268-47ba-9685-8df638b76ce3)
 
-This module contains different models to accomplish the various tasks.
+## `models`
 
 ### `DataPoint`
 
-This is all the data for a single RNA structure. It records the name, sequence, and reactivities of the structure. In the future, it may contain other informaiton that help evaluate the performance of each algoritm.
+### Evaluator
 
-### `predictors.py`
+This class contains all the data necessary to analyze a predictor's performance. As of right now it contains a method for generating `accuracy` and `p_value` derived from the Mann-Whitney U-test. Others to come.
+
+### `predictors`
 
 This file contains classes that encapsulate different ways in which the algorithms must be executed and evaluated. For example, the `Eterna` class calls the prediction method for EternaFold on a given sequence file. Conversely, the `SPOT_RNA` class executes the prediction algoirthm, but also converts the output `.ct` files into a secondary structure dot-brakcet string so the predictions can be evaluated.
 
-### `Evaluator`
-
-This class contains all the data necessary to analyze a predictor's performance. As of right now it contains an `accuracy` and `p_value` attribute, and a  `metrics` attribute that describes everything one might need to know for future evaluation.
-
-## `test_script.py`
+## `script.py`
 
 This file simply exists to test and show examples of how to use the `executions` models and evaluations.
 
