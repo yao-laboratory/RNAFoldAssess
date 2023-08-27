@@ -2,7 +2,7 @@ import json
 import os
 
 
-class PDB:
+class PDBTools:
     """
     Utility class for getting PDB files
     """
@@ -14,7 +14,7 @@ class PDB:
     def get_file(rna_id, destination_dir=None):
         url = f"https://files.rcsb.org/download/{rna_id}.pdb"
         if not destination_dir:
-            destination_dir = PDB.default_data_dir()
+            destination_dir = PDBTools.default_data_dir()
         destination_dir = os.path.abspath(destination_dir)
         cmd = f"wget -O {destination_dir}/{rna_id}.pdb {url}"
         os.system(cmd)
@@ -30,4 +30,4 @@ class PDB:
         f.close()
         data = json.loads(raw_data)["result_set"]
         for d in data:
-            PDB.get_file(d["identifier"], destination_dir)
+            PDBTools.get_file(d["identifier"], destination_dir)
