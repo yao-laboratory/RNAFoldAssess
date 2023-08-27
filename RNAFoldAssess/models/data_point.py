@@ -26,6 +26,24 @@ class DataPoint:
         self.path = os.path.abspath(f"{self.name}.fasta")
         return self.path
 
+    def to_constraint_file(self, destination_dir=None):
+        # For the RNA Structure folding algorithm
+        file_name = f"{self.name}_struc_constraint.txt"
+        if not destination_dir:
+            destination_dir = "."
+        file_path = f"{destination_dir}/{file_name}"
+        f = open(file_path, "w")
+        for i in range(len(self.reactivities)):
+            mu = str(self.reactivities[i])
+            if self.sequence[i] in ["T", "G"]:
+                mu = "-999"
+            f.write(str(i + 1) + "\t" + mu + "\n")
+        f.close()
+        return file_path
+
+    def __str__(self):
+        return f"{self.name}, {self.sequence}, {self.reactivities}"
+
     @staticmethod
     def factory(path):
         f = open(path)
