@@ -3,8 +3,10 @@ import json
 
 
 class DataPoint:
-    def __init__(self, data_hash):
+    def __init__(self, data_hash, name_prefix=None):
         self.name = data_hash["name"]
+        if name_prefix:
+            self.name = f"{name_prefix}_{self.name}"
         self.sequence = data_hash["sequence"]
         self.reactivities = data_hash["data"]
         self.reads = data_hash["reads"]
@@ -45,11 +47,11 @@ class DataPoint:
         return f"{self.name}, {self.sequence}, {self.reactivities}"
 
     @staticmethod
-    def factory(path):
+    def factory(path, name_prefix=None):
         f = open(path)
         json_data = json.loads(f.read())
         f.close()
         data_points = []
         for datum in json_data:
-            data_points.append(DataPoint(datum))
+            data_points.append(DataPoint(datum, name_prefix))
         return data_points
