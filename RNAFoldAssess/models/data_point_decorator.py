@@ -1,7 +1,7 @@
 import os
 from scipy.stats import mannwhitneyu
 
-from data_point import *
+from .data_point import *
 
 
 class DecoratedDataPoint(DataPoint):
