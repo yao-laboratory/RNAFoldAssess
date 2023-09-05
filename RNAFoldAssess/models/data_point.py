@@ -1,15 +1,16 @@
-import os
-import json
+import os, json, heapq
 
 
 class DataPoint:
-    def __init__(self, data_hash, name_prefix=None):
+    def __init__(self, data_hash, cohort=None):
         self.name = data_hash["name"]
-        if name_prefix:
-            self.name = f"{name_prefix}_{self.name}"
+        if cohort:
+            self.name = f"{cohort}_{self.name}"
         self.sequence = data_hash["sequence"]
         self.reactivities = data_hash["data"]
         self.reads = data_hash["reads"]
+        self.cohort = cohort
+        self.__normalize_reactivities()
 
     def to_seq_file(self):
         # .seq files are required for EternaFold
@@ -55,3 +56,74 @@ class DataPoint:
         for datum in json_data:
             data_points.append(DataPoint(datum, name_prefix))
         return data_points
+
+    @staticmethod
+    def get_structure_probabilities(path, name_prefix=None):
+        f = open(path)
+        json_data = json.loads(f.read())
+        f.close()
+        sequence_scores = []
+        for i in range(65):
+            sequence_scores.append({
+                "A": [0, 0.0],
+                "C": [0, 0.0],
+                "U": [0, 0.0],
+                "G": [0, 0.0]
+            })
+        for datum in json_data:
+            seq = datum["sequence"]
+            for i in range(65):
+                nt = seq[i]
+                sequence_scores[i][nt][0] += 1
+        for score in sequence_scores:
+            for nt in score:
+                score[nt][1] = round(score[nt][0] / len(json_data), 2)
+        consensus_sequence = ""
+        for score in sequence_scores:
+            consensus_sequence += max(score, key=score.get)
+        return { "consensus": consensus_sequence, "probabilities": sequence_scores }
+
+
+    @staticmethod
+    def combined_structure_probabilities(paths, name_prefixes=[]):
+        data = []
+        for path in paths:
+            f = open(path)
+            data.append(json.loads(f.read()))
+            f.close()
+        flattened_data = []
+        for item in data:
+            for datum in item:
+                flattened_data.append(datum)
+        del(data)
+        sequence_scores = []
+        for i in range(65):
+            sequence_scores.append({
+                "A": [0, 0.0],
+                "C": [0, 0.0],
+                "U": [0, 0.0],
+                "G": [0, 0.0]
+            })
+        for datum in flattened_data:
+            seq = datum["sequence"]
+            for i in range(65):
+                nt = seq[i]
+                sequence_scores[i][nt][0] += 1
+        for score in sequence_scores:
+            for nt in score:
+                score[nt][1] = round(score[nt][0] / len(flattened_data), 2)
+        consensus_sequence = ""
+        for score in sequence_scores:
+            consensus_sequence += max(score, key=score.get)
+        return { "consensus": consensus_sequence, "probabilities": sequence_scores }
+
+    def __normalize_reactivities(self):
+        n = 10
+        nlargest = heapq.nlargest(n, self.reactivities)
+        normalizer = sum(nlargest) / len(nlargest)
+        self.normalized_reactivities = []
+        for reactivity in self.reactivities:
+            norm_val = reactivity / normalizer
+            if norm_val > 1.0:
+                norm_val = 1.0
+            self.normalized_reactivities.append(norm_val)
