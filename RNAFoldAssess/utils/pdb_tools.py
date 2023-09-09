@@ -68,8 +68,6 @@ class PDBTools:
 
     @staticmethod
     def _get_latest_pdb(csv_lines, pdb_id):
-        # temp testing
-        # row = '"NR_4.0_12763.26","7QI4|1|A","7QI4|1|A,7OF0|1|A,6ZM6|1|A,7QI5|1|A,7O9M|1|A,7OF6|1|A,8OIT|1|B8,7OF4|1|A,6ZM5|1|A,7OF7|1|A,7QI6|1|A,6VMI|1|A,6VLZ|1|A,7OF2|1|A,8OIR|1|B8,7OF3|1|A,7L20|1|A,7ODR|1|A,7A5J|1|A,7OF5|1|A,7ODT|1|A,7O9K|1|A,5OOL|1|A,7ODS|1|A,7OIC|1|A,7A5H|1|A,7L08|1|A,7PO4|1|A,7QH7|1|A,7OIE|1|A,6ZSC|1|XA,7A5K|1|A3,7A5I|1|A3,7OID|1|A,6ZSD|1|XA,7PD3|1|A,7OG4|1|XA,7QH6|1|A,3J9M|1|A,6I9R|1|A,5OOM|1|A,6ZSG|1|XA,6ZSA|1|XA,6ZS9|1|XA,7OIA|1|A,3J7Y|1|A,7OIB|1|A,7OI9|1|A,6NU2|1|A,7OI8|1|A,7OI7|1|A"'
         for row in csv_lines:
             data = row.split('"')
             for d in data:

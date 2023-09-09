@@ -6,9 +6,9 @@ from pdb_tools import PDBTools
 #     f.write(f"{id}\n")
 # f.close()
 
-# f = open("./canonical_ids_with_protein", "r")
-# pdb_ids = f.readlines()
-# f.close()
+f = open("./canonical_ids_with_protein", "r")
+pdb_ids = f.readlines()
+f.close()
 
 destination_dir = "/common/yesselmanlab/ewhiting/data/crystal2/with_protein/"
 for pdb_id in pdb_ids:
