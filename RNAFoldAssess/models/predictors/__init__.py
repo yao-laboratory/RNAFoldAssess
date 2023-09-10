@@ -4,3 +4,4 @@ from .context_fold import *
 from .mxfold import *
 from .deep_fold import *
 from .rna_fold import *
+from .rna_structure import *
