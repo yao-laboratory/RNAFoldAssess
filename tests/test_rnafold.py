@@ -19,3 +19,4 @@ class TestRNAFold:
         assert(metrics['accuracy'] > 0.7)
         # clean up
         os.remove("seq_5865.fasta")
+        os.remove("seq_5865_ss.ps")
