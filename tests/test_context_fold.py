@@ -1,6 +1,7 @@
 import path, os
 
-from RNAFoldAssess.models import ContextFold, DataPoint, Evaluator
+from RNAFoldAssess.models import ContextFold, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestContextFold:
@@ -14,6 +15,6 @@ class TestContextFold:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'Context Fold')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'Context Fold')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)

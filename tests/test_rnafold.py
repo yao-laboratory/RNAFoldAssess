@@ -1,6 +1,7 @@
 import path, os
 
-from RNAFoldAssess.models import RNAFold, DataPoint, Evaluator
+from RNAFoldAssess.models import RNAFold, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestRNAFold:
@@ -14,8 +15,8 @@ class TestRNAFold:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'RNAFold')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'RNAFold')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
         # clean up
         os.remove("seq_5865.fasta")

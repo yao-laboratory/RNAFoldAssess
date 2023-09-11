@@ -25,9 +25,9 @@ This explains the different code files and will grow as time goes
 
 ### `DataPoint`
 
-### Evaluator
+### Scorer
 
-This class contains all the data necessary to analyze a predictor's performance. As of right now it contains a method for generating `accuracy` and `p_value` derived from the Mann-Whitney U-test. Others to come.
+In this module, we put different scoring algorithms. For example, the DSCI scorer--which uses the Mann-Whitney U-test--is encapsulated in the `DSCI` class. All classes in this module must inherit the base `Scorer` class and override the `evaluate method`. Note that the `Scorer` class is instantiated with a `DataPoint` object, algorithm name (e.g., EternaFold), and an optional parameter called `evaluate_immediately`. The `evaluate_immediately` parameter defaults to `True` and is used to indicate if the user wants the secondary structure prediction to be scored as soon as the `Scorer` object is instantiated. In other words, when `evaluate_immediately` is `True`, the `evaluate` method will be called at the end of the `__init__` method. If not, the user will have to manually call the `evaluate` method on the `Scorer` object.
 
 ### `predictors`
 

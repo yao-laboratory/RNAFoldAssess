@@ -1,14 +1,11 @@
 from scipy.stats import mannwhitneyu
 
+from .scorer import Scorer
 
-class Evaluator:
-    def __init__(self, data_point, secondary_structure, algorithm, evaluate_immediately=True):
-        self.data_point = data_point
-        self.secondary_structure = secondary_structure
-        self.algorithm = algorithm
-        if evaluate_immediately:
-            self.evaluate()
 
+# This scorer is called the DSCI method and uses the Man-Whitney U-Test
+
+class DSCI(Scorer):
     def evaluate(self):
         if len(self.data_point.sequence) != len(self.secondary_structure):
             print("Sequence length and secondary structure length don't match")
@@ -38,3 +35,4 @@ class Evaluator:
             "p": self.p_value,
             "algorithm": self.algorithm
         }
+

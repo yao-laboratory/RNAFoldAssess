@@ -1,6 +1,7 @@
 import path, os
 
-from RNAFoldAssess.models import MXFold, DataPoint, Evaluator
+from RNAFoldAssess.models import MXFold, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestMXFold:
@@ -14,8 +15,8 @@ class TestMXFold:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'MXFold')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'MXFold')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
         # clean up
         os.remove("seq_5865.fasta")

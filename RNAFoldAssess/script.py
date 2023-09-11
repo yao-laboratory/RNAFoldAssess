@@ -1,3 +1,6 @@
+# Old and obsolete, delete later
+
+
 import path
 
 from models import *

@@ -1,6 +1,7 @@
 import os
 
-from RNAFoldAssess.models import RNAStructure, DataPoint, Evaluator
+from RNAFoldAssess.models import RNAStructure, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestRNAStructure:
@@ -14,8 +15,8 @@ class TestRNAStructure:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path, "some_output.ct")
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'RNAStructure')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'RNAStructure')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
         # clean up
         os.remove("seq_5865.fasta")

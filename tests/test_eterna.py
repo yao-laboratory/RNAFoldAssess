@@ -1,6 +1,7 @@
 import path
 
-from RNAFoldAssess.models import Eterna, DataPoint, Evaluator
+from RNAFoldAssess.models import Eterna, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestEterna:
@@ -14,6 +15,6 @@ class TestEterna:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'EternaFold')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'EternaFold')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)

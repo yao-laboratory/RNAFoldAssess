@@ -1,6 +1,7 @@
 import path, os
 
-from RNAFoldAssess.models import SPOT_RNA, DataPoint, Evaluator
+from RNAFoldAssess.models import SPOT_RNA, DataPoint
+from RNAFoldAssess.models import DSCI
 
 
 class TestSPOT_RNA:
@@ -14,7 +15,7 @@ class TestSPOT_RNA:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        evaluation = Evaluator(self.datum, self.model.get_ss_prediction(), 'SPOT-RNA')
-        metrics = evaluation.metrics
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'SPOT-RNA')
+        metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.5) # This one's not super accurate
 
