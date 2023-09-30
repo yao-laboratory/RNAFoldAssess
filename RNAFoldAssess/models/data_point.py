@@ -2,7 +2,7 @@ import os, json, heapq
 
 
 class DataPoint:
-    def __init__(self, data_hash, cohort=None):
+    def __init__(self, data_hash, cohort=None, normalize_reactivities_on_init=False):
         self.name = data_hash["name"]
         if cohort:
             self.name = f"{cohort}_{self.name}"
@@ -10,7 +10,8 @@ class DataPoint:
         self.reactivities = data_hash["data"]
         self.reads = data_hash["reads"]
         self.cohort = cohort
-        self.__normalize_reactivities()
+        if normalize_reactivities_on_init:
+            self.__normalize_reactivities()
 
     def to_seq_file(self):
         # .seq files are required for EternaFold
@@ -29,6 +30,9 @@ class DataPoint:
         self.path = os.path.abspath(f"{self.name}.fasta")
         return self.path
 
+    def to_fasta_string(self):
+        return f">{self.name} en=0.00\n{self.sequence}\n"
+
     def to_constraint_file(self, destination_dir=None):
         # For the RNA Structure folding algorithm
         file_name = f"{self.name}_struc_constraint.txt"
@@ -46,6 +50,15 @@ class DataPoint:
 
     def __str__(self):
         return f"{self.name}, {self.sequence}, {self.reactivities}"
+
+    @staticmethod
+    def write_large_fasta_file(path, cohort, name_suffix):
+        file_name = f"{cohort}_{name_suffix}.fa"
+        data_points = DataPoint.factory(path, cohort)
+        f = open(file_name, "w")
+        for dp in data_points:
+            f.write(dp.to_fasta_string())
+        f.close()
 
     @staticmethod
     def factory(path, name_prefix=None):
