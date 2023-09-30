@@ -36,3 +36,5 @@ class DSCI(Scorer):
             "algorithm": self.algorithm
         }
 
+    def report(self):
+        return f"{self.data_point_name}, {self.accuracy}, {self.p_value}"
