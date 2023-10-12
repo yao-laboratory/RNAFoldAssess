@@ -19,7 +19,7 @@ Once more prediction algoirthms are identified and support for their functionali
 
 This explains the different code files and will grow as time goes
 
-![image](https://github.com/yao-laboratory/RNAFoldAssess/assets/47164199/a999b571-f268-47ba-9685-8df638b76ce3)
+![image](https://github.com/yao-laboratory/RNAFoldAssess/assets/47164199/4df2c90d-6085-4dfe-a296-0d0d54439d08)
 
 ## `models`
 
