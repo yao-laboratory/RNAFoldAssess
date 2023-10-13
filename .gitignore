@@ -1,3 +1,5 @@
 __pycache__
 *output/
 data/*
+build/*
+*egg-info
