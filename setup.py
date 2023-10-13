@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 setup(
     name = 'RNAFoldAssess',
     version = '0.1',
-    description = 'Training repository for RNA folding',
+    description = 'Benchmarking repository for RNA folding',
     long_description = LONG_DESCRIPTION,
     long_description_content_type = 'text/markdown',
     license = 'MIT',
@@ -21,7 +21,14 @@ setup(
     python_requires = '>=3.9',
     install_requires = [
         'scipy',
-        'biopython'],
-    packages = ['RNAFoldAssess']
+        'biopython'
+    ],
+    packages=[
+        'RNAFoldAssess',
+        'RNAFoldAssess.utils',
+        'RNAFoldAssess.models',
+        'RNAFoldAssess.models.predictors',
+        'RNAFoldAssess.models.scorers'
+    ]
 )
 
