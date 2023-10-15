@@ -65,6 +65,41 @@ class TestBasePairScorer:
         ]
         assert(parsed == expected_positives)
 
+    def test_acceptable_locations1(self):
+        structure = ".(.)..(..(.)..).."
+        scorer = BasePairScorer(structure, structure)
+        expected_locations = [
+            (1, 3),
+            (6, 14),
+            (9, 11)
+        ]
+        assert(scorer.acceptable_locations == expected_locations)
+
+    def test_acceptable_locations2(self):
+        structure = ".(.)..(..(.)..).."
+        scorer = BasePairScorer(structure, structure, bp_lenience=1)
+        expected_locations = [
+            (1, 3), # Actual location
+            (0, 3),
+            (1, 2),
+            (2, 3),
+            (1, 4),
+
+            (6, 14), # Actual location
+            (5, 14),
+            (6, 13),
+            (7, 14),
+            (6, 15),
+
+            (9, 11), # Actual location
+            (8, 11),
+            (9, 10),
+            (10, 11),
+            (9, 12)
+        ]
+        for loc in scorer.acceptable_locations:
+            assert(loc in expected_locations)
+
     def test_with_no_lenience(self):
         scorer = BasePairScorer(self.real, self.predicted)
         scorer.evaluate()
