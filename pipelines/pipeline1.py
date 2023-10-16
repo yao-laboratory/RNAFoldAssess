@@ -108,11 +108,20 @@ scores = []
 predictor = predictors[0]
 for dp in dps:
     input_file_path = dp.to_fasta_file()
-    print(f"INPUT: {input_file_path}")
     predictor["model"].execute(predictor["path"], input_file_path, remove_file_when_done=True)
     prediction = predictor['model'].get_ss_prediction()
     scorer = DSCI(dp, prediction, "SPOT-RNA")
     scores.append(scorer.metrics)
+
+# Run Eterna prediction
+predictor = predictors[1]
+for dp in dps:
+    input_file_path = dp.to_seq_file()
+    predictor["model"].execute(predictor["path"], input_file_path)
+    prediction = predictor["model"].get_ss_prediction()
+    scorer = DSCI(dp, prediction, "Eterna")
+    scores.append(scorer.metrics)
+
 
 print("\nPrinting scores\n")
 for s in scores:
