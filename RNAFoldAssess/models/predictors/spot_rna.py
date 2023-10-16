@@ -5,7 +5,7 @@ class SPOT_RNA:
     def __init__(self, conda_env_name="spot"):
         self.output = ""
         # self.ct2db_path_string = "../ViennaRNA-2.6.2/src/Utils/ct2db"
-        self.ct2db_path_string = "../ViennaRNA/src/Utils/ct2db"
+        self.ct2db_path_string = "/home/yesselmanlab/ewhiting/ViennaRNA/src/Utils/ct2db"
         self.conda_env_name = conda_env_name
 
     def execute(self, spot_rna_path, fasta_file, remove_file_when_done=False):
