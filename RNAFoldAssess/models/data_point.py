@@ -15,10 +15,11 @@ class DataPoint:
 
     def to_seq_file(self):
         # .seq files are required for EternaFold
-        f = open(f"{self.name}.seq", "w")
+        name = self.name.replace(" ", "_")
+        f = open(f"{name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.path = os.path.abspath(f"{self.name}.seq")
+        self.path = os.path.abspath(f"{name}.seq")
         return self.path
 
     def to_fasta_file(self):
