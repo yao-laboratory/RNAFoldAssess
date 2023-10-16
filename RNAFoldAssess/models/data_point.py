@@ -23,11 +23,12 @@ class DataPoint:
 
     def to_fasta_file(self):
         # .fasta files are required for SPOT-RNA
-        data = f">{self.name}\n{self.sequence}"
-        f = open(f"{self.name}.fasta", "w")
+        name = self.name.replace(" ", "_")
+        data = f">{name}\n{self.sequence}"
+        f = open(f"{name}.fasta", "w")
         f.write(data)
         f.close()
-        self.path = os.path.abspath(f"{self.name}.fasta")
+        self.path = os.path.abspath(f"{name}.fasta")
         return self.path
 
     def to_fasta_string(self):
