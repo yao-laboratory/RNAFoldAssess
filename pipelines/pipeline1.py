@@ -100,6 +100,12 @@ predictors.append({
     "path": path.Path("/home/yesselmanlab/ewhiting/EternaFold").abspath()
 })
 
+predictors.append({
+    "name": "MXFold",
+    "model": MXFold(),
+    "path": path.Path("/home/yesselmanlab/ewhiting/mxfold/build/mxfold").abspath()
+})
+
 # Run predictions
 predictions = []
 scores = []
@@ -122,6 +128,14 @@ for dp in dps:
     scorer = DSCI(dp, prediction, "Eterna")
     scores.append(scorer.metrics)
 
+# Run MXFold prediction
+predictor = predictors[2]
+for dp in dps:
+    input_file_path = dp.to_fasta_file()
+    predictor["model"].execute(predictor["path"], input_file_path)
+    prediction = predictor['model'].get_ss_prediction()
+    scorer = DSCI(dp, prediction, "MXFold")
+    scores.append(scorer.metrics)
 
 print("\nPrinting scores\n")
 for s in scores:
