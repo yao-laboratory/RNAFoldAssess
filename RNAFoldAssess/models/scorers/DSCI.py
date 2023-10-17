@@ -6,7 +6,7 @@ from .scorer import Scorer
 # This scorer is called the DSCI method and uses the Man-Whitney U-Test
 
 class DSCI(Scorer):
-    def evaluate(self):
+    def evaluate(self, precision=4):
         if len(self.data_point.sequence) != len(self.secondary_structure):
             print("Sequence length and secondary structure length don't match")
             return False
@@ -31,8 +31,8 @@ class DSCI(Scorer):
         self.p_value = metrics[1]
         self.metrics = {
             "data_point_name": self.data_point.name,
-            "accuracy": self.accuracy,
-            "p": self.p_value,
+            "accuracy": round(self.accuracy, precision),
+            "p": round(self.p_value, precision),
             "algorithm": self.algorithm
         }
 
