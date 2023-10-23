@@ -41,15 +41,28 @@ class TestDSCI:
 
     def test_perfect_prediction(self):
         prediction = ".(.)............"
-        scorer = DSCI(self.datum, prediction, "mock algo")
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
         assert(scorer.accuracy == 1.0)
         assert(scorer.p_value < 0.002)
         assert("DataPointMock" in scorer.report())
 
     def test_bad_prediction(self):
         prediction = "(.).()()()()()()"
-        scorer = DSCI(self.datum, prediction, "mock algo")
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
         assert(scorer.accuracy == 0.0)
+
+    def test_manual_entry(self):
+        # Want to make sure the static method
+        # and instance methodbehave identically
+        prediction = ".(.)............"
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
+        static_scorer = DSCI.score(
+            self.datum.sequence,
+            prediction,
+            self.datum.reactivities
+        )
+        assert(scorer.accuracy == static_scorer["accuracy"])
+        assert(scorer.p_value == static_scorer["p"])
 
 
 class TestBasePairScorer:
