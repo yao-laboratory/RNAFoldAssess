@@ -3,7 +3,11 @@
 
 
 class Scorer:
-    def __init__(self, data_point, secondary_structure, algorithm, evaluate_immediately=True):
+    def __init__(self,
+                 data_point=None,
+                 secondary_structure=None,
+                 algorithm=None,
+                 evaluate_immediately=False):
         self.data_point = data_point
         self.secondary_structure = secondary_structure
         self.algorithm = algorithm
