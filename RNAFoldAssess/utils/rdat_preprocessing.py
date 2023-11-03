@@ -20,6 +20,18 @@ class RDATPreprocessing:
 
 
 
+def parse_file(path):
+    f = open(path)
+    data = f.readlines()
+    f.close()
+    annotation = ""
+    for d in data:
+        if d.startswith("ANNOTATION"):
+            annotation = d
+            break
+    annotation = annotation.split()
+
+
 
 # # Test
 # path = "../../data/MTTR15_DMS_0001.rdat"
@@ -31,3 +43,5 @@ class RDATPreprocessing:
 
 # rdat_root = "/common/yesselmanlab/ewhiting/data/rmdb_data/good_rdats"
 # file_of_rdats = f"{rdat_root}/rdats_with_dms.txt"
+
+
