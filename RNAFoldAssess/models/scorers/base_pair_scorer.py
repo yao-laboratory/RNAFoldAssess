@@ -1,7 +1,7 @@
 from .scorer import Scorer
 
 
-class BasePairScorer:
+class BasePairScorer(Scorer):
     def __init__(self, true_structure, predicted_structure, bp_lenience=0):
         self.true_structure = true_structure
         self.predicted_structure = predicted_structure

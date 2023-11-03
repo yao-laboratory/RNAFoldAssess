@@ -3,18 +3,8 @@
 
 
 class Scorer:
-    def __init__(self,
-                 data_point=None,
-                 secondary_structure=None,
-                 algorithm=None,
-                 evaluate_immediately=False,
-                 **kwargs):
-        self.data_point = data_point
-        self.secondary_structure = secondary_structure
-        self.algorithm = algorithm
-        self.metrics = {}
-        if evaluate_immediately:
-            self.evaluate()
+    def __init__(self, *args, **kwargs):
+        pass
 
     def evaluate(self):
         # Override this method to apply the scoring technique you are writing.
