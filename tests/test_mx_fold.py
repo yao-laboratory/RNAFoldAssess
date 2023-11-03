@@ -18,5 +18,3 @@ class TestMXFold:
         scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'MXFold', evaluate_immediately=True, DMS=True)
         metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
-        # clean up
-        os.remove("seq_5865.fasta")
