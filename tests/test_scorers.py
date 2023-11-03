@@ -1,6 +1,6 @@
 import pytest
 
-from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer
+from RNAFoldAssess.models import Scorer, DSCI, DSCIException, DataPoint, BasePairScorer
 
 class TestBaseClass:
     scorer = Scorer(
@@ -23,7 +23,6 @@ class TestBaseClass:
 
 class TestDSCI:
     # Testing with C009C
-    base_data_path = "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data"
     datum = DataPoint(
         {
             "name": "DataPointMock",
@@ -39,27 +38,83 @@ class TestDSCI:
         }
     )
 
+    def test_raise_exception(self):
+        with pytest.raises(DSCIException) as e_info:
+            DSCI(self.datum, ".(.)............", "mock algo", evaluate_immediately=True)
+        assert(str(e_info.value) == "Please specify if reactivity data is DMS or SHAPE")
+
+    # DMS based tests
     def test_perfect_prediction(self):
         prediction = ".(.)............"
-        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
         assert(scorer.accuracy == 1.0)
         assert(scorer.p_value < 0.002)
         assert("DataPointMock" in scorer.report())
 
     def test_bad_prediction(self):
         prediction = "(.).()()()()()()"
-        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
         assert(scorer.accuracy == 0.0)
 
     def test_manual_entry(self):
         # Want to make sure the static method
         # and instance methodbehave identically
         prediction = ".(.)............"
-        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True)
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
         static_scorer = DSCI.score(
             self.datum.sequence,
             prediction,
-            self.datum.reactivities
+            self.datum.reactivities,
+            DMS=True
+        )
+        assert(scorer.accuracy == static_scorer["accuracy"])
+        assert(scorer.p_value == static_scorer["p"])
+
+    # SHAPE based tests
+    def test_paired_unpaired_retriever(self):
+        seq = "UUCCAAGCUCUG"
+        ss  = "..(...)....."
+        reactivities = [
+            0.0, 0.0, 0.9,
+            0.0, 0.0, 0.0,
+            0.9, 0.0, 0.0,
+            0.0, 0.0, 0.0
+        ]
+        DMS_expected_paired = [0.9]
+        DMS_expected_unpaired = [0.0, 0.0, 0.0, 0.0, 0.0]
+        SHAPE_expected_paired = [0.9, 0.9]
+        SHAPE_expected_unpaired = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        d_p, d_up = DSCI.get_paired_and_unpaired_nucleotides(seq, ss, reactivities, "DMS")
+        assert(d_p == DMS_expected_paired)
+        assert(d_up == DMS_expected_unpaired)
+
+        s_p, s_up = DSCI.get_paired_and_unpaired_nucleotides(seq, ss, reactivities, "SHAPE")
+        assert(s_p == SHAPE_expected_paired)
+        assert(s_up == SHAPE_expected_unpaired)
+
+    def test_perfect_prediction_SHAPE(self):
+        prediction = ".(.)............"
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, SHAPE=True)
+        assert(scorer.accuracy == 1.0)
+        assert(scorer.p_value < 0.002)
+        assert("DataPointMock" in scorer.report())
+
+    def test_bad_prediction_SHAPE(self):
+        prediction = "(.).()()()()()()"
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, SHAPE=True)
+        assert(scorer.accuracy == 0.0)
+
+    def test_manual_entry_SHAPE(self):
+        # Want to make sure the static method
+        # and instance methodbehave identically
+        prediction = ".(.)............"
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, SHAPE=True)
+        static_scorer = DSCI.score(
+            self.datum.sequence,
+            prediction,
+            self.datum.reactivities,
+            SHAPE=True
         )
         assert(scorer.accuracy == static_scorer["accuracy"])
         assert(scorer.p_value == static_scorer["p"])

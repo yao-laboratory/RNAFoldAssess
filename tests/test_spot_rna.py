@@ -15,7 +15,7 @@ class TestSPOT_RNA:
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'SPOT-RNA', evaluate_immediately=True)
+        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'SPOT-RNA', evaluate_immediately=True, DMS=True)
         metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.5) # This one's not super accurate
 

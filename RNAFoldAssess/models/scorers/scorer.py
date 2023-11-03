@@ -7,7 +7,8 @@ class Scorer:
                  data_point=None,
                  secondary_structure=None,
                  algorithm=None,
-                 evaluate_immediately=False):
+                 evaluate_immediately=False,
+                 **kwargs):
         self.data_point = data_point
         self.secondary_structure = secondary_structure
         self.algorithm = algorithm
