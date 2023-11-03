@@ -38,6 +38,12 @@ class PDBTools:
         for d in data:
             PDBTools.get_file(d["identifier"], destination_dir)
 
+    @staticmethod
+    def get_molecule_from_ebi(pdb_id):
+        url = f'https://www.ebi.ac.uk/pdbe/api/pdb/entry/molecules/{pdb_id}'
+        data = requests.get(url).json()[pdb_id.lower()]
+        return data
+
 
     @staticmethod
     def get_canonical_pdb_ids(input_file_path):
