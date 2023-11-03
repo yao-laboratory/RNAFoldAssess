@@ -116,7 +116,7 @@ for dp in dps:
     input_file_path = dp.to_fasta_file()
     predictor["model"].execute(predictor["path"], input_file_path, remove_file_when_done=True)
     prediction = predictor['model'].get_ss_prediction()
-    scorer = DSCI(dp, prediction, "SPOT-RNA")
+    scorer = DSCI(dp, prediction, "SPOT-RNA", evaluate_immediately=True, DMS=True)
     scores.append(scorer.metrics)
 
 # Run Eterna prediction
@@ -125,7 +125,7 @@ for dp in dps:
     input_file_path = dp.to_seq_file()
     predictor["model"].execute(predictor["path"], input_file_path)
     prediction = predictor["model"].get_ss_prediction()
-    scorer = DSCI(dp, prediction, "Eterna")
+    scorer = DSCI(dp, prediction, "Eterna", evaluate_immediately=True, DMS=True)
     scores.append(scorer.metrics)
 
 # Run MXFold prediction
@@ -134,7 +134,7 @@ for dp in dps:
     input_file_path = dp.to_fasta_file()
     predictor["model"].execute(predictor["path"], input_file_path)
     prediction = predictor['model'].get_ss_prediction()
-    scorer = DSCI(dp, prediction, "MXFold")
+    scorer = DSCI(dp, prediction, "MXFold", evaluate_immediately=True, DMS=True)
     scores.append(scorer.metrics)
 
 print("\nPrinting scores\n")
