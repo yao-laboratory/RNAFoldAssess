@@ -5,7 +5,7 @@ from .scorer import Scorer
 
 # This scorer is called the DSCI method and uses the Mann-Whitney U-Test
 
-class DSCI:
+class DSCI(Scorer):
     def __init__(self,
                  data_point=None,
                  secondary_structure=None,
