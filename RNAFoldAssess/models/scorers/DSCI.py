@@ -28,12 +28,10 @@ class DSCI(Scorer):
             raise DSCIException("Please specify if reactivity data is DMS or SHAPE")
 
         if len(sequence) != len(secondary_structure):
-            print("Sequence length and secondary structure length don't match")
-            return False
+            raise DSCIException(f"Sequence length ({len(sequence)}) and secondary structure length ({len(secondary_structure)}) don't match.")
 
         if len(reactivities) != len(secondary_structure):
-            print("Reactivities length and secondary structure length don't match")
-            return False
+            raise DSCIException(f"Reactivities length ({len(reactivities)}) and secondary structure length ({len(secondary_structure)}) don't match.")
 
         experiment_type = "DMS" if DMS else "SHAPE"
         paired, unpaired = DSCI.get_paired_and_unpaired_nucleotides(
@@ -43,13 +41,18 @@ class DSCI(Scorer):
             experiment_type
         )
 
-        result = mannwhitneyu(unpaired, paired, alternative="greater")
-        denominator = len(paired) * len(unpaired)
-        metrics = (result.statistic / denominator, result.pvalue)
-        return {
-            "accuracy": metrics[0],
-            "p": metrics[1]
-        }
+        try:
+            result = mannwhitneyu(unpaired, paired, alternative="greater")
+            denominator = len(paired) * len(unpaired)
+            metrics = (result.statistic / denominator, result.pvalue)
+            return {
+                "accuracy": metrics[0],
+                "p": metrics[1]
+            }
+        except TypeError as e:
+            raise DSCITypeError(f"TypeError failure reading sequence {sequence}: {str(e)}")
+        except ValueError as e:
+            raise DSCIValueError(f"ValueError failure reading sequence {sequence}: {str(e)}")
 
     @staticmethod
     def get_paired_and_unpaired_nucleotides(sequence, secondary_structure, reactivities, experiment_type):
@@ -93,4 +96,10 @@ class DSCI(Scorer):
 
 
 class DSCIException(Exception):
+    pass
+
+class DSCITypeError(Exception):
+    pass
+
+class DSCIValueError(Exception):
     pass
