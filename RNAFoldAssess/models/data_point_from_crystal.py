@@ -1,5 +1,7 @@
 import os
 
+from Bio.PDB import *
+
 class DataPointFromCrystal:
     def __init__(self, name, sequence, true_structure, pdb_id=None, experiment_type=None, predicted_structure=None):
         self.name = name
@@ -28,6 +30,18 @@ class DataPointFromCrystal:
 
     def to_fasta_string(self):
         return f">{self.name} en=0.00\n{self.sequence}\n"
+
+    def get_experiment_type(self, pdb_id=None):
+        if not self.pdb_id:
+            self.pdb_id = pdb_id
+        if not self.pdb_id:
+            raise Exception("Cannot get experiment type without PDB ID. Please supply one to this method or set the object's `pdb_id` attribute.")
+        parser = PDBParser()
+        file_path = f"/common/yesselmanlab/ewhiting/data/crystal1_XRAY/{self.pdb_id.upper()}.pdb"
+        structure = parser.get_structure(self.name, file_path)
+        method = structure.header["structure_method"]
+        self.experiment_type = method
+        return method
 
     @staticmethod
     def factory(path):
