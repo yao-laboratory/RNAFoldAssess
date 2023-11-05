@@ -1,6 +1,7 @@
 import pytest
 
-from RNAFoldAssess.models import Scorer, DSCI, DSCIException, DataPoint, BasePairScorer
+from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer
+from RNAFoldAssess.models import DSCIException, DSCITypeError, DSCIValueError
 
 class TestBaseClass:
     scorer = Scorer(
@@ -38,10 +39,26 @@ class TestDSCI:
         }
     )
 
-    def test_raise_exception(self):
+    def test_raise_experiment_exception(self):
         with pytest.raises(DSCIException) as e_info:
             DSCI(self.datum, ".(.)............", "mock algo", evaluate_immediately=True)
         assert(str(e_info.value) == "Please specify if reactivity data is DMS or SHAPE")
+
+    def test_raise_sequence_length_exception(self):
+        with pytest.raises(DSCIException) as e_info:
+            DSCI.score("GCGACGUGU", "..(...)..", [1,2,3,4,5,6], DMS=True)
+        assert(str(e_info.value) == "Reactivities length (6) and secondary structure length (9) don't match.")
+
+    def test_raise_sequence_length_exception(self):
+        with pytest.raises(DSCIException) as e_info:
+            DSCI.score("ACGUGU", "..(...)..", [1,2,3,4,5,6], DMS=True)
+        assert(str(e_info.value) == "Sequence length (6) and secondary structure length (9) don't match.")
+
+    def test_raise_u_test_exception(self):
+        reactivities = [0.001, 0.001, 0.001, 0.010]
+        with pytest.raises(DSCIValueError) as e_info:
+            DSCI.score("ACGU", "....", reactivities, DMS=True)
+        assert(str(e_info) == "<ExceptionInfo DSCIValueError('ValueError failure reading sequence ACGU: `x` and `y` must be of nonzero size.') tblen=2>")
 
     # DMS based tests
     def test_perfect_prediction(self):
