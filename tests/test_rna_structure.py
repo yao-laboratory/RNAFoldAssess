@@ -12,7 +12,8 @@ class TestRNAStructure:
     model_path = "/util/opt/anaconda/deployed-conda-envs/packages/rnastructure/envs/rnastructure-6.1/bin/Fold"
     # HCC Swan housekeeping:
     os.system("module load rnastructure")
-    os.system("export DATAPATH=/util/opt/anaconda/deployed-conda-envs/packages/rnastructure/envs/rnastructure-6.1/share/rnastructure/data_tables")
+    datapath = "/util/opt/anaconda/deployed-conda-envs/packages/rnastructure/envs/rnastructure-6.1/share/rnastructure/data_tables"
+    os.environ["DATAPATH"] = datapath
 
     def test_prediction(self):
         input_file_path = self.datum.to_fasta_file()

@@ -11,6 +11,8 @@ class TestContextFold:
     input_file_path = datum.sequence # Not actually a file but keeping it for consistency
     model = ContextFold()
     model_path = path.Path("/home/yesselmanlab/ewhiting/ContextFold_1_00").abspath()
+    # HCC Housekeeping
+    os.system("module load java")
 
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
