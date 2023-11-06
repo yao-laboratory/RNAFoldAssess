@@ -46,7 +46,8 @@ def write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_valu
     about_data += f"Shortest sequence: {min_len}\n"
     about_data += f"Most common sequence length: {mode_len}\n"
 
-    about_data += f"\nSkipped {skipped_count} molecules due to exceptions\n"
+    about_data += f"\nData points evaluated: {len(accuracies)}\n"
+    about_data += f"Skipped {skipped_count} molecules due to exceptions\n"
 
     about_data += f"\nMXFold Performance:\n"
     about_data += f"Average DSCI accuracy score: {round(avg_acc, 4)}\n"
