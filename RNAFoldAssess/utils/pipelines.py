@@ -5,22 +5,18 @@ from RNAFoldAssess.models import DataPoint
 headers = "algo_name, datapoint_name, accuracy, p_value, ground_truth_data_type"
 
 
-def get_data_point_list_from_directory(path, limit=0):
-    files = os.listdir(path)
+def get_data_point_list_from_directory(dp_path):
+    data_point_files = os.listdir(dp_path)
+    print(f"Loading data points from {len(data_point_files)} files ...")
+
     data_points = []
-    for f in files:
-        fdata = f.split(".")
-        # Only support JSON data
-        if fdata[-1] != "json":
-            continue
-        cohort = fdata[0]
-        dps = get_data_point_list_from_file(f"{path}/{f}", cohort)
+    for dpf in data_point_files:
+        cohort = dpf.split(".")[0]
+        print(f"Loading data points from {cohort} cohort")
+        dps = DataPoint.factory(f"{dp_path}/{dpf}", cohort)
         for dp in dps:
             data_points.append(dp)
-    if limit > 0:
-        dps = dps[0:limit]
-    return dps
-
+    return data_points
 
 
 def get_data_point_list_from_file(path, cohort=""):
@@ -56,7 +52,7 @@ def write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_valu
     about_data += f"Average DSCI accuracy score: {round(avg_acc, 4)}\n"
     about_data += f"Average DSCI p-vale score: {avg_p}\n"
     about_data += f"Mode accuracy: {mode_acc}\n"
-    about_data += f"Number of DSCI 1.0 scores: {one_point_oh_accuracies}\n"
+    about_data += f"Number of DSCI 1.0 scores: {perfects}\n"
     about_data += f"Lowest DSCI accruracy score: {lowest_acc[1]} on {lowest_acc[0]}\n"
     about_data += f"Highest DSCI p-value score: {highest_p[1]} on {highest_p[0]}\n"
 
