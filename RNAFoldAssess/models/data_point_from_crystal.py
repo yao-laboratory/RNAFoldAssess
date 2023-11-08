@@ -1,11 +1,18 @@
-import os
+import os, requests
 
 from Bio.PDB import *
 
 class DataPointFromCrystal:
-    def __init__(self, name, sequence, true_structure, pdb_id=None, experiment_type=None, predicted_structure=None):
+    def __init__(self,
+                 name,
+                 sequence,
+                 true_structure,
+                 pdb_id=None,
+                 experiment_type=None,
+                 predicted_structure=None,
+                 capitalize_sequence=True):
         self.name = name
-        self.sequence = sequence
+        self.sequence = sequence.upper() if capitalize_sequence else sequence
         self.true_structure = true_structure
         self.pdb_id = pdb_id
         self.experiment_type = experiment_type
@@ -36,12 +43,13 @@ class DataPointFromCrystal:
             self.pdb_id = pdb_id
         if not self.pdb_id:
             raise Exception("Cannot get experiment type without PDB ID. Please supply one to this method or set the object's `pdb_id` attribute.")
-        parser = PDBParser()
-        file_path = f"/common/yesselmanlab/ewhiting/data/crystal1_XRAY/{self.pdb_id.upper()}.pdb"
-        structure = parser.get_structure(self.name, file_path)
-        method = structure.header["structure_method"]
-        self.experiment_type = method
-        return method
+        # https://files.rcsb.org/header/{self.pdb_id}.pdb
+        pdb_header = os.popen(f"curl https://files.rcsb.org/header/{self.pdb_id}.pdb").read()
+        spl = pdb_header.split()
+        for i, item in enumerate(spl):
+            if item == "EXPDTA":
+                self.experiment_type = spl[i+1]
+                return self.experiment_type
 
     @staticmethod
     def factory(path):
