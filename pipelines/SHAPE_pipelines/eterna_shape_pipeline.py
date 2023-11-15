@@ -5,10 +5,13 @@ from RNAFoldAssess.models import DataPoint
 from RNAFoldAssess.models.scorers import DSCI, DSCITypeError, DSCIValueError
 from RNAFoldAssess.models.predictors import *
 
-eterna = Eterna()
-eterna_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+model_name = "Eterna"
+data_type_name = "SHAPE"
 
-dp_path = "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data"
+model = Eterna()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+
+dp_path = "/common/yesselmanlab/ewhiting/data/SHAPE"
 data_point_files = os.listdir(dp_path)
 
 print(f"Loading data points from {len(data_point_files)} files ...")
@@ -25,12 +28,11 @@ dp_size = len(data_points)
 print(f"Total of {dp_size} data points")
 print("Data points loaded!")
 
-# For testing
-# data_points = data_points[17360:17380] # There's an error-prone data point in here
+report_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_pipeline_report.txt"
 
 print("Writing headers ...")
 headers = "algo_name, datapoint_name, accuracy, p_value, ground_truth_data_type"
-f = open("/common/yesselmanlab/ewhiting/reports/eterna_dms_pipeline_report.txt", "w")
+f = open(report_path, "w")
 f.write(f"{headers}\n")
 
 # For info on dataset later
@@ -50,14 +52,19 @@ for dp in data_points:
         print(f"Completed {counter} of {dp_size}")
     lengths.append(len(dp.sequence))
     input_file_path = dp.to_seq_file()
-    eterna.execute(eterna_path, input_file_path)
-    prediction = eterna.get_ss_prediction()
+    model.execute(model_path, input_file_path)
+    try:
+        prediction = model.get_ss_prediction()
+    except:
+        print(f"Exception in: {input_file_path}")
+        skipped_count += 1
+        continue
     try:
         score = DSCI.score(
             dp.sequence,
             prediction,
             dp.reactivities,
-            DMS=True
+            SHAPE=True
         )
         accuracy = round(score["accuracy"], 4)
         p = round(score["p"], 4)
@@ -74,7 +81,7 @@ for dp in data_points:
         if p > highest_p[1]:
             highest_p = [dp.name, p]
 
-        f.write(f"EternaFold, {dp.name}, {accuracy}, {p}, DMS\n")
+        f.write(f"{model_name}, {dp.name}, {accuracy}, {p}, {data_type_name}\n")
         counter += 1
     except (DSCITypeError, DSCIValueError) as dsci_error:
         skipped_count += 1
@@ -84,7 +91,7 @@ for dp in data_points:
 f.close()
 
 # about dataset
-f2 = open("/common/yesselmanlab/ewhiting/reports/about_pipeline_eterna_dms.txt", "w")
+f2 = open(f"/common/yesselmanlab/ewhiting/reports/about_pipeline_{model_name}_{data_type_name}.txt", "w")
 avg_seq_len = sum(lengths) / len(lengths)
 max_len = max(lengths)
 min_len = min(lengths)
@@ -95,7 +102,7 @@ mode_acc = max(set(accuracies), key=accuracies.count)
 avg_p   = sum(p_values) / len(p_values)
 
 about_data = ""
-about_data += f"About DMS Data from Yesselman Lab\n"
+about_data += f"About SHAPE Dataset\n"
 about_data += f"Average sequence length: {avg_seq_len}\n"
 about_data += f"Longest sequence: {max_len}\n"
 about_data += f"Shortest sequence: {min_len}\n"
@@ -103,7 +110,7 @@ about_data += f"Most common sequence length: {mode_len}\n"
 
 about_data += f"\nSkipped {skipped_count} molecules due to exceptions\n"
 
-about_data += f"EternaFold Performance:\n"
+about_data += f"{model_name} Performance:\n"
 about_data += f"Average DSCI accuracy score: {round(avg_acc, 4)}\n"
 about_data += f"Average DSCI p-vale score: {avg_p}\n"
 about_data += f"Mode accuracy: {mode_acc}\n"
@@ -116,4 +123,3 @@ about_data += f"Report generated on: {datetime.datetime.now()}\n\n"
 
 f2.write(about_data)
 f2.close()
-
