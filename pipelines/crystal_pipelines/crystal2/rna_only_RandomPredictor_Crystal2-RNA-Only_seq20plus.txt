@@ -1,0 +1,34 @@
+About Crystal2-RNA-Only dataset
+Datapoints evaluated: 273
+Longest sequence: 298
+Shortest sequence: 2
+Most common lenth length: 22
+Skipped 1 datapoints because they had no sequence
+Skipped 0 datapoints because they had no secondary structure
+
+About Evaluation
+------------------
+For 0 basepair lenience:
+    Average sensitivity: 0.8244
+    Highest sensitivity: 1.0
+    Lowest sensitivity: 0.0 on 5K8H
+    Average PPV: 0.8265
+    Highest PPV: 1.0
+    Lowest PPV: 0 on 5K8H
+    Average F1: 0.8217
+    Highest F1: 1.0
+    Lowest F1: 0 on 5K8H
+
+For 1 basepair lenience:
+    Average sensitivity: 0.8424
+    Highest sensitivity: 1.0
+    Lowest sensitivity: 0.0 on 5K8H
+    Average PPV: 0.8446
+    Highest PPV: 1.0
+    Lowest PPV: 0 on 5K8H
+    Average F1: 0.8397
+    Highest F1: 1.0
+    Lowest F1: 0 on 5K8H
+
+Report generated on: 2023-11-12 22:14:09.405329
+
