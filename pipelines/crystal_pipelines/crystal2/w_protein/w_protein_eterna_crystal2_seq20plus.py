@@ -4,12 +4,12 @@ from RNAFoldAssess.models import DataPointFromCrystal
 from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.models.scorers import *
 
-crystal_base = "/common/yesselmanlab/ewhiting/data/crystal1_XRAY/symmetric_structures.txt"
+crystal_base = "/common/yesselmanlab/ewhiting/data/crystal2/with_protein/structures/symmetric_structures.txt"
 
 dps = DataPointFromCrystal.factory(crystal_base)
-# for dp in dps:
-#     if len(dp.sequence) < 20:
-#         dps.remove(dp)
+for dp in dps:
+    if len(dp.sequence) < 20:
+        dps.remove(dp)
 
 # For testing
 # dps = dps[175:200]
@@ -17,12 +17,12 @@ dps = DataPointFromCrystal.factory(crystal_base)
 headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, F1, ground_truth_data_type"
 leniences = [0, 1]
 
-# EternaFold
+# MXFold
 model = Eterna()
 model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
 
 predictor_name = "EternaFold"
-data_type = "Crystal-XRAY"
+data_type = "Crystal2-RNA-With-Protein"
 
 lengths = []
 sensitivities = {}
@@ -40,23 +40,27 @@ for lenience in leniences:
     lowest_f1[f"{lenience}"] = [1.0, ""]
 
 
-# analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_seq20plus_report.txt"
-# pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_seq20plus.txt"
+analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/w_protein_{predictor_name}_{data_type}_seq20plus_report.txt"
+pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/w_protein_{predictor_name}_{data_type}_seq20plus.txt"
 
-analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_report.txt"
-pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}.txt"
+# analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/w_protein_{predictor_name}_{data_type}_report.txt"
+# pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/w_protein_{predictor_name}_{data_type}.txt"
 
 f = open(analysis_report_path, "w")
 f.write(f"{headers}\n")
 
 counter = 0
 skipped = 0
+ss_skipped = 0
 dp_size = len(dps)
 
 print("About to run evaluation")
 for dp in dps:
     if len(dp.sequence) == 0:
         skipped += 1
+        continue
+    if len(dp.true_structure) == 0:
+        ss_skipped += 1
         continue
     if counter % 125 == 0:
         print(f"Completed {counter} of {dp_size} data points and {len(leniences)} leniences")
@@ -65,7 +69,7 @@ for dp in dps:
     model.execute(model_path, input_file_path)
     prediction = model.get_ss_prediction()
     for lenience in leniences:
-        f.write(f"{predictor_name}, {dp.name}, {lenience}, ")
+        f.write(f"w_protein_{predictor_name}, {dp.name}, {lenience}, ")
         scorer = BasePairScorer(dp.true_structure, prediction, lenience)
         scorer.evaluate()
         s = scorer.sensitivity
@@ -101,6 +105,7 @@ about_data += f"Longest sequence: {max(lengths)}\n"
 about_data += f"Shortest sequence: {min(lengths)}\n"
 about_data += f"Most common lenth length: {max(set(lengths), key=lengths.count)}\n"
 about_data += f"Skipped {skipped} datapoints because they had no sequence\n"
+about_data += f"Skipped {ss_skipped} datapoints because they had no secondary structure\n"
 about_data += f"\n"
 about_data += f"About Evaluation\n"
 about_data += f"------------------\n"
