@@ -15,7 +15,27 @@ class DataPoint:
 
     def to_seq_file(self):
         # .seq files are required for EternaFold
+        # This string replacing is stupid but I'm doing it in a time crunch
         name = self.name.replace(" ", "_")
+        name = name.replace("/", "")
+        name = name.replace("'", "")
+        name = name.replace("(", "")
+        name = name.replace(")", "")
+        name = name.replace("[", "")
+        name = name.replace("]", "")
+        name = name.replace("{", "")
+        name = name.replace("}", "")
+        name = name.replace("<", "")
+        name = name.replace(">", "")
+        name = name.replace(";", "")
+        name = name.replace(",", "")
+        name = name.replace("|", "")
+        name = name.replace("`", "")
+        name = name.replace('"', "")
+        name = name.replace("$", "S")
+        name = name.replace("&", "and")
+        if len(name) > 200:
+            name = name[0:200]
         f = open(f"{name}.seq", "w")
         f.write(self.sequence)
         f.close()
@@ -24,7 +44,27 @@ class DataPoint:
 
     def to_fasta_file(self):
         # .fasta files are required for SPOT-RNA
+        # This string replacing is stupid but I'm doing it in a time crunch
         name = self.name.replace(" ", "_")
+        name = name.replace("/", "")
+        name = name.replace("'", "")
+        name = name.replace("(", "")
+        name = name.replace(")", "")
+        name = name.replace("[", "")
+        name = name.replace("]", "")
+        name = name.replace("{", "")
+        name = name.replace("}", "")
+        name = name.replace("<", "")
+        name = name.replace(">", "")
+        name = name.replace(";", "")
+        name = name.replace(",", "")
+        name = name.replace("|", "")
+        name = name.replace("`", "")
+        name = name.replace('"', "")
+        name = name.replace("$", "S")
+        name = name.replace("&", "and")
+        if len(name) > 200:
+            name = name[0:200]
         data = f">{name}\n{self.sequence}"
         f = open(f"{name}.fasta", "w")
         f.write(data)
@@ -37,7 +77,28 @@ class DataPoint:
 
     def to_constraint_file(self, destination_dir=None):
         # For the RNA Structure folding algorithm
-        file_name = f"{self.name}_struc_constraint.txt"
+        # This string replacing is stupid but I'm doing it in a time crunch
+        name = self.name.replace(" ", "_")
+        name = name.replace("/", "")
+        name = name.replace("'", "")
+        name = name.replace("(", "")
+        name = name.replace(")", "")
+        name = name.replace("[", "")
+        name = name.replace("]", "")
+        name = name.replace("{", "")
+        name = name.replace("}", "")
+        name = name.replace("<", "")
+        name = name.replace(">", "")
+        name = name.replace(";", "")
+        name = name.replace(",", "")
+        name = name.replace("|", "")
+        name = name.replace("`", "")
+        name = name.replace('"', "")
+        name = name.replace("$", "S")
+        name = name.replace("&", "and")
+        if len(name) > 200:
+            name = name[0:200]
+        file_name = f"{name}_struc_constraint.txt"
         if not destination_dir:
             destination_dir = "."
         file_path = f"{destination_dir}/{file_name}"

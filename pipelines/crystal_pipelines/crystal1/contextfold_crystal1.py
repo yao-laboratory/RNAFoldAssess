@@ -17,7 +17,7 @@ dps = DataPointFromCrystal.factory(crystal_base)
 headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, F1, ground_truth_data_type"
 leniences = [0, 1]
 
-# MXFold
+# ContextFold
 model = ContextFold()
 model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
 
@@ -55,15 +55,20 @@ dp_size = len(dps)
 
 print("About to run evaluation")
 for dp in dps:
-    if len(dp.sequence) == 0:
+    if len(dp.sequence) <= 3:
+        # Can't do less than 3
         skipped += 1
         continue
     if counter % 125 == 0:
         print(f"Completed {counter} of {dp_size} data points and {len(leniences)} leniences")
     lengths.append(len(dp.sequence))
-    input_file_path = dp.to_fasta_file()
-    model.execute(model_path, input_file_path)
-    prediction = model.get_ss_prediction()
+    model.execute(model_path, dp.sequence)
+    try:
+        prediction = model.get_ss_prediction()
+    except:
+        skipped += 1
+        print(f"Skipping {dp.name} due to raised exception")
+        continue
     for lenience in leniences:
         f.write(f"{predictor_name}, {dp.name}, {lenience}, ")
         scorer = BasePairScorer(dp.true_structure, prediction, lenience)
