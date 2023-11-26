@@ -13,6 +13,6 @@ generate_bpRNA_evaluations(
     model=model,
     model_name=model_name,
     model_path="",
-    testing=False
+    testing=True
 )
 print("done")

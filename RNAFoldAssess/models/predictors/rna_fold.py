@@ -9,12 +9,12 @@ class RNAFold:
     def __int__(self):
         self.output = ""
 
-    def execute(self, path, fasta_file, delete_input_file_immediately=True):
+    def execute(self, path, fasta_file, remove_file_when_done=True):
         path_to_rna_fold = os.path.abspath(path)
         exec_string = f"{path} {fasta_file}"
         self.output = os.popen(exec_string).read()
         file_name_base = fasta_file.split(".")[0]
-        if delete_input_file_immediately:
+        if remove_file_when_done:
             try:
                 os.system(f"rm {file_name_base}*")
             except FileNotFoundError:
