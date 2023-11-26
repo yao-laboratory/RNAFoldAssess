@@ -9,12 +9,13 @@ class RNAFold:
     def __int__(self):
         self.output = ""
 
-    def execute(self, path, fasta_file):
+    def execute(self, path, fasta_file, delete_input_file_immediately=True):
         path_to_rna_fold = os.path.abspath(path)
         exec_string = f"{path} {fasta_file}"
         self.output = os.popen(exec_string).read()
         file_name_base = fasta_file.split(".")[0]
-        os.system(f"rm {file_name_base}*")
+        if delete_input_file_immediately:
+            os.system(f"rm {file_name_base}*")
 
     def get_ss_prediction(self):
         if self.output == "":

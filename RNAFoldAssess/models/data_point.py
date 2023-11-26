@@ -34,6 +34,7 @@ class DataPoint:
         name = name.replace('"', "")
         name = name.replace("$", "S")
         name = name.replace("&", "and")
+        name = name.replace("~", "")
         if len(name) > 200:
             name = name[0:200]
         f = open(f"{name}.seq", "w")
@@ -63,6 +64,7 @@ class DataPoint:
         name = name.replace('"', "")
         name = name.replace("$", "S")
         name = name.replace("&", "and")
+        name = name.replace("~", "")
         if len(name) > 200:
             name = name[0:200]
         data = f">{name}\n{self.sequence}"

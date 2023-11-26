@@ -14,7 +14,7 @@ class RandomPredictor:
         f2 = open("ss_file.txt", "r")
         self.output = f2.read().strip()
         f2.close()
-        os.remove("ss_file.txt")
+        # os.remove("ss_file.txt")
 
     def get_ss_prediction(self):
         if self.output == "":
