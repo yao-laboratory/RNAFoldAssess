@@ -11,6 +11,5 @@ class TestRandomPredictor:
 
     def test_prediction(self):
         self.model.execute(fasta_file=self.input_file_path)
-        os.remove(self.input_file_path)
         prediction = self.model.get_ss_prediction()
         assert(len(prediction) == len(self.datum.sequence))

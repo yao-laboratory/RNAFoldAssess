@@ -41,23 +41,26 @@ class BasePairScorer(Scorer):
 
     def get_false_negatives(self):
         fn = 0
-        for bp in self.true_structure:
-            pos_locs = [bp]
-            i, j = bp
-            for r in range(self.bp_lenience):
-                e = r + 1
-                pos_locs.append((i + e, j))
-                pos_locs.append((i, j + e))
-                pos_locs.append((i - e, j))
-                pos_locs.append((i, j - e))
+        if len(self.true_structure) > 0 and len(self.predicted_structure) == 0:
+            self.fn += len(self.true_structure)
+        else:
+            for bp in self.true_structure:
+                pos_locs = [bp]
+                i, j = bp
+                for r in range(self.bp_lenience):
+                    e = r + 1
+                    pos_locs.append((i + e, j))
+                    pos_locs.append((i, j + e))
+                    pos_locs.append((i - e, j))
+                    pos_locs.append((i, j - e))
 
-            for pbp in self.predicted_structure:
-                if pbp in pos_locs:
-                    fn = 0
-                    break
-                else:
-                    fn = 1
-            self.fn += fn
+                for pbp in self.predicted_structure:
+                    if pbp in pos_locs:
+                        fn = 0
+                        break
+                    else:
+                        fn = 1
+                self.fn += fn
 
     def get_acceptable_locations(self):
         """
