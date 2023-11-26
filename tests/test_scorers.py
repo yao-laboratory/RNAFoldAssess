@@ -238,6 +238,28 @@ class TestBasePairScorer:
         scorer.evaluate()
         assert(scorer.fn == 2)
 
+    def test_false_negative_calculation7(self):
+        real = "..(..).."
+        pred = "........"
+        scorer = BasePairScorer(real, pred)
+        scorer.evaluate()
+        assert(scorer.fn == 1)
+
+    def test_false_negative_calculation8(self):
+        real = "..(..)..(..)..(...).."
+        pred = "....................."
+        scorer = BasePairScorer(real, pred)
+        scorer.evaluate()
+        assert(scorer.fn == 3)
+
+
+    def test_false_negative_calculation9(self):
+        real = "..........."
+        pred = "..........."
+        scorer = BasePairScorer(real, pred)
+        scorer.evaluate()
+        assert(scorer.fn == 0)
+
     def test_perfect_match(self):
         scorer = BasePairScorer(self.real, self.real)
         scorer.evaluate()
