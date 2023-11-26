@@ -15,7 +15,10 @@ class RNAFold:
         self.output = os.popen(exec_string).read()
         file_name_base = fasta_file.split(".")[0]
         if delete_input_file_immediately:
-            os.system(f"rm {file_name_base}*")
+            try:
+                os.system(f"rm {file_name_base}*")
+            except FileNotFoundError:
+                print(f"RNAFold: Couldn't find {file_name_base} files to delete")
 
     def get_ss_prediction(self):
         if self.output == "":

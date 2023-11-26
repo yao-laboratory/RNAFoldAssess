@@ -10,8 +10,10 @@ class MXFold:
         exec_string = f"{path} {fasta_file}"
         self.output = os.popen(exec_string).read()
         if remove_file_when_done:
-            # print(f"MXFold object is deleting {fasta_file}")
-            os.remove(fasta_file)
+            try:
+                os.remove(fasta_file)
+            except FileNotFoundError:
+                print(f"MXFold: Couldn't find {fasta_file} to delete")
 
     def get_ss_prediction(self):
         if self.output == "":
