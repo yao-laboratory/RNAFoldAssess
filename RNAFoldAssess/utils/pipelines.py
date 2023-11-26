@@ -1,6 +1,7 @@
-import os, datetime
+import os, datetime, time
 
 from RNAFoldAssess.models import DataPoint
+from RNAFoldAssess.models.scorers import *
 
 headers = "algo_name, datapoint_name, accuracy, p_value, ground_truth_data_type"
 
@@ -64,3 +65,150 @@ def write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_valu
     f.write(about_data)
     f.close()
 
+def write_bp_pipeline_report(pipeline_report_path,
+                             count_of_rows,
+                             leniences,
+                             sensitivities,
+                             lowest_sensitivity,
+                             ppvs,
+                             lowest_ppv,
+                             f1s,
+                             lowest_f1):
+    about_data = ""
+    about_data += f"About bpRNA dataset\n"
+    about_data += f"Datapoints evaluated: {count_of_rows / len(leniences)}\n"
+    about_data += f"\n"
+    about_data += f"About Evaluation\n"
+    about_data += f"------------------\n"
+    for lenience in leniences:
+        about_data += f"For {lenience} basepair lenience:\n"
+        sens = sensitivities[f"{lenience}"]
+        ls = lowest_sensitivity[f"{lenience}"]
+        ps = ppvs[f"{lenience}"]
+        lp = lowest_ppv[f"{lenience}"]
+        fs = f1s[f"{lenience}"]
+        lf = lowest_f1[f"{lenience}"]
+        about_data += f"    Average sensitivity: {round(sum(sens) / len(sens), 4)}\n"
+        about_data += f"    Highest sensitivity: {max(sens)}\n"
+        about_data += f"    Lowest sensitivity: {round(ls[0], 4)} on {ls[1]}\n"
+        about_data += f"    Average PPV: {round(sum(ps) / len(ps), 4)}\n"
+        about_data += f"    Highest PPV: {max(ps)}\n"
+        about_data += f"    Lowest PPV: {round(lp[0], 4)} on {lp[1]}\n"
+        about_data += f"    Average F1: {round(sum(fs) / len(fs), 4)}\n"
+        about_data += f"    Highest F1: {max(fs)}\n"
+        about_data += f"    Lowest F1: {round(lf[0], 4)} on {lf[1]}\n"
+        about_data += "\n"
+
+    report = open(pipeline_report_path, "w")
+    report.write(about_data)
+    report.close()
+
+
+def generate_bpRNA_evaluations(model,
+                               model_name,
+                               model_path,
+                               sequence_data_path="/common/yesselmanlab/ewhiting/data/bprna/fasta_files",
+                               leniences=[0, 1],
+                               testing=False):
+    data_type_name = "bpRNA-1m-90"
+    headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, F1, data_point_type"
+    skipped = 0
+    lengths = []
+    weird_sequences = []
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_report.txt"
+    # Make the file
+    f = open(analysis_report_path, "w")
+    f.close()
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_aux_data.txt"
+    counter = 0
+    dbn_path = "/common/yesselmanlab/ewhiting/data/bprna/dbnFiles"
+    sequence_files = os.listdir(sequence_data_path)
+    file_len = len(sequence_files)
+    if testing:
+        sequence_files = sequence_files[0:50]
+        start = time.time()
+    rows_to_write = []
+    for file in sequence_files:
+        if counter % 250 == 0:
+            print(f"Writing {counter} of {file_len}")
+            f = open(analysis_report_path, "a")
+            for r in rows_to_write:
+                f.write(r)
+            f.close()
+            rows_to_write = []
+        name = file.split(".")[0]
+        data_type = name.split("_")[1]
+        dbn_file_path = f"{dbn_path}/{name}.dbn"
+        dbn_file = open(dbn_file_path)
+        data = dbn_file.readlines()
+        true_structure = data[4].strip()
+        seq = data[3].strip()
+        if not sequence_is_only_nts(seq):
+            weird_sequences.append(name)
+            continue
+        try:
+            line_to_write = ""
+            if model_name == "ContextFold":
+                print("ContextFold")
+                model.execute(model_path, seq)
+            elif model_name == "RandomPredictor":
+                model.execute(f"{sequence_data_path}/{file}")
+            else:
+                model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)
+            prediction = model.get_ss_prediction()
+            for lenience in leniences:
+                line_to_write = f"{model_name}, {name}, {lenience}, "
+                scorer = BasePairScorer(true_structure, prediction, lenience)
+                scorer.evaluate()
+                s = scorer.sensitivity
+                p = scorer.ppv
+                f1 = scorer.f1
+                line_to_write += f"{s}, {p}, {f1}\n"
+                rows_to_write.append(line_to_write)
+            lengths.append(len(seq))
+            counter += 1
+        except:
+            skipped += 1
+            continue
+
+    if len(rows_to_write) != 0:
+        print(f"Writing {counter} of {file_len}")
+        f = open(analysis_report_path, "a")
+        for r in rows_to_write:
+            f.write(r)
+        f.close()
+        rows_to_write = []
+
+    if testing:
+        end = time.time()
+        elapsed = end - start
+        avg = len(sequence_files) / elapsed
+        projected_time = (file_len * avg) / 60 / 60
+
+    # Get auxilary data
+    aux_data = f"Data points evaluated: {counter}\n"
+    aux_data += f"Longest sequence: {max(lengths)}\n"
+    aux_data += f"Shortest sequence: {min(lengths)}\n"
+    aux_data += f"Average sequence length: {sum(lengths) / len(lengths)}\n"
+    aux_data += f"Skipped {skipped} files for throwing exceptions\n"
+
+    if testing:
+        aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
+
+    if len(weird_sequences) != 0:
+        aux_data += "Files with non-nucleotides in the sequence:\n"
+        for ws in weird_sequences:
+            aux_data += f"{ws}\n"
+
+    aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
+    aux_file = open(aux_data_path, "w")
+    aux_file.write(aux_data)
+    aux_file.close()
+
+def sequence_is_only_nts(seq):
+    nucleotides = {"A", "C", "U", "G", "a", "c", "u", "g"}
+    seq_chars = set(seq)
+    for sc in seq_chars:
+        if sc not in nucleotides:
+            return False
+    return True
