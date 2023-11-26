@@ -115,11 +115,11 @@ def generate_bpRNA_evaluations(model,
     skipped = 0
     lengths = []
     weird_sequences = []
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_report.txt"
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/bprna/{model_name}_{data_type_name}_report.txt"
     # Make the file
     f = open(analysis_report_path, "w")
     f.close()
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_aux_data.txt"
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/bprna/{model_name}_{data_type_name}_aux_data.txt"
     counter = 0
     dbn_path = "/common/yesselmanlab/ewhiting/data/bprna/dbnFiles"
     sequence_files = os.listdir(sequence_data_path)
@@ -141,6 +141,7 @@ def generate_bpRNA_evaluations(model,
         dbn_file_path = f"{dbn_path}/{name}.dbn"
         dbn_file = open(dbn_file_path)
         data = dbn_file.readlines()
+        dbn_file.close()
         true_structure = data[4].strip()
         seq = data[3].strip()
         if not sequence_is_only_nts(seq):
@@ -155,7 +156,10 @@ def generate_bpRNA_evaluations(model,
                 model.execute(f"{sequence_data_path}/{file}")
             else:
                 model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)
-            prediction = model.get_ss_prediction()
+            if model_name == "IPknot":
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
             for lenience in leniences:
                 line_to_write = f"{model_name}, {name}, {lenience}, "
                 scorer = BasePairScorer(true_structure, prediction, lenience)
@@ -196,9 +200,7 @@ def generate_bpRNA_evaluations(model,
         aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
 
     if len(weird_sequences) != 0:
-        aux_data += "Files with non-nucleotides in the sequence:\n"
-        for ws in weird_sequences:
-            aux_data += f"{ws}\n"
+        aux_data += f"Skippped {len(weird_sequences)} files with non-nucleotides in the sequence\n"
 
     aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
     aux_file = open(aux_data_path, "w")

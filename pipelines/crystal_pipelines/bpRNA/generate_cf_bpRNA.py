@@ -22,17 +22,17 @@ def generate_c_bpRNA_evaluations(model,
     skipped = 0
     lengths = []
     weird_sequences = []
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_report.txt"
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/bprna/{model_name}_{data_type_name}_report.txt"
     # Make the file
     f = open(analysis_report_path, "w")
     f.close()
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{model_name}_{data_type_name}_aux_data.txt"
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/bprna/{model_name}_{data_type_name}_aux_data.txt"
     counter = 0
     dbn_path = "/common/yesselmanlab/ewhiting/data/bprna/dbnFiles"
     sequence_files = os.listdir(sequence_data_path)
     file_len = len(sequence_files)
     if testing:
-        sequence_files = sequence_files[600:1600]
+        sequence_files = sequence_files[0:50]
         start = time.time()
     rows_to_write = []
     for file in sequence_files:
