@@ -83,7 +83,7 @@ def generate_dms_evaluations(model,
             f.close()
             rows_to_write = []
 
-        if model_name != "ContextFold":
+        if model_name not in ["ContextFold", "SeqFold"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
             else:
@@ -91,7 +91,7 @@ def generate_dms_evaluations(model,
         try:
             line_to_write = ""
             # Handle different model types
-            if model_name == "ContextFold":
+            if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
             elif model_name == "RandomPredictor":
                 model.execute(input_file_path)
@@ -287,8 +287,8 @@ def generate_bpRNA_evaluations(model,
             continue
         try:
             line_to_write = ""
-            if model_name == "ContextFold":
-                print("ContextFold")
+            if model_name in ["ContextFold", "SeqFold"]:
+                # These models don't require an input file
                 model.execute(model_path, seq)
             elif model_name == "RandomPredictor":
                 model.execute(f"{sequence_data_path}/{file}")
