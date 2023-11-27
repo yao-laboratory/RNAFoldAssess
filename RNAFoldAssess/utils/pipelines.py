@@ -30,6 +30,144 @@ def analysis_report_location(predictor_name, data_type):
 def pipeline_report_location(predictor_name, data_type):
     return f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_pipeline.txt"
 
+def generate_dms_evaluations(model,
+                               model_name,
+                               model_path,
+                               sequence_data_path="/common/yesselmanlab/ewhiting/data/bprna/fasta_files",
+                               dp_file_path="/common/yesselmanlab/ewhiting/ss_deeplearning_data/data",
+                               data_type_name="YesselmanDMS",
+                               to_seq_file=False,
+                               testing=False):
+    headers = "algo_name, datapoint_name, accuracy, p_value"
+    skipped = 0
+    lengths = []
+    problem_datapoints = []
+    data_point_files = os.listdir(dp_file_path)
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/ydata/{model_name}_{data_type_name}_report.txt"
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/ydata/{model_name}_{data_type_name}_aux_data.txt"
+
+    print(f"Loading data points from {len(data_point_files)} files ...")
+    data_points = []
+    for dpf in data_point_files:
+        cohort = dpf.split(".")[0]
+        print(f"Loading data points from {cohort} cohort")
+        dps = DataPoint.factory(f"{dp_file_path}/{dpf}", cohort)
+        for dp in dps:
+            data_points.append(dp)
+
+    file_len = len(data_points)
+
+    if testing:
+        data_points = data_points[17360:17410] # There's an error-prone data point in here
+
+    dp_size = len(data_points)
+    print(f"Total of {dp_size} data points")
+    print("Data points loaded!")
+
+    f = open(analysis_report_path, "w")
+    f.write(f"{headers}\n")
+    f.close()
+
+    print("About to generate evaluations")
+    if testing:
+        start = time.time()
+
+    counter = 0
+    rows_to_write = []
+    for dp in data_points:
+        if counter % 250 == 0:
+            print(f"Completed {counter} of {dp_size}")
+            f = open(analysis_report_path, "a")
+            for r in rows_to_write:
+                f.write(r)
+            f.close()
+            rows_to_write = []
+
+        if model_name != "ContextFold":
+            if to_seq_file:
+                input_file_path = dp.to_seq_file()
+            else:
+                input_file_path = dp.to_fasta_file()
+        try:
+            line_to_write = ""
+            # Handle different model types
+            if model_name == "ContextFold":
+                model.execute(model_path, dp.sequence)
+            elif model_name == "RandomPredictor":
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+
+            if model_name == "IPknot":
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
+
+            score = DSCI.score(
+                dp.sequence,
+                prediction,
+                dp.reactivities,
+                DMS=True
+            )
+
+            accuracy = round(score["accuracy"], 4)
+            p = round(score["p"], 4)
+
+            headers = "algo_name, datapoint_name, accuracy, p_value"
+            line_to_write = f"{model_name}, {dp.name}, {round(accuracy, 4)}, {round(p, 4)}\n"
+            rows_to_write.append(line_to_write)
+
+            lengths.append(len(dp.sequence))
+            counter += 1
+
+        except (DSCITypeError, DSCIValueError) as dsci_error:
+            skipped += 1
+            problem_datapoints.append(dp.name)
+            print(f"Encountered DSCI error on {dp.name}: {str(dsci_error)}")
+            continue
+
+        except:
+            skipped += 1
+            continue
+
+    if len(rows_to_write) != 0:
+        print(f"Writing {counter} of {file_len}")
+        f = open(analysis_report_path, "a")
+        for r in rows_to_write:
+            f.write(r)
+        f.close()
+        rows_to_write = []
+
+    if testing:
+        end = time.time()
+        elapsed = end - start
+        avg = len(data_point_files) / elapsed
+        projected_time = (file_len * avg) / 60 / 60
+
+    # Get auxilary data
+    if len(lengths) == 0:
+        lengths = [1,2,3,4] # Some bs data to stop exceptions
+    aux_data = f"Data points evaluated: {counter}\n"
+    aux_data += f"Longest sequence: {max(lengths)}\n"
+    aux_data += f"Shortest sequence: {min(lengths)}\n"
+    aux_data += f"Average sequence length: {sum(lengths) / len(lengths)}\n"
+    aux_data += f"Skipped {skipped} files for throwing exceptions\n"
+
+    if testing:
+        aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
+
+    if len(problem_datapoints) != 0:
+        aux_data += f"Skippped {len(problem_datapoints)} datapoints for throwing DSCI exceptions:\n"
+        for pd in problem_datapoints:
+            aux_data += f"{pd}\n"
+
+    aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
+    aux_file = open(aux_data_path, "w")
+    aux_file.write(aux_data)
+    aux_file.close()
+
+
+
 def write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_values, perfects, lowest_acc, highest_p, skipped_count):
     avg_seq_len = sum(lengths) / len(lengths)
     max_len = max(lengths)
