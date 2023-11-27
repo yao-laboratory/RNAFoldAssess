@@ -7,3 +7,4 @@ from .rna_fold import *
 from .rna_structure import *
 from .random_predictor import *
 from .ipknot import *
+from .seqfold import *
