@@ -166,9 +166,87 @@ def generate_dms_evaluations(model,
     aux_file.write(aux_data)
     aux_file.close()
 
+def analyze_dms_evaluations(loc, model_name, data_type="YesselmanLabDMS"):
+    f = open(loc)
+    data = f.readlines()
+    f.close()
+    data.pop(0) # Get rid of headers
+
+    accuracies = []
+    p_values = []
+    lowest_acc = [None, 1.0]
+    highest_p = [None, 0.0]
+    perfect_score_count = 0
+
+    total_rows = len(data)
+
+    counter = 0
+    for d in data:
+        if counter % 250 == 0:
+            print(f"Processing {counter} of {total_rows}")
+        d = d.split(",")
+        name = d[1].strip()
+        acc = float(d[2].strip())
+        p = float(d[3].strip())
+        accuracies.append(acc)
+        p_values.append(p)
+        if acc == 1.0:
+            perfect_score_count += 1
+        if acc < lowest_acc[1]:
+            lowest_acc = [name, acc]
+        if p > highest_p[1]:
+            highest_p = [name, p]
+        counter += 1
+
+    write_dms_pipeline_report(
+        model_name,
+        data_type,
+        accuracies,
+        p_values,
+        perfect_score_count,
+        lowest_acc,
+        highest_p
+    )
+
+def write_dms_pipeline_report(model_name,
+                              data_type,
+                              accuracies,
+                              p_values,
+                              perfect_score_count,
+                              lowest_acc,
+                              highest_p):
+    avg_acc = sum(accuracies) / len(accuracies)
+    mode_acc = max(set(accuracies), key=accuracies.count)
+    avg_p   = sum(p_values) / len(p_values)
+
+    about_data = ""
+    about_data += f"{model_name} Performance:\n"
+    about_data += f"Data points evaluated: {len(accuracies)}\n"
+    about_data += f"Average DSCI accuracy score: {round(avg_acc, 4)}\n"
+    about_data += f"Average DSCI p-vale score: {avg_p}\n"
+    about_data += f"Mode accuracy: {mode_acc}\n"
+    about_data += f"Number of DSCI 1.0 scores: {perfect_score_count}\n"
+    about_data += f"Lowest DSCI accruracy score: {lowest_acc[1]} on {lowest_acc[0]}\n"
+    about_data += f"Highest DSCI p-value score: {highest_p[1]} on {highest_p[0]}\n"
+
+    about_data += f"\n"
+    about_data += f"Report generated on: {datetime.datetime.now()}\n\n"
+
+    pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/ydata/{model_name}_{data_type}_analysis.txt"
+    f = open(pipeline_report_path, "w")
+    f.write(about_data)
+    f.close()
 
 
-def write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_values, perfects, lowest_acc, highest_p, skipped_count):
+def write_pipeline_report(predictor_name,
+                          data_type,
+                          lengths,
+                          accuracies,
+                          p_values,
+                          perfects,
+                          lowest_acc,
+                          highest_p,
+                          skipped_count):
     avg_seq_len = sum(lengths) / len(lengths)
     max_len = max(lengths)
     min_len = min(lengths)
@@ -240,6 +318,74 @@ def write_bp_pipeline_report(pipeline_report_path,
     report = open(pipeline_report_path, "w")
     report.write(about_data)
     report.close()
+
+def analyze_bprna_evaluations(eval_location, model_name):
+    f = open(eval_location)
+    rows = f.readlines()
+    f.close()
+
+    sensitivities = {}
+    ppvs = {}
+    f1s = {}
+    lowest_sensitivity = {}
+    lowest_ppv = {}
+    lowest_f1 = {}
+    leniences = [0, 1]
+    for lenience in leniences:
+        sensitivities[f"{lenience}"] = []
+        ppvs[f"{lenience}"] = []
+        f1s[f"{lenience}"] = []
+        lowest_sensitivity[f"{lenience}"] = [1.0, ""]
+        lowest_ppv[f"{lenience}"] = [1.0, ""]
+        lowest_f1[f"{lenience}"] = [1.0, ""]
+
+    count_of_rows = len(rows)
+    counter = 0
+
+    print(f"Starting analysis on {count_of_rows} datapoints ...")
+
+    for r in rows:
+        r = r.split(",")
+        name = r[1].strip()
+        recorded_lenience = int(r[2].strip())
+
+        counter += 1
+        if counter % 250 == 0:
+            print(f"Working on {counter} of {count_of_rows}")
+        for lenience in leniences:
+            if recorded_lenience == lenience:
+                s = float(r[3].strip())
+                p = float(r[4].strip())
+                f1 = float(r[5].strip())
+                sensitivities[f"{lenience}"].append(s)
+                ppvs[f"{lenience}"].append(p)
+                f1s[f"{lenience}"].append(f1)
+
+                if s < lowest_sensitivity[f"{lenience}"][0]:
+                    lowest_sensitivity[f"{lenience}"][0] = s
+                    lowest_sensitivity[f"{lenience}"][1] = name
+
+                if p < lowest_ppv[f"{lenience}"][0]:
+                    lowest_ppv[f"{lenience}"][0] = p
+                    lowest_ppv[f"{lenience}"][1] = name
+
+                if f1 < lowest_f1[f"{lenience}"][0]:
+                    lowest_f1[f"{lenience}"][0] = f1
+                    lowest_f1[f"{lenience}"][1] = name
+
+    pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/bprna/{model_name}_bpRNA_analysis.txt"
+    write_bp_pipeline_report(
+        pipeline_report_path,
+        count_of_rows,
+        leniences,
+        sensitivities,
+        lowest_sensitivity,
+        ppvs,
+        lowest_ppv,
+        f1s,
+        lowest_f1
+    )
+
 
 
 def generate_bpRNA_evaluations(model,
