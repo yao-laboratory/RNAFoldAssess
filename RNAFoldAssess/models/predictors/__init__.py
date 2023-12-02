@@ -1,4 +1,5 @@
 from .eterna import *
+from .contrafold import *
 from .spot_rna import *
 from .context_fold import *
 from .mxfold import *
