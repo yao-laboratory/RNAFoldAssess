@@ -27,30 +27,31 @@ class EternaDataPoint:
                 self.reactivities[i] = new_val
 
     def to_seq_file(self):
-        f = open(f"{name}.seq", "w")
+        f = open(f"{self.name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.seq_path = os.path.abspath(f"{name}.seq")
+        self.seq_path = os.path.abspath(f"{self.name}.seq")
         return self.seq_path
 
     def to_fasta_file(self):
-        data = f">{name}\n{self.sequence}"
-        f = open(f"{name}.fasta", "w")
+        data = f">{self.name}\n{self.sequence}"
+        f = open(f"{self.name}.fasta", "w")
         f.write(data)
         f.close()
-        self.fasta_path = os.path.abspath(f"{name}.fasta")
+        self.fasta_path = os.path.abspath(f"{self.name}.fasta")
         return self.fasta_path
 
     # We have to implement DSCI in a special way with these data points
     # becase there isn't reactivity for every data point
     def assess_prediction(self, ss_prediction):
         structure = ""
-        reactivities = []
         sequence = ""
         for pos in self.positions:
-            structure += ss_prediction[pos]
-            sequence += self.sequence[pos]
-            reactivities.append(self.reactivities[pos])
+            try:
+                structure += ss_prediction[pos]
+                sequence += self.sequence[pos]
+            except Exception as e:
+                print(f"Out of bounds error in {self.name}")
 
         DMS = False
         SHAPE = False
@@ -62,7 +63,7 @@ class EternaDataPoint:
         return DSCI.score(
             sequence=sequence,
             secondary_structure=structure,
-            reactivities=reactivities,
+            reactivities=self.reactivities,
             DMS=DMS,
             SHAPE=SHAPE
         )
@@ -75,6 +76,12 @@ class EternaDataPoint:
         f.close()
         data_points = []
         for datum in json_data:
-            data_points.append(EternaDataPoint(datum))
+            # Some ad-hoc cleaning of the data
+            dp = EternaDataPoint(datum)
+            if dp.name.startswith("ETERNA_R73_0000_ANNOTATION"):
+                dp.mapping_method = "SHAPE"
+            if dp.name.startswith("ETERNA_R70_0000_ANNOTATION") and dp.mapping_method == "UNKNOWN":
+                dp.mapping_method = "SHAPE"
+            data_points.append(dp)
         return data_points
 
