@@ -1,6 +1,8 @@
 import os, datetime, time
 
-from RNAFoldAssess.models import DataPoint
+import pandas as pd
+
+from RNAFoldAssess.models import DataPoint, EternaDataPoint
 from RNAFoldAssess.models.scorers import *
 
 headers = "algo_name, datapoint_name, accuracy, p_value, ground_truth_data_type"
@@ -29,6 +31,129 @@ def analysis_report_location(predictor_name, data_type):
 
 def pipeline_report_location(predictor_name, data_type):
     return f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_pipeline.txt"
+
+def generate_eterna_data_evaluations(model,
+                                     model_name,
+                                     model_path,
+                                     data_points_path="/common/yesselmanlab/ewhiting/data/translated_eterna_data/eterna.json",
+                                     data_type_name="EternaRDATData",
+                                     to_seq_file=False,
+                                     testing=False):
+    datapoints = EternaDataPoint.factory(data_points_path)
+    if testing:
+        datapoints = datapoints[:10]
+    shape_datapoints = []
+    dms_datapoints = []
+
+    fail_count = 0
+    for dp in datapoints:
+        if dp.mapping_method == "SHAPE":
+            shape_datapoints.append(dp)
+        elif dp.mapping_method == "DMS":
+            dms_datapoints.append(dp)
+        else:
+            print(f"Error in {dp.name}")
+            fail_count += 1
+
+    print(f"There are {len(shape_datapoints)} SHAPE datapoints")
+    print(f"There are {len(dms_datapoints)} DMS datapoints")
+    print(f"There were {fail_count} errors detecting chemical mapping experiment type")
+
+    headers = "algo_name, datapoint_name, accuracy, p_value, sequence_length"
+    shape_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_SHAPE_pipeline_report.txt"
+    dms_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_DMS_pipeline_report.txt"
+
+    # Run SHAPE evals
+    print("Starting SHAPE evaluations")
+    shape_evals, problem_datapoints, s_skipped = eterna_data_evals(model, model_name, model_path, shape_datapoints, to_seq_file)
+    if len(shape_evals) > 0:
+        sf = open(shape_report_path, "w")
+        sf.write(f"{headers}\n")
+        for sev in shape_evals:
+            line = f"{model_name}, {sev[0]}, {sev[1]}, {sev[2]}, {sev[3]}\n"
+            sf.write(line)
+        sf.close()
+        write_eterna_data_analysis(model_name, shape_evals, problem_datapoints, s_skipped, "SHAPE")
+    print("SHAPE evaluation complete")
+    # Run DMS evals
+    print("Starting DMS evaluations")
+    dms_evals, problem_datapoints, d_skipped = eterna_data_evals(model, model_name, model_path, dms_datapoints, to_seq_file)
+    if len(dms_evals) > 0:
+        df = open(dms_report_path, "w")
+        df.write(f"{headers}\n")
+        for dev in dms_evals:
+            line = f"{model_name}, {dev[0]}, {dev[1]}, {dev[2]}, {dev[3]}\n"
+            df.write(line)
+        df.close()
+        write_eterna_data_analysis(model_name, dms_evals, problem_datapoints, d_skipped, "DMS")
+    print("DMS evaluation compelte")
+
+def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_mapping_method):
+    count_problems = len(problems)
+    accuracies = []
+    lengths = []
+    perfect_score_count = 0
+    for ev in evals:
+        acc = ev[1]
+        if acc == 1.0:
+            perfect_score_count += 1
+        accuracies.append(acc)
+        lengths.append(ev[3])
+    s = pd.Series(accuracies)
+    descriptive_stats = s.describe()
+    report = f"{model_name} evaluation on Eterna {chemical_mapping_method}\n"
+    report += f"Evaluated {len(evals)} datapoints\n"
+    report += f"Skipped {skipped} datapoints due to exceptions\n"
+    report += f"Using DSCI, {perfect_score_count} predictions achieved a perfect score\n"
+    report += f"Descriptive statistics:\n"
+    report += f"{descriptive_stats}\n"
+    if len(problems) > 0:
+        report += "\nSkipped datapoints:\n"
+        for p in problems:
+            report += f"{p}\n"
+        report += "\n"
+    report += f"Report generated on: {datetime.datetime.now()}\n\n"
+    path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_analysis_report.txt"
+    f = open(path, "w")
+    f.write(report)
+    f.close()
+
+def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
+    retvals = []
+    problem_datapoints = []
+    skipped = 0
+    counter = 0
+    for dp in data_points:
+        counter += 1
+        if counter % 150 == 0:
+            print(f"Working on {counter} of {len(data_points)}")
+        if model_name not in ["ContextFold", "SeqFold"]:
+            if to_seq_file:
+                input_file_path = dp.to_seq_file()
+            else:
+                input_file_path = dp.to_fasta_file()
+        try:
+            line_to_write = ""
+            # Handle different model types
+            if model_name in ["ContextFold", "SeqFold"]:
+                model.execute(model_path, dp.sequence)
+            elif model_name == "RandomPredictor":
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+            predicted_structure = model.get_ss_prediction()
+            score = dp.assess_prediction(predicted_structure)
+            retvals.append([dp.name, round(score["accuracy"], 4), round(score["p"], 4), len(dp.sequence)])
+        except (DSCITypeError, DSCIValueError) as dsci_error:
+            skipped += 1
+            problem_datapoints.append(dp.name)
+            print(f"Encountered DSCI error on {dp.name}: {str(dsci_error)}")
+            continue
+        except Exception as e:
+            skipped += 1
+            continue
+    return retvals, problem_datapoints, skipped
+
 
 def generate_dms_evaluations(model,
                                model_name,
