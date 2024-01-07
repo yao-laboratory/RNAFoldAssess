@@ -71,3 +71,24 @@ class DataPointFromCrystal:
                 )
             )
         return data_points
+
+    @staticmethod
+    def factory_from_dbn_files(path):
+        dbn_files = [dbn for dbn in os.listdir(path) if dbn.endswith(".dbn")]
+        data_points = []
+        for dbn_file in dbn_files:
+            f = open(f"{path}/{dbn_file}")
+            lines = f.readlines()
+            f.close()
+            name = dbn_file.split(".")[0]
+            seq = lines[1]
+            true_structure = lines[2]
+            data_points.append(
+                DataPointFromCrystal(
+                    name=name,
+                    sequence=seq.strip(),
+                    true_structure=true_structure.strip(),
+                    pdb_id=name[:4]
+                )
+            )
+        return data_points

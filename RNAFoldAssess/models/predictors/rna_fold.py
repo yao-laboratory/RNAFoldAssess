@@ -9,7 +9,7 @@ class RNAFold:
     def __int__(self):
         self.output = ""
 
-    def execute(self, path, fasta_file, remove_file_when_done=True):
+    def execute(self, path, fasta_file, remove_file_when_done=False):
         path_to_rna_fold = os.path.abspath(path)
         exec_string = f"{path} {fasta_file}"
         self.output = os.popen(exec_string).read()

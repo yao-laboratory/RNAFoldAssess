@@ -6,9 +6,9 @@ from RNAFoldAssess.utils import *
 
 data_dir = "/common/yesselmanlab/ewhiting/data/crystal1_XRAY/redo_analysis/secondary_structures/preprocessed/twenty_plus"
 
-model_name = "ContextFold"
-model = ContextFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
+model_name = "IPknot"
+model = IPknot()
+model_path = os.path.abspath("/common/yesselmanlab/ewhiting/ipknot-1.1.0-x86_64-linux/ipknot")
 data_type_name = "crystal1"
 
 crystal_evals(

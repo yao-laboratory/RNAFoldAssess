@@ -6,15 +6,14 @@ from RNAFoldAssess.utils import *
 
 data_dir = "/common/yesselmanlab/ewhiting/data/crystal1_XRAY/redo_analysis/secondary_structures/preprocessed/twenty_plus"
 
-model_name = "ContextFold"
-model = ContextFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
+model_name = "RandomPredictor"
+model = RandomPredictor()
 data_type_name = "crystal1"
 
 crystal_evals(
     model=model,
     model_name=model_name,
-    model_path=model_path,
+    model_path="",
     dbn_path=data_dir,
     data_type_name=data_type_name,
     testing=False

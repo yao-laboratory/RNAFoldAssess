@@ -6,9 +6,9 @@ from RNAFoldAssess.utils import *
 
 data_dir = "/common/yesselmanlab/ewhiting/data/crystal1_XRAY/redo_analysis/secondary_structures/preprocessed/twenty_plus"
 
-model_name = "ContextFold"
-model = ContextFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
+model_name = "SPOT-RNA"
+model = SPOT_RNA()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/SPOT-RNA")
 data_type_name = "crystal1"
 
 crystal_evals(
@@ -17,5 +17,5 @@ crystal_evals(
     model_path=model_path,
     dbn_path=data_dir,
     data_type_name=data_type_name,
-    testing=False
+    testing=True
 )
