@@ -35,7 +35,10 @@ class DataPointFromCrystal:
         self.path = os.path.abspath(f"{name}.fasta")
         return self.path
 
-    def to_fasta_string(self):
+    def to_fasta_string(self, capitalize_sequence=True):
+        sequence = self.sequence
+        if capitalize_sequence:
+            sequence = self.sequence.upper()
         return f">{self.name} en=0.00\n{self.sequence}\n"
 
     def get_experiment_type(self, pdb_id=None):

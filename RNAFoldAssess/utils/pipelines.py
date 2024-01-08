@@ -162,6 +162,9 @@ def crystal_evals(model,
                   fasta_file_location="/common/yesselmanlab/ewhiting/data/crystal1_XRAY/fasta_files",
                   to_seq_file=False,
                   leniences=[0, 1],
+                  crystal2_dataset=True,
+                  rna_only=False,
+                  with_protein=False,
                   testing=False):
     headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, f1"
     dps = DataPointFromCrystal.factory_from_dbn_files(dbn_path)
@@ -184,8 +187,16 @@ def crystal_evals(model,
         lowest_ppv[f"{lenience}"] = [1.0, ""]
         lowest_f1[f"{lenience}"] = [1.0, ""]
 
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}_report.txt"
-    pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}.txt"
+    if crystal2_dataset:
+        if rna_only:
+            analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/rna_only/{model_name}_{data_type_name}_report.txt"
+            pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/rna_only/{model_name}_{data_type_name}.txt"
+        elif with_protein:
+            analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/with_protein/{model_name}_{data_type_name}_report.txt"
+            pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/with_protein/{model_name}_{data_type_name}.txt"
+    else:
+        analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}_report.txt"
+        pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}.txt"
 
     f = open(analysis_report_path, "w")
     f.write(f"{headers}\n")
@@ -259,7 +270,7 @@ def crystal_evals(model,
     about_data += f"Longest sequence: {max(lengths)}\n"
     about_data += f"Shortest sequence: {min(lengths)}\n"
     about_data += f"Most common lenth length: {max(set(lengths), key=lengths.count)}\n"
-    about_data += f"Skipped {skipped} datapoints because they had no sequence\n"
+    about_data += f"Skipped {skipped} datapoints because of raised exceptions\n"
     about_data += f"\n"
     about_data += f"About Evaluation\n"
     about_data += f"------------------\n"
