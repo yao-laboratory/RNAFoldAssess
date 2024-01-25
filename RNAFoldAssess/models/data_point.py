@@ -14,93 +14,37 @@ class DataPoint:
             self.__normalize_reactivities()
 
     def to_seq_file(self):
-        # .seq files are required for EternaFold
-        # This string replacing is stupid but I'm doing it in a time crunch
-        name = self.name.replace(" ", "_")
-        name = name.replace("/", "")
-        name = name.replace("'", "")
-        name = name.replace("(", "")
-        name = name.replace(")", "")
-        name = name.replace("[", "")
-        name = name.replace("]", "")
-        name = name.replace("{", "")
-        name = name.replace("}", "")
-        name = name.replace("<", "")
-        name = name.replace(">", "")
-        name = name.replace(";", "")
-        name = name.replace(",", "")
-        name = name.replace("|", "")
-        name = name.replace("`", "")
-        name = name.replace('"', "")
-        name = name.replace("$", "S")
-        name = name.replace("&", "and")
-        name = name.replace("~", "")
-        if len(name) > 200:
-            name = name[0:200]
-        f = open(f"{name}.seq", "w")
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        if len(file_safe_name) > 200:
+            file_safe_name = file_safe_name[0:200]
+        f = open(f"{file_safe_name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.path = os.path.abspath(f"{name}.seq")
+        self.path = os.path.abspath(f"{file_safe_name}.seq")
         return self.path
 
     def to_fasta_file(self):
-        # .fasta files are required for SPOT-RNA
-        # This string replacing is stupid but I'm doing it in a time crunch
-        name = self.name.replace(" ", "_")
-        name = name.replace("/", "")
-        name = name.replace("'", "")
-        name = name.replace("(", "")
-        name = name.replace(")", "")
-        name = name.replace("[", "")
-        name = name.replace("]", "")
-        name = name.replace("{", "")
-        name = name.replace("}", "")
-        name = name.replace("<", "")
-        name = name.replace(">", "")
-        name = name.replace(";", "")
-        name = name.replace(",", "")
-        name = name.replace("|", "")
-        name = name.replace("`", "")
-        name = name.replace('"', "")
-        name = name.replace("$", "S")
-        name = name.replace("&", "and")
-        name = name.replace("~", "")
-        if len(name) > 200:
-            name = name[0:200]
-        data = f">{name}\n{self.sequence}"
-        f = open(f"{name}.fasta", "w")
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        if len(file_safe_name) > 200:
+            file_safe_name = file_safe_name[0:200]
+        data = f">{file_safe_name}\n{self.sequence}"
+        f = open(f"{file_safe_name}.fasta", "w")
         f.write(data)
         f.close()
-        self.path = os.path.abspath(f"{name}.fasta")
+        self.path = os.path.abspath(f"{file_safe_name}.fasta")
         return self.path
 
     def to_fasta_string(self):
         return f">{self.name} en=0.00\n{self.sequence}\n"
 
     def to_constraint_file(self, destination_dir=None):
-        # For the RNA Structure folding algorithm
-        # This string replacing is stupid but I'm doing it in a time crunch
-        name = self.name.replace(" ", "_")
-        name = name.replace("/", "")
-        name = name.replace("'", "")
-        name = name.replace("(", "")
-        name = name.replace(")", "")
-        name = name.replace("[", "")
-        name = name.replace("]", "")
-        name = name.replace("{", "")
-        name = name.replace("}", "")
-        name = name.replace("<", "")
-        name = name.replace(">", "")
-        name = name.replace(";", "")
-        name = name.replace(",", "")
-        name = name.replace("|", "")
-        name = name.replace("`", "")
-        name = name.replace('"', "")
-        name = name.replace("$", "S")
-        name = name.replace("&", "and")
-        if len(name) > 200:
-            name = name[0:200]
-        file_name = f"{name}_struc_constraint.txt"
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        if len(file_safe_name) > 200:
+            file_safe_name = file_safe_name[0:200]
+        file_name = f"{file_safe_name}_struc_constraint.txt"
         if not destination_dir:
             destination_dir = "."
         file_path = f"{destination_dir}/{file_name}"
