@@ -140,12 +140,9 @@ class DataPoint:
         return { "consensus": consensus_sequence, "probabilities": sequence_scores }
 
     def __normalize_reactivities(self):
-        n = 10
-        nlargest = heapq.nlargest(n, self.reactivities)
-        normalizer = sum(nlargest) / len(nlargest)
-        self.normalized_reactivities = []
-        for reactivity in self.reactivities:
-            norm_val = reactivity / normalizer
-            if norm_val > 1.0:
-                norm_val = 1.0
-            self.normalized_reactivities.append(norm_val)
+        # Using a simple normalizer
+        largest = heapq.nlargest(1, self.reactivities)[0]
+        if largest > 0:
+            for i, r in enumerate(self.reactivities):
+                new_val = round(r / largest, 6)
+                self.reactivities[i] = new_val
