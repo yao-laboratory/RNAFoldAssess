@@ -4,10 +4,10 @@ import os, datetime
 from RNAFoldAssess.models import DataPoint
 from RNAFoldAssess.models.scorers import DSCI, DSCITypeError, DSCIValueError
 from RNAFoldAssess.models.predictors import *
-from RNAFoldAssess.utils import *
+from pipeline_util import *
 
-rna_fold = RNAFold()
-rna_fold_path = os.path.abspath("/home/yesselmanlab/ewhiting/ViennaRNA/bin/RNAfold")
+contextFold = ContextFold()
+contextfold_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
 
 dp_path = "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data"
 data_points = get_data_point_list_from_directory(dp_path)
@@ -17,9 +17,9 @@ print(f"Total of {dp_size} data points")
 print("Data points loaded!")
 
 # for testing
-# data_points = data_points[0:10000]
+data_points = data_points[0:10]
 
-predictor_name = "RNAFold"
+predictor_name = "example-ContextFold"
 data_type = "DMS"
 
 analysis_report_location = analysis_report_location(predictor_name, data_type)
@@ -43,9 +43,8 @@ for dp in data_points:
     if counter % 250 == 0:
       print(f"Completed {counter} of {dp_size}")
     lengths.append(len(dp.sequence))
-    input_file_path = dp.to_fasta_file()
-    rna_fold.execute(rna_fold_path, input_file_path)
-    prediction = rna_fold.get_ss_prediction()
+    contextFold.execute(contextfold_path, dp.sequence)
+    prediction = contextFold.get_ss_prediction()
     try:
         score = DSCI.score(
             dp.sequence,
@@ -78,3 +77,5 @@ for dp in data_points:
 f.close()
 
 write_pipeline_report(predictor_name, data_type, lengths, accuracies, p_values, one_point_oh_accuracies, lowest_acc, highest_p, skipped_count)
+
+
