@@ -1,7 +1,7 @@
 import pytest
 
 from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer, BasePairPseudoknotScorer
-from RNAFoldAssess.models import DSCIException, DSCITypeError, DSCIValueError
+from RNAFoldAssess.models import DSCIException, DSCIValueError
 
 class TestBaseClass:
     scorer = Scorer(
@@ -44,7 +44,7 @@ class TestDSCI:
             DSCI(self.datum, ".(.)............", "mock algo", evaluate_immediately=True)
         assert(str(e_info.value) == "Please specify if reactivity data is DMS or SHAPE")
 
-    def test_raise_sequence_length_exception(self):
+    def test_raise_reactivities_length_exception(self):
         with pytest.raises(DSCIException) as e_info:
             DSCI.score("GCGACGUGU", "..(...)..", [1,2,3,4,5,6], DMS=True)
         assert(str(e_info.value) == "Reactivities length (6) and secondary structure length (9) don't match.")

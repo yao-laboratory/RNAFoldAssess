@@ -1,4 +1,4 @@
-import path
+import os
 
 from RNAFoldAssess.models import ContraFold, DataPoint
 from RNAFoldAssess.models import DSCI
@@ -11,11 +11,11 @@ class TestContraFold:
     input_file_path = datum.to_seq_file()
     model = ContraFold()
     # Remember, ContraFold is just EternaFold with default parameters
-    model_path = path.Path("/home/yesselmanlab/ewhiting/EternaFold").abspath()
+    model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
 
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
         prediction = self.model.get_ss_prediction()
-        scorer = DSCI(self.datum, self.model.get_ss_prediction(), 'ContraFold', evaluate_immediately=True, DMS=True)
+        scorer = DSCI(self.datum, prediction, 'ContraFold', evaluate_immediately=True, DMS=True)
         metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
