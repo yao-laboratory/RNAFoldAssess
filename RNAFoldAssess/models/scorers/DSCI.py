@@ -3,11 +3,91 @@ from scipy.stats import mannwhitneyu
 from .scorer import Scorer
 
 
-# This scorer is called the DSCI method and uses the Mann-Whitney U-Test
-
 class DSCI(Scorer):
+    """
+    This class implements the DSCI scoring methd, which makes use of the
+    Mann-Whitney U-Test. Note that there are two options to run this scoring
+    mechanism: with a static method (score) or an instance method (evaluate).
+
+    The static method, `score`, requires as input a nucleotide sequence, a
+    predicted secondary structure, chemical mapping reactivity data, and an
+    indication of whether the chemical mapping reactivity data comse from a
+    DMS or SHAPE experiment. Note that the implementation of DSCI differs
+    depending on the type of chemical mapping data given.
+
+    The following code provides an example usage of the DSCI class:
+
+    ```python
+    from RNAFoldAssess.models.scorers import DSCI
+
+    squence = "ACUGACUGAAAAAAAA"
+    predicted_structure = ".(.)............"
+    dms_reactivities = [
+        10.0, 0.0, 10.0, 0.0,
+        10.0, 10.0, 10.0, 10.0,
+        10.0, 10.0, 10.0, 10.0,
+        10.0, 10.0, 10.0, 10.0
+    ]
+
+    score = DSCI.score(
+        sequence,
+        predicted_structure,
+        dms_reactivities,
+        DMS=True
+    )
+    ```
+
+    The `score` method returns a dictionary with an "accuracy" and "p" keys.
+    The "accuracy" key contains a number between 0 and 1 and is the output
+    of the Mann-Whitney U-Test, the "p" is the P-value from the test. In
+    the above example, the value of `score` would be very similar to:
+
+        {
+            "accuracy": 1.0,
+            "p": 0.002
+        }
+
+    Using the instance method, `evaluate`, works similarly. First, you have
+    to create a DSCI object with a `data_point` attribute. Note that the
+    `data_point` has to be an object with `name`, `sequence`, and `reactivites`
+    attributes. There is a `DataPoint` class in this package that can be
+    used, but as long as the object has those attributes, it can be used
+    as the DSCI object's `data_point` attribute.
+
+    The following code provides an example usage of the `evaluate` method:
+
+    ```python
+    from RNAFoldAssess.models.scorers import DSCI
+    from RNAFoldAssess.models import DataPoint
+    data_point = DataPoint(
+        {
+            "name": "DataPointMock",
+            "sequence": "ACUGACUGAAAAAAAA",
+            # Points 1 and 3
+            "data": [
+                10.0, 0.0, 10.0, 0.0,
+                10.0, 10.0, 10.0, 10.0,
+                10.0, 10.0, 10.0, 10.0,
+                10.0, 10.0, 10.0, 10.0
+            ],
+            "reads": 1
+        }
+    )
+
+    scorer = DSCI(self.datum, prediction, "mock algo", DMS=True)
+    scorer.evaluate()
+    accuracy = scorer.accuracy
+    p_value = scorer.p_value
+    ```
+
+    Note that running `evaluate` does not return anything, it only sets the
+    object's `accuracy` and `p_value` attributes. In order to get either of
+    those values, you have to call the `accuracy` or `p_value` attribute.
+    In the above example, the `accuracy` value should be close to 1.0 and the
+    `p_value` value should be less than 0.02
+    """
     def __init__(self,
-                 data_point=None,
+                 data_point,
                  secondary_structure=None,
                  algorithm=None,
                  evaluate_immediately=False,
