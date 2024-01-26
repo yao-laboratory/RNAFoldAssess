@@ -1,12 +1,11 @@
-import heapq
-
-
-# Utitlities for normalizing data. This is mostly for normalizing
-# DMS and SHAPE readings. To normalize, we usually divide everything
-# by the highest number in the dataset. Also, we sometimes have to
-# change negative numbers to just be zero
-
 class Normalizers:
+    """
+    Utitlities for normalizing data. This is mostly for normalizing
+    DMS and SHAPE readings. To normalize, we usually divide everything
+    by the highest number in the dataset. Also, we sometimes have to
+    change negative numbers to just be zero
+    """
+
     @staticmethod
     def simple_normalizer(data=[]):
         m = max(data)

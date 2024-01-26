@@ -1,6 +1,5 @@
 import os, requests
 
-from Bio.PDB import *
 
 class DataPointFromCrystal:
     def __init__(self,
@@ -39,7 +38,7 @@ class DataPointFromCrystal:
         sequence = self.sequence
         if capitalize_sequence:
             sequence = self.sequence.upper()
-        return f">{self.name} en=0.00\n{self.sequence}\n"
+        return f">{self.name} en=0.00\n{sequence}\n"
 
     def get_experiment_type(self, pdb_id=None):
         if not self.pdb_id:

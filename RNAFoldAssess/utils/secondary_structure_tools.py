@@ -1,6 +1,3 @@
-import os
-
-
 class SecondaryStructureTools:
     asterisks  = "*" * 76
     ss_string = "Secondary structures"
@@ -8,12 +5,12 @@ class SecondaryStructureTools:
     @staticmethod
     def parse_structure_file(path):
         """
-        # This method parses the standard-output generated from the
-        # x3dna DSSR method. Usually, we just use the files output
-        # by that tool, but sometimes we pipe the entire output to
-        # a file. This method can read such a file and return an
-        # object from it. The object is a Python dictionary object
-        # with name, sequence, structure, and chains key-value pairs.
+        This method parses the standard-output generated from the
+        x3dna DSSR method. Usually, we just use the files that
+        tool outputs, but sometimes we pipe the entire output to
+        a file. This method can read such a file and return an
+        object from it. The object is a Python dictionary object
+        with name, sequence, structure, and chains key-value pairs.
         """
         f = open(path)
         raw_data = f.read()
