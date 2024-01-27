@@ -1,0 +1,39 @@
+name: Test Pull Request
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, '3.10', '3.11']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Testing with version ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '21'
+      - name: Install RNAFold
+        run: |
+          wget https://www.tbi.univie.ac.at/RNA/download/sourcecode/2_6_x/ViennaRNA-2.6.4.tar.gz
+          tar -zxvf ViennaRNA-2.6.4.tar.gz
+          cd ViennaRNA-2.6.4
+          ./configure
+          make
+          sudo make install
+          pwd
+      - name: Run Tests
+        run: |
+          pip install -e .
+          pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
