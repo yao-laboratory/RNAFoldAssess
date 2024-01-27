@@ -31,5 +31,6 @@ jobs:
       - name: Run Tests
         run: |
           pwd
+          ls
           pip install -e .
-          pytest /home/runner/work/RNAFoldAssess/tests
+          pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
