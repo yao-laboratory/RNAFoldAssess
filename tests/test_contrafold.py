@@ -6,7 +6,7 @@ from RNAFoldAssess.models import DSCI
 
 class TestContraFold:
     # Testing with C009C
-    base_data_path = "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data"
+    base_data_path = "./tests/fixtures"
     datum = DataPoint.factory(f'{base_data_path}/C009C.json')[0]
     input_file_path = datum.to_seq_file()
     model = ContraFold()

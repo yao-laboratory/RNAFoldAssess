@@ -21,7 +21,8 @@ setup(
     python_requires = '>=3.9',
     install_requires = [
         'scipy',
-        'biopython'
+        'requests',
+        'pandas'
     ],
     packages=[
         'RNAFoldAssess',
