@@ -28,15 +28,19 @@ jobs:
           make
           sudo make install
           pwd
-      - name: Install ContraFold
+      - name: Checkout ContraFold
         uses: actions/checkout@v2
         with:
           repository: eternagame/EternaFold
-          path: '~/EternaFold'
-          run: |
-            cd ~/EternaFold/src
-            make
-            pwd
+          path: /home/runner/work/RNAFoldAssess/
+      - name: Install EternaFold
+        run: |
+          cd /home/runner/work/RNAFoldAssess/EternaFold/src
+          make
+          pwd
 
       - name: Run Tests
-        run: pytest
+        run: |
+          pwd
+          pip install -e .
+          pytest
