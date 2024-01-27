@@ -40,8 +40,4 @@ jobs:
           echo "about to echo the path"
           echo $PATH
           pip install -e .
-          echo "1111111"
-          ls /home/runner/work/RNAFoldAssess/RNAFoldAssess
-          echo "2222222"
-          ls /home/runner/work/RNAFoldAssess/RNAFoldAssess/RNAFoldAssess
-          # pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
+          pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
