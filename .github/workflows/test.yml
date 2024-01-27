@@ -28,17 +28,6 @@ jobs:
           make
           sudo make install
           pwd
-      - name: Checkout EternaFold
-        uses: actions/checkout@v2
-        with:
-          repository: eternagame/EternaFold
-      - name: Install EternaFold
-        run: |
-          which git
-          cd /home/runner/work/RNAFoldAssess/RNAFoldAssess/EternaFold/src
-          make
-          pwd
-
       - name: Run Tests
         run: |
           pwd
