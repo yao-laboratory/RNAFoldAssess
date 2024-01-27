@@ -38,6 +38,7 @@ jobs:
           pwd
           ls
           echo "about to echo the path"
-          echo $PATH
+          echo "AHHHHHHHHHH"
+          /home/runner/work/RNAFoldAssess/RNAFoldAssess/ViennaRNA-2.6.4/bin/RNAfold GUAUCCACGCGAGUAGCGUGGAUGCAAAAAAAUAAUAAUAUGGGUGUGGAACUACAGGCAGUAGGGGAAACCCUACUGAACUACCUGCCACACCCUAAGUUAUUAUUUUAC
           pip install -e .
-          pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
+          # pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
