@@ -37,7 +37,8 @@ jobs:
         run: |
           pwd
           ls
-          echo "about to run which java"
-          which java
+          echo "about to echo the path"
+          PATH=/opt/hostedtoolcache/Java_Oracle_jdk/21/x64/bin:$PATH
+          echo $PATH
           pip install -e .
           pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
