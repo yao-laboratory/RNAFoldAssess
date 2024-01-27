@@ -38,7 +38,8 @@ jobs:
           pwd
           ls
           echo "about to echo the path"
-          echo "AHHHHHHHHHH"
-          /home/runner/work/RNAFoldAssess/RNAFoldAssess/ViennaRNA-2.6.4/bin/RNAfold GUAUCCACGCGAGUAGCGUGGAUGCAAAAAAAUAAUAAUAUGGGUGUGGAACUACAGGCAGUAGGGGAAACCCUACUGAACUACCUGCCACACCCUAAGUUAUUAUUUUAC
+          echo "1111111"
+          ls /home/runner/work/RNAFoldAssess/RNAFoldAssess/
+          # /home/runner/work/RNAFoldAssess/RNAFoldAssess/ViennaRNA-2.6.4/bin/RNAfold GUAUCCACGCGAGUAGCGUGGAUGCAAAAAAAUAAUAAUAUGGGUGUGGAACUACAGGCAGUAGGGGAAACCCUACUGAACUACCUGCCACACCCUAAGUUAUUAUUUUAC
           pip install -e .
           # pytest /home/runner/work/RNAFoldAssess/RNAFoldAssess/tests
