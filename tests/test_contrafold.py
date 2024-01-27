@@ -11,7 +11,7 @@ class TestContraFold:
     input_file_path = datum.to_seq_file()
     model = ContraFold()
     # Remember, ContraFold is just EternaFold with default parameters
-    model_path = os.path.abspath("/home/runner/work/RNAFoldAssess/EternaFold")
+    model_path = os.path.abspath("/home/runner/work/RNAFoldAssess/RNAFoldAssess/EternaFold")
 
     def test_prediction(self):
         self.model.execute(self.model_path, self.input_file_path)
