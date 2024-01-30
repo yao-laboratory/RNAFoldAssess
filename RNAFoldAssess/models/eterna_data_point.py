@@ -4,6 +4,15 @@ from RNAFoldAssess.models.scorers import DSCI
 
 
 class EternaDataPoint:
+    """
+    This class provides some utitliy functions for working with data from .rdat files
+    in the EternaBench dataset. Specifically, the author of this repository worked with
+    a lot of the files at this link:
+
+    https://github.com/eternagame/EternaBench/tree/master/data/ChemMappingPreprocessing/raw_rdats
+
+    and many of these methods are helper functions to handle that data.
+    """
     def __init__(self, data_hash, normalize_reactivities_on_init=True):
         self.name = data_hash["name"]
         self.sequence = data_hash["sequence"]
@@ -15,35 +24,52 @@ class EternaDataPoint:
             self.normalize_reactivities()
 
     def unnegate_negatives(self):
+        """
+        A lot of the chemical mapping data in the EternaBench dataset is
+        negative, which will mess up the DSCI scoring algorithm. This
+        method sets any negative number in the reactivity data to 0.
+        """
         for i, r in enumerate(self.reactivities):
             if r <= 0:
                 self.reactivities[i] = 0
 
     def normalize_reactivities(self):
-        largest = heapq.nlargest(1, self.reactivities)[0]
+        largest = max(self.reactivities)
         if largest > 0:
             for i, r in enumerate(self.reactivities):
                 new_val = round(r / largest, 6)
                 self.reactivities[i] = new_val
 
     def to_seq_file(self):
-        f = open(f"{self.name}.seq", "w")
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        f = open(f"{file_safe_name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.seq_path = os.path.abspath(f"{self.name}.seq")
+        self.seq_path = os.path.abspath(f"{file_safe_name}.seq")
         return self.seq_path
 
     def to_fasta_file(self):
-        data = f">{self.name}\n{self.sequence}"
-        f = open(f"{self.name}.fasta", "w")
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        data = f">{file_safe_name}\n{self.sequence}"
+        f = open(f"{file_safe_name}.fasta", "w")
         f.write(data)
         f.close()
-        self.fasta_path = os.path.abspath(f"{self.name}.fasta")
+        self.fasta_path = os.path.abspath(f"{file_safe_name}.fasta")
         return self.fasta_path
 
     # We have to implement DSCI in a special way with these data points
     # becase there isn't reactivity for every data point
     def assess_prediction(self, ss_prediction):
+        """
+        We don't directly use the built-in DSCI scorer of RNAFoldAssess for
+        EternaBench data because not every nucleotide in their dataset has
+        reactivity data. As such, we don't count those nucleotides in the
+        scoring of secondary structure predictions. We decide that there is
+        "no reactivity data" if the reactivity data for that index is 0 (or
+        negative implicitly since we unnegate all the reactivity data by default).
+        """
         structure = ""
         sequence = ""
         for pos in self.positions:
