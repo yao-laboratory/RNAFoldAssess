@@ -30,7 +30,7 @@ class RNAFold:
     predicted secondary structure in dot-bracket notation. To retrieve that
     dot-bracket string, you have to run the `get_ss_prediction` method.
     """
-    def __int__(self):
+    def __init__(self):
         self.output = ""
 
     def execute(self, path_to_rnafold, fasta_file, remove_file_when_done=False):

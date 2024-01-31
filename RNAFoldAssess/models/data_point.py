@@ -2,14 +2,61 @@ import os, json, heapq
 
 
 class DataPoint:
-    def __init__(self, data_hash, cohort=None, normalize_reactivities_on_init=False):
+    """
+    The `DataPoint` class was developped while working with DMS data in our lab. The
+    data we had was captured in a JSON file and looked something like the following:
+
+    ```json
+    [
+        {
+            "name": "sequence_1",
+            "sequence": "ACGUG",
+            "structure": ".....",
+            "data": [0.8, 0.9, 0.7, 0.7, 0.6],
+            "reads": 312
+        },
+        {
+            "name": "sequence_2",
+            ... etc ...
+        }
+    ]
+    ```
+
+    Each file contained thousands of data points, and data points across files had
+    similar names. Therefore, we used the file name as a "cohort." So, if we had
+    two files of 100 squences each called DMS_FILE_1.json and DMS_FILE_2.json, then
+    sequence_1 from the first file was in chort DMS_FILE_1 and its name was
+    DMS_FILE_1_sequence_1. Likewise, in the DMS_FILE_2.json file, the data point named
+    sequence_1 was called DMS_FILE_2_sequence_1.
+
+    If you wish to use this class, the constructor needs, at least, a `data_hash` value
+    that is a dictionary and has at least a name, sequence, and data attribute. The
+    reads attribute is optional.
+
+    Similarly, if you have a JSON file with several data points in them, you can use
+    this class's static `factory` method to create a list of those data points:
+
+    ```python
+    from RNAFoldAssess.models import DataPoint
+
+    dms_file_loc = "data/experiment_1.json"
+    data_points = DataPoint.factory(dms_file_loc)
+    ```
+
+    Please note, the JSON data in the file must have at least a name, sequence, and
+    data attribute.
+    """
+    def __init__(self, data_hash, cohort=None, normalize_reactivities_on_init=False, normalize_and_unnegate_reactivities_on_init=False):
         self.name = data_hash["name"]
         if cohort:
             self.name = f"{cohort}_{self.name}"
         self.sequence = data_hash["sequence"]
         self.reactivities = data_hash["data"]
-        self.reads = data_hash["reads"]
+        self.reads = data_hash["reads"] if "reads" in data_hash else None
         self.cohort = cohort
+        if normalize_and_unnegate_reactivities_on_init:
+            normalize_reactivities_on_init = True
+            self.__unnegate_reactivities()
         if normalize_reactivities_on_init:
             self.__normalize_reactivities()
 
@@ -80,12 +127,23 @@ class DataPoint:
         return data_points
 
     @staticmethod
-    def get_structure_probabilities(path, name_prefix=None):
+    def get_structure_probabilities(path):
+        """
+        This method will take a file containing a json array of DMS data and
+        create a consensus structure from the sequences. This method assumes
+        that all sequences in the json file are the same length. The object
+        returned from this method is a dictionary containing two keys:
+
+            consensus: the consensus structure
+            probabilities: each RNA nucleotide (A, C, G, U) and its probability
+                           from 0 to 1 of being at that location in the sequence
+        """
         f = open(path)
         json_data = json.loads(f.read())
         f.close()
         sequence_scores = []
-        for i in range(65):
+        sequence_length = len(json_data[0]["sequence"])
+        for i in range(sequence_length):
             sequence_scores.append({
                 "A": [0, 0.0],
                 "C": [0, 0.0],
@@ -94,7 +152,7 @@ class DataPoint:
             })
         for datum in json_data:
             seq = datum["sequence"]
-            for i in range(65):
+            for i in range(sequence_length):
                 nt = seq[i]
                 sequence_scores[i][nt][0] += 1
         for score in sequence_scores:
@@ -107,7 +165,7 @@ class DataPoint:
 
 
     @staticmethod
-    def combined_structure_probabilities(paths, name_prefixes=[]):
+    def combined_structure_probabilities(paths):
         data = []
         for path in paths:
             f = open(path)
@@ -141,8 +199,13 @@ class DataPoint:
 
     def __normalize_reactivities(self):
         # Using a simple normalizer
-        largest = heapq.nlargest(1, self.reactivities)[0]
+        largest = max(self.reactivities)
         if largest > 0:
             for i, r in enumerate(self.reactivities):
                 new_val = round(r / largest, 6)
                 self.reactivities[i] = new_val
+
+    def __unnegate_reactivities(self):
+        for i, r in enumerate(self.reactivities):
+            if r < 0:
+                self.reactivities[i] = 0.0

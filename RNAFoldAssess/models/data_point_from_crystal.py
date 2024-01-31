@@ -1,7 +1,30 @@
-import os, requests
+import os
 
 
 class DataPointFromCrystal:
+    """
+    This class was created while we were working with output from PDB files,
+    however, it is mostly a data point that is built via manual entry. The
+    true_structure attribute can be extracted from the PDB file; we used x3dna
+    in our work to get the "known" secondary structure. You can use whatever
+    tool you want, but the structure should be in dot-bracket notation. This
+    class doesn't provide any convenience methods like a secondary structure
+    extractor, a sequence extractor, or even a means of downloading the PDB
+    file remotely. The class assumes you already have sequence and secondary
+    structure data.
+
+    The static `factory` method in this class will create a list of data points
+    if you give it a text file structured like so:
+
+    ```
+    >pdb_id_1 other=info
+    ACGUGCUGUCGGU
+    .(.....).....
+    >pdb_id_2 other=info
+    AGGUGCUGUCGGU
+    .(.......)...
+    ```
+    """
     def __init__(self,
                  name,
                  sequence,
@@ -18,20 +41,21 @@ class DataPointFromCrystal:
         self.predicted_structure = predicted_structure
 
     def to_seq_file(self):
-        name = self.name.replace(" ", "_")
-        f = open(f"{name}.seq", "w")
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        f = open(f"{file_safe_name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.path = os.path.abspath(f"{name}.seq")
+        self.path = os.path.abspath(f"{file_safe_name}.seq")
         return self.path
 
     def to_fasta_file(self):
-        name = self.name.replace(" ", "_")
-        data = f">{name}\n{self.sequence}"
-        f = open(f"{name}.fasta", "w")
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        data = f">{file_safe_name}\n{self.sequence}"
+        f = open(f"{file_safe_name}.fasta", "w")
         f.write(data)
         f.close()
-        self.path = os.path.abspath(f"{name}.fasta")
+        self.path = os.path.abspath(f"{file_safe_name}.fasta")
         return self.path
 
     def to_fasta_string(self, capitalize_sequence=True):
