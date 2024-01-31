@@ -20,7 +20,7 @@ class DSCI(Scorer):
     ```python
     from RNAFoldAssess.models.scorers import DSCI
 
-    squence = "ACUGACUGAAAAAAAA"
+    sequence = "ACUGACUGAAAAAAAA"
     predicted_structure = ".(.)............"
     dms_reactivities = [
         10.0, 0.0, 10.0, 0.0,
@@ -44,7 +44,7 @@ class DSCI(Scorer):
 
         {
             "accuracy": 1.0,
-            "p": 0.002
+            "p": 0.0013
         }
 
     Using the instance method, `evaluate`, works similarly. First, you have
