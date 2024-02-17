@@ -54,12 +54,6 @@ class TestDSCI:
             DSCI.score("ACGUGU", "..(...)..", [1,2,3,4,5,6], DMS=True)
         assert(str(e_info.value) == "Sequence length (6) and secondary structure length (9) don't match.")
 
-    def test_raise_u_test_exception(self):
-        reactivities = [0.001, 0.001, 0.001, 0.010]
-        with pytest.raises(DSCIValueError) as e_info:
-            DSCI.score("ACGU", "....", reactivities, DMS=True)
-        assert(str(e_info) == "<ExceptionInfo DSCIValueError('ValueError failure reading sequence ACGU: `x` and `y` must be of nonzero size.') tblen=2>")
-
     # DMS based tests
     def test_perfect_prediction(self):
         prediction = ".(.)............"
@@ -86,6 +80,42 @@ class TestDSCI:
         )
         assert(scorer.accuracy == static_scorer["accuracy"])
         assert(scorer.p_value == static_scorer["p"])
+
+    def test_no_base_pairs_accurate(self):
+        datum = DataPoint(
+            {
+                "name": "DataPointMock2",
+                "sequence": "ACUGACUGAAAAAAAA",
+                "data": [
+                    10.0, 10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0, 10.0,
+                    10.0, 10.0, 10.0, 10.0
+                ],
+                "reads": 1
+            }
+        )
+        prediction = "................"
+        scorer = DSCI(datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
+        assert(scorer.accuracy == 1.0)
+
+    def test_no_base_pairs_inaccurate(self):
+        datum = DataPoint(
+            {
+                "name": "DataPointMock2",
+                "sequence": "ACUGACUGAAAAAAAA",
+                "data": [
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0
+                ],
+                "reads": 1
+            }
+        )
+        prediction = "................"
+        scorer = DSCI(datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
+        assert(scorer.accuracy == 0.0)
 
     # SHAPE based tests
     def test_paired_unpaired_retriever(self):

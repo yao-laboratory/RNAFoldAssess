@@ -298,11 +298,155 @@ def crystal_evals(model,
     f2.write(about_data)
     f2.close()
 
+def generate_rasp_data(model,
+                       model_name,
+                       model_path,
+                       data_path,
+                       data_type_name,
+                       file_prefix,
+                       species,
+                       to_seq_file=False,
+                       testing=False,
+                       chemical_mapping_method="DMS"):
+    headers = "algo_name, datapoint_name, prediction, accuracy, p_value"
+    skipped = 0
+    lengths = []
+    problem_datapoints = []
+    generated_report_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_predictions.txt"
+    problem_datapoint_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_problems.txt"
+    print(f"Loading datapoints")
+    dps = DataPoint.factory(data_path)
+    # Remove data points that are only 1 nucleotide long
+    # 1-nt sequence cannot form a secondary structure
+    for dp in dps:
+        if len(dp.sequence) == 1:
+            dps.remove(dp)
+    dp_count = len(dps)
+    print(f"Loaded {dp_count} datapoints")
+    if testing:
+        dps = dps[200:400]
+
+    report_file = open(generated_report_path, "w")
+    report_file.write(headers + "\n")
+    problem_file = open(problem_datapoint_path, "w")
+
+    print("About to generate evaluations")
+    if testing:
+        start = time.time()
+
+    counter = 0
+    rows_to_write = []
+    for dp in dps:
+        if counter % 200 == 0:
+            print(f"Completed {counter} of {dp_count}")
+            for r in rows_to_write:
+                report_file.write(r)
+            rows_to_write = []
+
+        if model_name not in ["ContextFold", "SeqFold"]:
+            if to_seq_file:
+                input_file_path = dp.to_seq_file()
+            else:
+                input_file_path = dp.to_fasta_file()
+        else:
+            # These two models can take string input
+            input_file_path = dp.sequence
+        try:
+            # Handle different model types
+            if model_name in ["ContextFold", "SeqFold"]:
+                if model_name == "ContextFold" and len(dp.sequence) < 10:
+                    skipped += 1
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 10\n")
+                    continue
+                if model_name == "SeqFold" and len(dp.sequence) < 2:
+                    skipped += 1
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
+                    continue
+                model.execute(model_path, dp.sequence)
+            elif model_name == "RandomPredictor":
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+
+            if model_name == "IPknot":
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
+
+            if chemical_mapping_method == "DMS":
+                score = DSCI.score(
+                    dp.sequence,
+                    prediction,
+                    dp.reactivities,
+                    DMS=True
+                )
+            else:
+                score = DSCI.score(
+                    dp.sequence,
+                    prediction,
+                    dp.reactivities,
+                    SHAPE=True
+                )
+
+            accuracy = round(score["accuracy"], 4)
+            p = round(score["p"], 4)
+
+            line_to_write = f"{model_name}, {dp.name}, {prediction}, {accuracy}, {p}\n"
+            rows_to_write.append(line_to_write)
+
+            lengths.append(len(dp.sequence))
+            counter += 1
+
+        except (DSCITypeError, DSCIValueError) as dsci_error:
+            skipped += 1
+            problem_to_write = f"{dp.name}, {dsci_error}, {prediction}\n"
+            problem_file.write(problem_to_write)
+            continue
+
+        except Exception as e:
+            skipped += 1
+            problem_to_write = f"{dp.name}, {e}\n"
+            problem_file.write(problem_to_write)
+
+    if len(rows_to_write) != 0:
+        for r in rows_to_write:
+            report_file.write(r)
+            rows_to_write = []
+
+    report_file.close()
+    problem_file.close()
+
+    if testing:
+        end = time.time()
+        elapsed = end - start
+        avg = len(dps) / elapsed
+        projected_time = (dp_count * avg) / 60 / 60
+
+    # Get auxilary data
+    if len(lengths) == 0:
+        lengths = [1,2,3,4] # Some bs data to stop exceptions
+    aux_data = f"Data points evaluated: {counter}\n"
+    aux_data += f"Longest sequence: {max(lengths)}\n"
+    aux_data += f"Shortest sequence: {min(lengths)}\n"
+    aux_data += f"Average sequence length: {sum(lengths) / len(lengths)}\n"
+    aux_data += f"Skipped {skipped} files for throwing exceptions\n"
+
+    if testing:
+        aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
+
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_aux_data.txt"
+    aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
+    aux_file = open(aux_data_path, "w")
+    aux_file.write(aux_data)
+    aux_file.close()
+
+
 def generate_dms_evaluations(model,
                                model_name,
                                model_path,
                                sequence_data_path="/common/yesselmanlab/ewhiting/data/bprna/fasta_files",
                                dp_file_path="/common/yesselmanlab/ewhiting/ss_deeplearning_data/data",
+                               reports_dir="ydata",
                                data_type_name="YesselmanDMS",
                                to_seq_file=False,
                                testing=False):
@@ -311,8 +455,8 @@ def generate_dms_evaluations(model,
     lengths = []
     problem_datapoints = []
     data_point_files = os.listdir(dp_file_path)
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/ydata/{model_name}_{data_type_name}_report.txt"
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/ydata/{model_name}_{data_type_name}_aux_data.txt"
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_report.txt"
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_aux_data.txt"
 
     print(f"Loading data points from {len(data_point_files)} files ...")
     data_points = []
@@ -324,9 +468,6 @@ def generate_dms_evaluations(model,
             data_points.append(dp)
 
     file_len = len(data_points)
-
-    if testing:
-        data_points = data_points[17360:17410] # There's an error-prone data point in here
 
     dp_size = len(data_points)
     print(f"Total of {dp_size} data points")

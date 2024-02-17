@@ -42,6 +42,10 @@ class DSCI(Scorer):
         )
 
         try:
+            if not paired:
+                paired = [1.0]
+            if not unpaired:
+                unpaired = [0]
             result = mannwhitneyu(unpaired, paired, alternative="greater")
             denominator = len(paired) * len(unpaired)
             metrics = (result.statistic / denominator, result.pvalue)
