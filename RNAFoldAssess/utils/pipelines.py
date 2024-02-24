@@ -337,6 +337,10 @@ def generate_rasp_data(model,
     counter = 0
     rows_to_write = []
     for dp in dps:
+        if len(dp.sequence) <= 1:
+            skipped += 1
+            problem_file.write(f"{dp.name} Can't predict base pairing for one nucleotide\n")
+            continue
         if counter % 200 == 0:
             print(f"Completed {counter} of {dp_count}")
             for r in rows_to_write:
