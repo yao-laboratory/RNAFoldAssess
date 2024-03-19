@@ -18,7 +18,7 @@ def generate_c_bpRNA_evaluations(model,
                                leniences=[0, 1],
                                testing=False):
     data_type_name = "bpRNA-1m-90"
-    headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, F1, data_point_type"
+    headers = "algo_name, datapoint_name, lenience, sequence, prediction, sensitivity, ppv, F1, data_point_type"
     skipped = 0
     lengths = []
     weird_sequences = []
@@ -62,7 +62,7 @@ def generate_c_bpRNA_evaluations(model,
                 model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)
             prediction = model.get_ss_prediction()
             for lenience in leniences:
-                line_to_write = f"{model_name}, {name}, {lenience}, "
+                line_to_write = f"{model_name}, {name}, {lenience}, {seq}, {prediction}, "
                 scorer = BasePairScorer(true_structure, prediction, lenience)
                 scorer.evaluate()
                 s = scorer.sensitivity

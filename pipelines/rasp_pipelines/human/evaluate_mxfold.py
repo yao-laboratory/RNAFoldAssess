@@ -2,7 +2,7 @@ import os, datetime
 
 import pandas as pd
 
-model_name = "ContextFold"
+model_name = "MXFold"
 chemical_mapping_method = "DMS"
 species = "human"
 
@@ -56,7 +56,7 @@ for jf in json_files:
 
 all_avg_p_val = sum(all_p_vals) / len(all_p_vals)
 all_s = pd.Series(all_acc_scores)
-all_descriptive_stats = s.describe()
+all_descriptive_stats = all_s.describe()
 
 report = f"{model_name} evaluation on RASP data for {species} species\n"
 report += f"Evaluated {len(all_acc_scores)} data points\n"

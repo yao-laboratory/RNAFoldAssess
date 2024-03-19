@@ -59,7 +59,7 @@ def generate_eterna_data_evaluations(model,
     print(f"There are {len(dms_datapoints)} DMS datapoints")
     print(f"There were {fail_count} errors detecting chemical mapping experiment type")
 
-    headers = "algo_name, datapoint_name, accuracy, p_value, sequence_length"
+    headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value, sequence_length"
     shape_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_SHAPE_pipeline_report.txt"
     dms_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_DMS_pipeline_report.txt"
 
@@ -70,7 +70,7 @@ def generate_eterna_data_evaluations(model,
         sf = open(shape_report_path, "w")
         sf.write(f"{headers}\n")
         for sev in shape_evals:
-            line = f"{model_name}, {sev[0]}, {sev[1]}, {sev[2]}, {sev[3]}\n"
+            line = f"{model_name}, {sev[0]}, {sev[1]}, {sev[2]}, {sev[3]}, {sev[4]}, {sev[5]}\n"
             sf.write(line)
         sf.close()
         write_eterna_data_analysis(model_name, shape_evals, problem_datapoints, s_skipped, "SHAPE")
@@ -82,7 +82,7 @@ def generate_eterna_data_evaluations(model,
         df = open(dms_report_path, "w")
         df.write(f"{headers}\n")
         for dev in dms_evals:
-            line = f"{model_name}, {dev[0]}, {dev[1]}, {dev[2]}, {dev[3]}\n"
+            line = f"{model_name}, {dev[0]}, {dev[1]}, {dev[2]}, {dev[3]}, {dev[4]}, {dev[5]}\n"
             df.write(line)
         df.close()
         write_eterna_data_analysis(model_name, dms_evals, problem_datapoints, d_skipped, "DMS")
@@ -143,7 +143,7 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
                 model.execute(model_path, input_file_path)
             predicted_structure = model.get_ss_prediction()
             score = dp.assess_prediction(predicted_structure)
-            retvals.append([dp.name, round(score["accuracy"], 4), round(score["p"], 4), len(dp.sequence)])
+            retvals.append([dp.name, dp.sequence, predicted_structure, round(score["accuracy"], 4), round(score["p"], 4), len(dp.sequence)])
         except (DSCITypeError, DSCIValueError) as dsci_error:
             skipped += 1
             problem_datapoints.append(dp.name)
@@ -157,16 +157,13 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
 def crystal_evals(model,
                   model_name,
                   model_path,
-                  dbn_path,
-                  data_type_name,
-                  fasta_file_location="/common/yesselmanlab/ewhiting/data/crystal1_XRAY/fasta_files",
+                  dbn_path="/common/yesselmanlab/ewhiting/data/crystal_all/symmetric_chains_no_pseudoknot",
+                  data_type_name="crystal",
+                  fasta_file_location="/common/yesselmanlab/ewhiting/data/crystal1_all/fasta_files",
                   to_seq_file=False,
                   leniences=[0, 1],
-                  crystal2_dataset=True,
-                  rna_only=False,
-                  with_protein=False,
                   testing=False):
-    headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, f1"
+    headers = "algo_name, datapoint_name, lenience, sequence, prediction, sensitivity, ppv, f1"
     dps = DataPointFromCrystal.factory_from_dbn_files(dbn_path)
     if testing:
         dps = dps[:20]
@@ -187,16 +184,8 @@ def crystal_evals(model,
         lowest_ppv[f"{lenience}"] = [1.0, ""]
         lowest_f1[f"{lenience}"] = [1.0, ""]
 
-    if crystal2_dataset:
-        if rna_only:
-            analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/rna_only/{model_name}_{data_type_name}_report.txt"
-            pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/rna_only/{model_name}_{data_type_name}.txt"
-        elif with_protein:
-            analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/with_protein/{model_name}_{data_type_name}_report.txt"
-            pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal2/with_protein/{model_name}_{data_type_name}.txt"
-    else:
-        analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}_report.txt"
-        pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal1/{model_name}_{data_type_name}.txt"
+    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal_all/{model_name}_{data_type_name}_report.txt"
+    pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal_all/{model_name}_{data_type_name}.txt"
 
     f = open(analysis_report_path, "w")
     f.write(f"{headers}\n")
@@ -207,6 +196,10 @@ def crystal_evals(model,
 
     print("About to run evaluation")
     for dp in dps:
+        if len(dp.sequence) <= 1:
+            skipped += 1
+            print(f"Skipping {dp.name} because it is only one nucleotide long")
+            continue
         if counter % 125 == 0:
             print(f"Completed {counter} of {dp_size} data points and {len(leniences)} leniences")
         lengths.append(len(dp.sequence))
@@ -238,7 +231,7 @@ def crystal_evals(model,
             continue
 
         for lenience in leniences:
-            f.write(f"{model_name}, {dp.name}, {lenience}, ")
+            f.write(f"{model_name}, {dp.name}, {lenience}, {dp.sequence}, {prediction}, ")
             scorer = BasePairScorer(dp.true_structure, prediction, lenience)
             scorer.evaluate()
             s = scorer.sensitivity
@@ -808,7 +801,7 @@ def generate_bpRNA_evaluations(model,
                                leniences=[0, 1],
                                testing=False):
     data_type_name = "bpRNA-1m-90"
-    headers = "algo_name, datapoint_name, lenience, sensitivity, ppv, F1, data_point_type"
+    headers = "algo_name, datapoint_name, lenience, sequence, prediction, sensitivity, ppv, F1, data_point_type"
     skipped = 0
     lengths = []
     weird_sequences = []
@@ -864,7 +857,7 @@ def generate_bpRNA_evaluations(model,
                 s = scorer.sensitivity
                 p = scorer.ppv
                 f1 = scorer.f1
-                line_to_write += f"{s}, {p}, {f1}\n"
+                line_to_write += f"{seq}, {prediction}, {s}, {p}, {f1}\n"
                 rows_to_write.append(line_to_write)
             lengths.append(len(seq))
             counter += 1

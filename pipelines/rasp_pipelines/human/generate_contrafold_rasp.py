@@ -5,10 +5,9 @@ from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.utils import *
 
 
-model_name = "ContextFold"
-model = ContextFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
-
+model_name = "ContraFold"
+model = ContraFold()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
 
 species = "human"
 data = f"/common/yesselmanlab/ewhiting/data/rasp_data/processed/{species}"

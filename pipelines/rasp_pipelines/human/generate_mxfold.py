@@ -4,10 +4,9 @@ from RNAFoldAssess.models import DataPointFromCrystal
 from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.utils import *
 
-
-model_name = "ContextFold"
-model = ContextFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
+model_name = "MXFold"
+model = MXFold()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/mxfold/build/mxfold")
 
 
 species = "human"
@@ -28,4 +27,5 @@ for json_file in json_files:
         testing=False,
         chemical_mapping_method="DMS"
     )
+
 

@@ -2,9 +2,9 @@ import os, datetime
 
 import pandas as pd
 
-model_name = "ContextFold"
-chemical_mapping_method = "DMS"
-species = "arabidopsis"
+model_name = "MXFold"
+chemical_mapping_method = "SHAPE"
+species = "covid"
 
 
 data = f"/common/yesselmanlab/ewhiting/data/rasp_data/processed/{species}"
@@ -31,12 +31,9 @@ for jf in json_files:
             acc = float(prediction[-2])
             if acc == 1.0:
                 perfect_score_count += 1
-                all_perfect_score_count += 1
             p = float(prediction[-1])
             acc_scores.append(acc)
-            all_acc_scores.append(acc)
             p_vals.append(p)
-            all_p_vals.append(p)
         avg_p_val = sum(p_vals) / len(p_vals)
         s = pd.Series(acc_scores)
         descriptive_stats = s.describe()
@@ -50,6 +47,10 @@ for jf in json_files:
         f = open(report_path, "w")
         f.write(report)
         f.close()
+
+        all_acc_scores += acc_scores
+        all_p_vals += p_vals
+        all_perfect_score_count += perfect_score_count
 
 
 

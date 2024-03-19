@@ -11,7 +11,7 @@ source ~/.bashrc
 conda activate rna_fold_assess
 module load java
 
-cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/arabidopsis
+cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/covid
 python generate_mxfold.py
 python evaluate_mxfold.py
 

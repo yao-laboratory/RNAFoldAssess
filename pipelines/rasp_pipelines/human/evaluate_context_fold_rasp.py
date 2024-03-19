@@ -4,7 +4,7 @@ import pandas as pd
 
 model_name = "ContextFold"
 chemical_mapping_method = "DMS"
-species = "arabidopsis"
+species = "human"
 
 
 data = f"/common/yesselmanlab/ewhiting/data/rasp_data/processed/{species}"
