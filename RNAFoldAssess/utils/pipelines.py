@@ -301,12 +301,12 @@ def generate_rasp_data(model,
                        to_seq_file=False,
                        testing=False,
                        chemical_mapping_method="DMS"):
-    headers = "algo_name, datapoint_name, prediction, accuracy, p_value"
+    headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value"
     skipped = 0
     lengths = []
     problem_datapoints = []
-    generated_report_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_predictions.txt"
-    problem_datapoint_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_problems.txt"
+    generated_report_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_predictions.txt"
+    problem_datapoint_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_problems.txt"
     print(f"Loading datapoints")
     dps = DataPoint.factory(data_path)
     # Remove data points that are only 1 nucleotide long
@@ -388,7 +388,7 @@ def generate_rasp_data(model,
             accuracy = round(score["accuracy"], 4)
             p = round(score["p"], 4)
 
-            line_to_write = f"{model_name}, {dp.name}, {prediction}, {accuracy}, {p}\n"
+            line_to_write = f"{model_name}, {dp.name}, {dp.sequence}, {prediction}, {accuracy}, {p}\n"
             rows_to_write.append(line_to_write)
 
             lengths.append(len(dp.sequence))
@@ -431,7 +431,7 @@ def generate_rasp_data(model,
     if testing:
         aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
 
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{file_prefix}_aux_data.txt"
+    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_aux_data.txt"
     aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
     aux_file = open(aux_data_path, "w")
     aux_file.write(aux_data)
