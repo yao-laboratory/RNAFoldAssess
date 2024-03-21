@@ -48,7 +48,7 @@ class TestDSCI:
     def test_raise_experiment_exception(self):
         with pytest.raises(DSCIException) as e_info:
             DSCI(self.datum, ".(.)............", "mock algo", evaluate_immediately=True)
-        assert(str(e_info.value) == "Please specify if reactivity data is DMS or SHAPE")
+        assert(str(e_info.value) == "Please specify if reactivity data is DMS, SHAPE, or CMCT")
 
     def test_raise_sequence_length_exception(self):
         with pytest.raises(DSCIException) as e_info:

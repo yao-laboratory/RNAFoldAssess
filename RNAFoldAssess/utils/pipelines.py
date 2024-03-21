@@ -460,10 +460,10 @@ def generate_ribonanza_evaluations(model,
     # Experiment types:
     # {'BzCN_cotx', 'deg_Mg_50C', 'BzCN', 'DMS_M2_seq', 'deg_pH10', 'deg_Mg_pH10', 'DMS_cotx', 'deg_50C', 'NMIA', 'DMS', 'CMCT', '1M7'
     experiment_map = {
-        "BzCN_cotx": "DMS",
-        "DMS_M2_seq": "DMS",
-        "DMS_cotx": "DMS",
-        "DMS": "DMS",
+        "BzCN_cotx": "DMS4",
+        "DMS_M2_seq": "DMS4",
+        "DMS_cotx": "DMS4",
+        "DMS": "DMS4",
         "1M7": "SHAPE",
         "NMIA": "SHAPE",
         "BzCN": "SHAPE",
@@ -471,7 +471,7 @@ def generate_ribonanza_evaluations(model,
         "deg_50C": "SHAPE",
         "deg_pH10": "SHAPE",
         "deg_Mg_pH10": "SHAPE",
-        "CMCT": "DMS"
+        "CMCT": "CMCT"
     }
     report_path = "/common/yesselmanlab/ewhiting/reports/ribonanza"
 
@@ -551,7 +551,7 @@ def generate_ribonanza_evaluations(model,
             else:
                 prediction = model.get_ss_prediction()
 
-            if chemical_mapping_method == "DMS":
+            if chemical_mapping_method in ["DMS4", "SHAPE"]:
                 score = DSCI.score(
                     dp.sequence,
                     prediction,
@@ -563,7 +563,7 @@ def generate_ribonanza_evaluations(model,
                     dp.sequence,
                     prediction,
                     dp.reactivities,
-                    SHAPE=True
+                    CMCT=True
                 )
 
             accuracy = round(score["accuracy"], 4)

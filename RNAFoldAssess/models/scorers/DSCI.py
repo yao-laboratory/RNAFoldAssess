@@ -12,7 +12,8 @@ class DSCI(Scorer):
                  algorithm=None,
                  evaluate_immediately=False,
                  DMS=False,
-                 SHAPE=False):
+                 SHAPE=False,
+                 CMCT=False):
         self.data_point = data_point
         self.secondary_structure = secondary_structure
         self.algorithm = algorithm
@@ -23,9 +24,9 @@ class DSCI(Scorer):
             self.evaluate()
 
     @staticmethod
-    def score(sequence, secondary_structure, reactivities, DMS=False, SHAPE=False):
+    def score(sequence, secondary_structure, reactivities, DMS=False, SHAPE=False, CMCT=False):
         if not DMS != SHAPE:
-            raise DSCIException("Please specify if reactivity data is DMS or SHAPE")
+            raise DSCIException("Please specify if reactivity data is DMS, SHAPE, or CMCT")
 
         if len(sequence) != len(secondary_structure):
             raise DSCIException(f"Sequence length ({len(sequence)}) and secondary structure length ({len(secondary_structure)}) don't match.")
@@ -33,7 +34,13 @@ class DSCI(Scorer):
         if len(reactivities) != len(secondary_structure):
             raise DSCIException(f"Reactivities length ({len(reactivities)}) and secondary structure length ({len(secondary_structure)}) don't match.")
 
-        experiment_type = "DMS" if DMS else "SHAPE"
+        if DMS:
+            experiment_type = "DMS"
+        elif SHAPE:
+            experiment_type = "SHAPE"
+        elif CMCT:
+            experiment_type = "CMCT"
+
         paired, unpaired = DSCI.get_paired_and_unpaired_nucleotides(
             sequence,
             secondary_structure,
