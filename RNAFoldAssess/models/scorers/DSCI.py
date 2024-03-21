@@ -60,11 +60,13 @@ class DSCI(Scorer):
 
     @staticmethod
     def get_paired_and_unpaired_nucleotides(sequence, secondary_structure, reactivities, experiment_type):
-        if experiment_type not in ["DMS", "SHAPE"]:
-            raise DSCIException("Please specify if reactivity data is DMS or SHAPE")
+        if experiment_type not in ["DMS", "SHAPE", "CMCT"]:
+            raise DSCIException("Please specify if reactivity data is DMS, SHAPE, or CMCT")
 
         paired, unpaired = [], []
         for nt, db, val in zip(sequence, secondary_structure, reactivities):
+            if experiment_type == "CMCT" and (nt != "G" and nt != "U"):
+                continue
             if experiment_type == "DMS" and (nt != "A" and nt != "C"):
                 continue
             if db == ".":

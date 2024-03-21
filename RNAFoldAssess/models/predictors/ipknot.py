@@ -5,7 +5,7 @@ class IPknot:
     def __init__(self):
         self.output = ""
 
-    def execute(self, path, fasta_file, remove_file_when_done=False):
+    def execute(self, path, fasta_file, remove_file_when_done=True):
         path_to_ipknot = os.path.abspath(path)
         exec_string = f"{path} {fasta_file}"
         self.output = os.popen(exec_string).read()

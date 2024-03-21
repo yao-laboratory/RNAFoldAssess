@@ -329,10 +329,16 @@ def generate_rasp_data(model,
 
     counter = 0
     rows_to_write = []
+    length_skip_threshold = 5
     for dp in dps:
         if len(dp.sequence) <= 1:
             skipped += 1
             problem_file.write(f"{dp.name} Can't predict base pairing for one nucleotide\n")
+            continue
+        if len(dp.sequence) < length_skip_threshold:
+            # Want to skip these because we think a secondary structure cannot
+            # form if it's less than 5 nucleotides long. Don't want to add to
+            # the skipped count, just continue.
             continue
         if counter % 200 == 0:
             print(f"Completed {counter} of {dp_count}")
@@ -436,6 +442,149 @@ def generate_rasp_data(model,
     aux_file = open(aux_data_path, "w")
     aux_file.write(aux_data)
     aux_file.close()
+
+
+def generate_ribonanza_evaluations(model,
+                                   model_name,
+                                   model_path,
+                                   to_seq_file=False,
+                                   testing=False):
+    ribo_data_csv = "/common/yesselmanlab/ewhiting/data/ribonanza/rmdb_data.v1.3.0.csv"
+    f = open(ribo_data_csv)
+    data = f.readlines()
+    f.close()
+    # Get rid of headers
+    data.pop(0)
+    data = [d.split(",") for d in data]
+    r1_index = 7
+    # Experiment types:
+    # {'BzCN_cotx', 'deg_Mg_50C', 'BzCN', 'DMS_M2_seq', 'deg_pH10', 'deg_Mg_pH10', 'DMS_cotx', 'deg_50C', 'NMIA', 'DMS', 'CMCT', '1M7'
+    experiment_map = {
+        "BzCN_cotx": "DMS",
+        "DMS_M2_seq": "DMS",
+        "DMS_cotx": "DMS",
+        "DMS": "DMS",
+        "1M7": "SHAPE",
+        "NMIA": "SHAPE",
+        "BzCN": "SHAPE",
+        "deg_Mg_50C": "SHAPE",
+        "deg_50C": "SHAPE",
+        "deg_pH10": "SHAPE",
+        "deg_Mg_pH10": "SHAPE",
+        "CMCT": "DMS"
+    }
+    report_path = "/common/yesselmanlab/ewhiting/reports/ribonanza"
+
+    # Create report file map
+    report_files = {}
+    for k in experiment_map:
+        f = open(f"{report_path}/{model_name}_{k}_predictions.txt", "w")
+        report_files[k] = f
+
+    # Create problem file map
+    problem_files = {}
+    for k in experiment_map:
+        f = open(f"{report_path}/{model_name}_{k}_problems.txt", "w")
+        problem_files[k] = f
+
+    if testing:
+        data = data[:10]
+
+    # Run Evaluations
+    print("Starting evaluations")
+    counter = 0
+    for d in data:
+        name = d[0]
+        seq = d[1]
+        experiment_type = d[2]
+        chemical_mapping_method = experiment_map[experiment_type]
+        report_file = report_files[experiment_type]
+        problem_file = problem_files[experiment_type]
+        reactivities = d[r1_index:len(seq) + r1_index]
+        testable_seq = ""
+        testable_reactivities = []
+        for i, reactivity in enumerate(reactivities):
+            if reactivity != "":
+                testable_seq += seq[i]
+                testable_reactivities.append(float(reactivity))
+
+        sequence = testable_seq
+        if len(sequence) < 2:
+            # Can't predict secondary structure on one nucleotide
+            continue
+
+        reactivities = testable_reactivities
+        dp = DataPoint({
+            "name": name,
+            "sequence": sequence,
+            "data": reactivities,
+            "reads": 0
+        })
+        if counter % 200 == 0:
+            print(f"Completed {counter} of {len(data)}")
+
+        if model_name not in ["ContextFold", "SeqFold"]:
+            if to_seq_file:
+                input_file_path = dp.to_seq_file()
+            else:
+                input_file_path = dp.to_fasta_file()
+        else:
+            # These two models can take string input
+            input_file_path = dp.sequence
+        try:
+            # Handle different model types
+            if model_name in ["ContextFold", "SeqFold"]:
+                if model_name == "ContextFold" and len(dp.sequence) < 10:
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 10\n")
+                    continue
+                if model_name == "SeqFold" and len(dp.sequence) < 2:
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
+                    continue
+                model.execute(model_path, dp.sequence)
+            elif model_name == "RandomPredictor":
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+
+            if model_name == "IPknot":
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
+
+            if chemical_mapping_method == "DMS":
+                score = DSCI.score(
+                    dp.sequence,
+                    prediction,
+                    dp.reactivities,
+                    DMS=True
+                )
+            else:
+                score = DSCI.score(
+                    dp.sequence,
+                    prediction,
+                    dp.reactivities,
+                    SHAPE=True
+                )
+
+            accuracy = round(score["accuracy"], 4)
+            p = round(score["p"], 4)
+
+            line_to_write = f"{model_name}, {dp.name}, {dp.sequence}, {prediction}, {accuracy}, {p}\n"
+            report_file.write(line_to_write)
+            counter += 1
+
+        except (DSCITypeError, DSCIValueError) as dsci_error:
+            problem_to_write = f"{dp.name}, {dsci_error}, {prediction}\n"
+            problem_file.write(problem_to_write)
+            continue
+
+        except Exception as e:
+            problem_to_write = f"{dp.name}, {e}\n"
+            problem_file.write(problem_to_write)
+
+    for k in experiment_map:
+        report_files[k].close()
+        problem_files[k].close()
 
 
 def generate_dms_evaluations(model,

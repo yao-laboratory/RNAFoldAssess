@@ -5,7 +5,7 @@ class Eterna:
     def __init__(self):
         self.output = ""
 
-    def execute(self, eterna_path, seq_file, remove_file_when_done=False):
+    def execute(self, eterna_path, seq_file, remove_file_when_done=True):
         exec_string = f"{eterna_path}/src/contrafold predict {seq_file} --params {eterna_path}/parameters/EternaFoldParams.v1"
         self.output = os.popen(exec_string).read()
         if remove_file_when_done:

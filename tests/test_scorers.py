@@ -23,6 +23,12 @@ class TestBaseClass:
 
 
 class TestDSCI:
+    """
+    *** !!!! NOTE !!!! ***
+    I may have gotten a few parts wrong in the tests here. Just know that
+    High reactivity --> High probability of unpaired nucleotide
+    Low reactivity  --> High probability of paired nucleotide
+    """
     # Testing with C009C
     datum = DataPoint(
         {
@@ -115,22 +121,24 @@ class TestDSCI:
         )
         prediction = "................"
         scorer = DSCI(datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
-        assert(scorer.accuracy == 0.0)
+        assert(scorer.accuracy == 0.5)
 
     # SHAPE based tests
     def test_paired_unpaired_retriever(self):
         seq = "UUCCAAGCUCUG"
         ss  = "..(...)....."
         reactivities = [
-            0.0, 0.0, 0.9,
-            0.0, 0.0, 0.0,
-            0.9, 0.0, 0.0,
-            0.0, 0.0, 0.0
+            0.9, 0.9, 0.0,
+            0.9, 0.9, 0.9,
+            0.0, 0.9, 0.9,
+            0.9, 0.9, 0.9
         ]
-        DMS_expected_paired = [0.9]
-        DMS_expected_unpaired = [0.0, 0.0, 0.0, 0.0, 0.0]
-        SHAPE_expected_paired = [0.9, 0.9]
-        SHAPE_expected_unpaired = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        DMS_expected_paired = [0.0]
+        DMS_expected_unpaired = [0.9, 0.9, 0.9, 0.9, 0.9]
+        SHAPE_expected_paired = [0.0, 0.0]
+        SHAPE_expected_unpaired = [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+        CMCT_expected_paired = [0.0]
+        CMCT_expected_unpaired = [0.9, 0.9, 0.9, 0.9, 0.9]
 
         d_p, d_up = DSCI.get_paired_and_unpaired_nucleotides(seq, ss, reactivities, "DMS")
         assert(d_p == DMS_expected_paired)
@@ -139,6 +147,10 @@ class TestDSCI:
         s_p, s_up = DSCI.get_paired_and_unpaired_nucleotides(seq, ss, reactivities, "SHAPE")
         assert(s_p == SHAPE_expected_paired)
         assert(s_up == SHAPE_expected_unpaired)
+
+        c_p, c_up = DSCI.get_paired_and_unpaired_nucleotides(seq, ss, reactivities, "CMCT")
+        assert(c_p == CMCT_expected_paired)
+        assert(c_up == CMCT_expected_unpaired)
 
     def test_perfect_prediction_SHAPE(self):
         prediction = ".(.)............"
