@@ -2,9 +2,9 @@
 #SBATCH --licenses=common
 #SBATCH --time=60:00:00          # Run time in hh:mm:ss
 #SBATCH --mem-per-cpu=64GB
-#SBATCH --job-name=cf_rasp
-#SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/contrafold/cf_rasp.%J.err
-#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/contrafold/cf_rasp.%J.out
+#SBATCH --job-name=cr_rasp
+#SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/contrafold/cr_rasp.%J.err
+#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rasp_pipelines/contrafold/cr_rasp.%J.out
 
 conda init bash
 source ~/.bashrc

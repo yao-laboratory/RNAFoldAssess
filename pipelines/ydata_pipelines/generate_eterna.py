@@ -15,6 +15,6 @@ generate_dms_evaluations(
     model_name=model_name,
     model_path=model_path,
     to_seq_file=True,
-    testing=True
+    testing=False
 )
 print("done")

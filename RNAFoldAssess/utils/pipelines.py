@@ -400,6 +400,9 @@ def generate_rasp_data(model,
             lengths.append(len(dp.sequence))
             counter += 1
 
+            if to_seq_file:
+                os.remove(input_file_path)
+
         except (DSCITypeError, DSCIValueError) as dsci_error:
             skipped += 1
             problem_to_write = f"{dp.name}, {dsci_error}, {prediction}\n"
@@ -556,7 +559,7 @@ def generate_ribonanza_evaluations(model,
                     dp.sequence,
                     prediction,
                     dp.reactivities,
-                    DMS=True
+                    SHAPE=True
                 )
             else:
                 score = DSCI.score(
@@ -596,7 +599,7 @@ def generate_dms_evaluations(model,
                                data_type_name="YesselmanDMS",
                                to_seq_file=False,
                                testing=False):
-    headers = "algo_name, datapoint_name, accuracy, p_value"
+    headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value"
     skipped = 0
     lengths = []
     problem_datapoints = []
@@ -613,6 +616,8 @@ def generate_dms_evaluations(model,
         for dp in dps:
             data_points.append(dp)
 
+    if testing:
+        data_points = data_points[:20]
     file_len = len(data_points)
 
     dp_size = len(data_points)
@@ -630,6 +635,7 @@ def generate_dms_evaluations(model,
     counter = 0
     rows_to_write = []
     for dp in data_points:
+        made_a_file = False
         if counter % 250 == 0:
             print(f"Completed {counter} of {dp_size}")
             f = open(analysis_report_path, "a")
@@ -641,8 +647,10 @@ def generate_dms_evaluations(model,
         if model_name not in ["ContextFold", "SeqFold"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
+                made_a_file = True
             else:
                 input_file_path = dp.to_fasta_file()
+                made_a_file = True
         try:
             line_to_write = ""
             # Handle different model types
@@ -668,12 +676,14 @@ def generate_dms_evaluations(model,
             accuracy = round(score["accuracy"], 4)
             p = round(score["p"], 4)
 
-            headers = "algo_name, datapoint_name, accuracy, p_value"
-            line_to_write = f"{model_name}, {dp.name}, {round(accuracy, 4)}, {round(p, 4)}\n"
+            line_to_write = f"{model_name}, {dp.name}, {dp.sequence}, {prediction}, {round(accuracy, 4)}, {round(p, 4)}\n"
             rows_to_write.append(line_to_write)
 
             lengths.append(len(dp.sequence))
             counter += 1
+
+            if made_a_file:
+                os.remove(input_file_path)
 
         except (DSCITypeError, DSCIValueError) as dsci_error:
             skipped += 1
