@@ -291,6 +291,111 @@ def crystal_evals(model,
     f2.write(about_data)
     f2.close()
 
+
+def generate_rnandria_evaluations(model, model_name, model_path, source_data_path, source_type, to_seq_file=False, testing=False):
+    headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value, sequence_length"
+    skipped = 0
+    counter = 0
+    length_skip_threshold = 5
+    problem_datapoints = []
+    report_dir = "/common/yesselmanlab/ewhiting/reports/rnandria"
+    report_path = f"{model_name}_rnandria_{source_type}_predictions.txt"
+    problem_path = f"{model_name}_rnandria_{source_type}_problems.txt"
+    report_file = open(f"{report_dir}/{report_path}", "w")
+    problem_file = open(f"{report_dir}/{problem_path}", "w")
+    dps = DataPoint.factory(source_data_path)
+
+    print("Loading datapoints")
+    if testing:
+        dps = dps[:20]
+    dp_count = len(dps)
+    print(f"Loaded {dp_count} data points")
+    rows_to_write = []
+    for dp in dps:
+        if len(dp.sequence) <= 1:
+            skipped += 1
+            problem_file.write(f"{dp.name} Can't predict base pairing for one nucleotide\n")
+            continue
+        if len(dp.sequence) < length_skip_threshold:
+            # Want to skip these because we think a secondary structure cannot
+            # form if it's less than 5 nucleotides long. Don't want to add to
+            # the skipped count, just continue.
+            continue
+        if counter % 200 == 0:
+            print(f"Completed {counter} of {dp_count}")
+            for r in rows_to_write:
+                report_file.write(r)
+            rows_to_write = []
+
+        if model_name not in ["ContextFold", "SeqFold"]:
+            if to_seq_file:
+                input_file_path = dp.to_seq_file()
+            else:
+                input_file_path = dp.to_fasta_file()
+        else:
+            # These two models can take string input
+            input_file_path = dp.sequence
+        try:
+            # Handle different model types
+            if model_name in ["ContextFold", "SeqFold"]:
+                if model_name == "ContextFold" and len(dp.sequence) < 10:
+                    skipped += 1
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 10\n")
+                    continue
+                if model_name == "SeqFold" and len(dp.sequence) < 2:
+                    skipped += 1
+                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
+                    continue
+                model.execute(model_path, dp.sequence)
+            elif model_name == "RandomPredictor":
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+
+            if model_name == "IPKnot":
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
+
+            score = DSCI.score(
+                dp.sequence,
+                prediction,
+                dp.reactivities,
+                DMS=True
+            )
+
+            accuracy = round(score["accuracy"], 4)
+            p = round(score["p"], 4)
+
+            line_to_write = f"{model_name}, {dp.name}, {dp.sequence}, {prediction}, {accuracy}, {p}, {len(dp.sequence)}\n"
+            rows_to_write.append(line_to_write)
+
+            counter += 1
+
+            if to_seq_file:
+                os.remove(input_file_path)
+
+        except (DSCITypeError, DSCIValueError) as dsci_error:
+            skipped += 1
+            problem_to_write = f"{dp.name}, {dsci_error}, {prediction}\n"
+            problem_file.write(problem_to_write)
+            continue
+
+        except Exception as e:
+            skipped += 1
+            problem_to_write = f"{dp.name}, {e}\n"
+            problem_file.write(problem_to_write)
+
+    if len(rows_to_write) != 0:
+        for r in rows_to_write:
+            report_file.write(r)
+            rows_to_write = []
+
+    report_file.close()
+    problem_file.close()
+
+
+
 def generate_rasp_data(model,
                        model_name,
                        model_path,

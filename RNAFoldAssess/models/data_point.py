@@ -8,7 +8,8 @@ class DataPoint:
             self.name = f"{cohort}_{self.name}"
         self.sequence = data_hash["sequence"]
         self.reactivities = data_hash["data"]
-        self.reads = data_hash["reads"]
+        if "reads" in list(data_hash.keys()):
+            self.reads = data_hash["reads"]
         self.cohort = cohort
         if normalize_reactivities_on_init:
             self.__normalize_reactivities()
