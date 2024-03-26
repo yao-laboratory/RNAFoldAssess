@@ -95,6 +95,21 @@ class SecondaryStructureTools:
         """
         return ("[" in dbn or "]" in dbn)
 
+    @staticmethod
+    def get_free_energy(sequence, structure):
+        rna_fold_path = "/home/yesselmanlab/ewhiting/ViennaRNA/bin/RNAeval"
+        # Have to make temp file
+        tmp_file = "/common/yesselmanlab/ewhiting/tmp/input.txt"
+        fh = open(tmp_file, "w")
+        fh.write(f"{sequence}\n{structure}")
+        fh.close()
+        cmd = f"{rna_fold_path} -d2 < {tmp_file}"
+        fe_output = os.popen(cmd).read().strip()
+        fe = fe_output.split(" ")[-1]
+        fe = float(fe[1:-1])
+        os.remove(tmp_file)
+        return fe
+
 
 class SecondaryStructureToolsException(Exception):
     pass
