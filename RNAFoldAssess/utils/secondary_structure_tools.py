@@ -103,11 +103,18 @@ class SecondaryStructureTools:
         fh = open(tmp_file, "w")
         fh.write(f"{sequence}\n{structure}")
         fh.close()
-        cmd = f"{rna_fold_path} -d2 < {tmp_file}"
+        # The `--nsp` allows for non-canonical base pairs
+        cmd = f'{rna_fold_path} --nsp="CU,UC,AC,CA,AG,GA,GG,AA,UU,CC" -d2 < {tmp_file}'
         fe_output = os.popen(cmd).read().strip()
+        if fe_output == "":
+            return False
         fe = fe_output.split(" ")[-1]
-        fe = float(fe[1:-1])
-        os.remove(tmp_file)
+        fe = float(fe.replace("(", "").replace(")", ""))
+        try:
+            os.remove(tmp_file)
+        except FileNotFoundError:
+            print(f"SecondaryStructureTools couldn't remove {tmp_file}")
+            return fe
         return fe
 
 
