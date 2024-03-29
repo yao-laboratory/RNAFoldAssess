@@ -405,7 +405,8 @@ def generate_rasp_data(model,
                        species,
                        to_seq_file=False,
                        testing=False,
-                       chemical_mapping_method="DMS"):
+                       chemical_mapping_method="DMS",
+                       part_2=False):
     headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value"
     skipped = 0
     lengths = []
@@ -424,6 +425,9 @@ def generate_rasp_data(model,
     if testing:
         dps = dps[200:400]
 
+    if part_2:
+        generated_report_path += ".2.txt"
+        problem_datapoint_path += ".2.txt"
     report_file = open(generated_report_path, "w")
     report_file.write(headers + "\n")
     problem_file = open(problem_datapoint_path, "w")
@@ -556,7 +560,8 @@ def generate_ribonanza_evaluations(model,
                                    model_name,
                                    model_path,
                                    to_seq_file=False,
-                                   testing=False):
+                                   testing=False,
+                                   part2=False):
     ribo_data_csv = "/common/yesselmanlab/ewhiting/data/ribonanza/rmdb_data.v1.3.0.csv"
     f = open(ribo_data_csv)
     data = f.readlines()
@@ -586,13 +591,19 @@ def generate_ribonanza_evaluations(model,
     # Create report file map
     report_files = {}
     for k in experiment_map:
-        f = open(f"{report_path}/{model_name}_{k}_predictions.txt", "w")
+        if part2:
+            f = open(f"{report_path}/{model_name}_{k}_predictions2.txt", "w")
+        else:
+            f = open(f"{report_path}/{model_name}_{k}_predictions.txt", "w")
         report_files[k] = f
 
     # Create problem file map
     problem_files = {}
     for k in experiment_map:
-        f = open(f"{report_path}/{model_name}_{k}_problems.txt", "w")
+        if part2:
+            f = open(f"{report_path}/{model_name}_{k}_problems2.txt", "w")
+        else:
+            f = open(f"{report_path}/{model_name}_{k}_problems.txt", "w")
         problem_files[k] = f
 
     if testing:
@@ -654,7 +665,7 @@ def generate_ribonanza_evaluations(model,
             else:
                 model.execute(model_path, input_file_path)
 
-            if model_name == "IPknot":
+            if model_name == "IPKnot":
                 prediction = model.get_ss_prediction_ignore_pseudoknots()
             else:
                 prediction = model.get_ss_prediction()

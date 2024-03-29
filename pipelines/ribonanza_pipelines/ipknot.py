@@ -12,5 +12,6 @@ generate_ribonanza_evaluations(
     model,
     model_name,
     model_path,
-    testing=False
+    testing=False,
+    part2=True
 )
