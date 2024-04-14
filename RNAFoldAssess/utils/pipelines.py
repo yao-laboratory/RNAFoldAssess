@@ -4,6 +4,7 @@ import pandas as pd
 
 from RNAFoldAssess.models import DataPoint, EternaDataPoint, DataPointFromCrystal
 from RNAFoldAssess.models.scorers import *
+from RNAFoldAssess.utils.secondary_structure_tools import SecondaryStructureTools
 
 headers = "algo_name, datapoint_name, accuracy, p_value, ground_truth_data_type"
 
@@ -141,7 +142,10 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
-            predicted_structure = model.get_ss_prediction()
+            if model_name in ["IPKnot", "IPknot"]:
+                predicted_structure = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                predicted_structure = model.get_ss_prediction()
             score = dp.assess_prediction(predicted_structure)
             retvals.append([dp.name, dp.sequence, predicted_structure, round(score["accuracy"], 4), round(score["p"], 4), len(dp.sequence)])
         except (DSCITypeError, DSCIValueError) as dsci_error:
@@ -586,7 +590,7 @@ def generate_ribonanza_evaluations(model,
         "deg_Mg_pH10": "SHAPE",
         "CMCT": "CMCT"
     }
-    report_path = "/common/yesselmanlab/ewhiting/reports/ribonanza"
+    report_path = "/common/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
 
     # Create report file map
     report_files = {}
@@ -628,11 +632,11 @@ def generate_ribonanza_evaluations(model,
                 testable_reactivities.append(float(reactivity))
 
         sequence = testable_seq
+        reactivities = testable_reactivities
         if len(sequence) < 2:
             # Can't predict secondary structure on one nucleotide
             continue
 
-        reactivities = testable_reactivities
         dp = DataPoint({
             "name": name,
             "sequence": sequence,
@@ -670,25 +674,27 @@ def generate_ribonanza_evaluations(model,
             else:
                 prediction = model.get_ss_prediction()
 
+            testable_prediction = prediction[:len(sequence)]
             if chemical_mapping_method in ["DMS4", "SHAPE"]:
                 score = DSCI.score(
-                    dp.sequence,
-                    prediction,
-                    dp.reactivities,
+                    sequence,
+                    testable_prediction,
+                    reactivities,
                     SHAPE=True
                 )
             else:
                 score = DSCI.score(
-                    dp.sequence,
-                    prediction,
-                    dp.reactivities,
+                    sequence,
+                    testable_prediction,
+                    reactivities,
                     CMCT=True
                 )
 
             accuracy = round(score["accuracy"], 4)
             p = round(score["p"], 4)
-
-            line_to_write = f"{model_name}, {dp.name}, {dp.sequence}, {prediction}, {accuracy}, {p}\n"
+            # Get free energy
+            fe = SecondaryStructureTools.get_free_energy(testable_seq, testable_prediction)
+            line_to_write = f"{model_name}, {dp.name}, {testable_seq}, {testable_prediction}, {accuracy}, {p}, {fe}\n"
             report_file.write(line_to_write)
             counter += 1
 

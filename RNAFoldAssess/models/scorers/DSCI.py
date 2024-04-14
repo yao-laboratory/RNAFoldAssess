@@ -25,7 +25,8 @@ class DSCI(Scorer):
 
     @staticmethod
     def score(sequence, secondary_structure, reactivities, DMS=False, SHAPE=False, CMCT=False):
-        if not DMS != SHAPE:
+        reactivity_types = [DMS, SHAPE, CMCT]
+        if reactivity_types.count(True) != 1:
             raise DSCIException("Please specify if reactivity data is DMS, SHAPE, or CMCT")
 
         if len(sequence) != len(secondary_structure):

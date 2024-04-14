@@ -15,6 +15,6 @@ generate_bpRNA_evaluations(
     model_name=model_name,
     model_path=model_path,
     sequence_data_path="/common/yesselmanlab/ewhiting/data/bprna/seq_files",
-    testing=True
+    testing=False
 )
 print("done")

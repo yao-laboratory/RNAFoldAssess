@@ -1,4 +1,4 @@
-import os
+import os, string, random
 
 
 class SecondaryStructureTools:
@@ -99,7 +99,8 @@ class SecondaryStructureTools:
     def get_free_energy(sequence, structure):
         rna_fold_path = "/home/yesselmanlab/ewhiting/ViennaRNA/bin/RNAeval"
         # Have to make temp file
-        tmp_file = "/common/yesselmanlab/ewhiting/tmp/input.txt"
+        random_string = "".join(random.choices(string.ascii_letters + string.digits, k=12))
+        tmp_file = f"/common/yesselmanlab/ewhiting/tmp/input_{random_string}.txt"
         fh = open(tmp_file, "w")
         fh.write(f"{sequence}\n{structure}")
         fh.close()

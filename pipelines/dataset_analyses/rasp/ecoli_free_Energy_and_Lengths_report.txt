@@ -1,0 +1,3 @@
+RASP - ecoli - predictions analysis report
+Removed 0 free-energy readings from high-accuracy predictions
+Removed 0 free-energy readings from low-accuracy predictions
