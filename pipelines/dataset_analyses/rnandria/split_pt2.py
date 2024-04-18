@@ -12,8 +12,9 @@ def human_file_name(model_name):
     return f"{base_dir}/{model_name}_rnandria_human_mRNA_predictions.txt"
 
 destination_base = "/common/yesselmanlab/ewhiting/reports/rnandria/analyses"
+all_destination = f"{destination_base}"
 pri_destination = f"{destination_base}/pri"
-human_destination = f"{destination_dir}/human"
+human_destination = f"{destination_base}/human"
 
 all_accuracies = []
 pri_accuracies = []
@@ -65,16 +66,16 @@ all_stats = all_s.describe()
 pri_stats = pri_s.describe()
 human_stats = human_s.describe()
 
-f = open(f"{destination_base}/all_accuracies_stats.txt", "w")
-w.write(str(all_stats))
+f = open(f"all_accuracies_stats.txt", "w")
+f.write(str(all_stats))
 f.close()
 
-f = open(f"{destination_base}/pri_accuracies_stats.txt", "w")
-w.write(str(pri_stats))
+f = open(f"pri_accuracies_stats.txt", "w")
+f.write(str(pri_stats))
 f.close()
 
-f = open(f"{destination_base}/human_accuracies_stats.txt", "w")
-w.write(str(human_stats))
+f = open(f"human_accuracies_stats.txt", "w")
+f.write(str(human_stats))
 f.close()
 
 
@@ -97,7 +98,7 @@ for m in models:
         "pri_mid": 0,
         "pri_high": 0,
         "human_low": 0,
-        "human_mid": 0
+        "human_mid": 0,
         "human_high": 0
     }
 
@@ -115,38 +116,55 @@ for m in models:
     data = pf.readlines()
     pf.close()
     # Get rid of headers
-    if data == []:
-        continue
-    data.pop(0)
-    for d in data:
-        items = d.split(", ")
-        acc = items[4]
-        if acc <= lo_cutoff:
-            all_lo_preds.append(d)
-            model_perf[m]["all_low"] += 1
-        elif acc >= hi_cutoff:
-            all_hi_preds.append(d)
-            model_perf[m]["all_high"] += 1
-        else:
-            model_perf[m]["all_mid"] += 1
+    if data != []:
+        data.pop(0)
+        for d in data:
+            items = d.split(", ")
+            acc = float(items[4])
+            if acc <= lo_cutoff:
+                all_lo_preds.append(d)
+                model_perf[m]["all_low"] += 1
+            elif acc >= hi_cutoff:
+                all_hi_preds.append(d)
+                model_perf[m]["all_high"] += 1
+            else:
+                model_perf[m]["all_mid"] += 1
 
-        if acc <= pri_lo_cutoff:
-            pri_lo_preds.append(d)
-            model_perf[m]["pri_low"] += 1
-        elif acc >= pri_hi_cutoff:
-            pri_hi_preds.append(d)
-            model_perf[m]["pri_high"] += 1
-        else:
-            model_perf[m]["pri_mid"] += 1
+            if acc <= pri_lo_cutoff:
+                pri_lo_preds.append(d)
+                model_perf[m]["pri_low"] += 1
+            elif acc >= pri_hi_cutoff:
+                pri_hi_preds.append(d)
+                model_perf[m]["pri_high"] += 1
+            else:
+                model_perf[m]["pri_mid"] += 1
 
-        if acc <= human_lo_cutoff:
-            hum_lo_preds.append(d)
-            model_perf[m]["human_low"] += 1
-        elif acc >= human_hi_cutoff:
-            hum_hi_preds.append(d)
-            model_perf[m]["human_high"] += 1
-        else:
-            model_perf[m]["human_mid"] += 1
+    hum_path = human_file_name(m)
+    hf = open(hum_path)
+    data = hf.readlines()
+    hf.close()
+    if data != []:
+        data.pop(0)
+        for d in data:
+            items = d.split(", ")
+            acc = float(items[4])
+            if acc <= lo_cutoff:
+                all_lo_preds.append(d)
+                model_perf[m]["all_low"] += 1
+            elif acc >= hi_cutoff:
+                all_hi_preds.append(d)
+                model_perf[m]["all_high"] += 1
+            else:
+                model_perf[m]["all_mid"] += 1
+
+            if acc <= human_lo_cutoff:
+                hum_lo_preds.append(d)
+                model_perf[m]["human_low"] += 1
+            elif acc >= human_hi_cutoff:
+                hum_hi_preds.append(d)
+                model_perf[m]["human_high"] += 1
+            else:
+                model_perf[m]["human_mid"] += 1
 
 
 def write_predictions(predictions, file_path):
@@ -157,11 +175,15 @@ def write_predictions(predictions, file_path):
 
 destination_base = "/common/yesselmanlab/ewhiting/reports/rnandria/analyses"
 pri_destination = f"{destination_base}/pri"
-human_destination = f"{destination_dir}/human"
+human_destination = f"{destination_base}/human"
 
 write_predictions(all_lo_preds, f"{destination_base}/all_low_predictions.txt")
-write_predictions(all_lo_preds, f"{pri_destination}/pri_miRNA_low_predictions.txt")
-write_predictions(all_lo_preds, f"{human_destination}/human_mRNA_predictions.txt")
+write_predictions(pri_lo_preds, f"{pri_destination}/pri_miRNA_low_predictions.txt")
+write_predictions(hum_lo_preds, f"{human_destination}/human_mRNA_low_predictions.txt")
+
+write_predictions(all_hi_preds, f"{destination_base}/all_high_predictions.txt")
+write_predictions(pri_hi_preds, f"{pri_destination}/pri_miRNA_high_predictions.txt")
+write_predictions(hum_hi_preds, f"{human_destination}/human_mRNA_high_predictions.txt")
 
 def write_model_perf(location, prefix):
     line = "model, low, high, middle\n"
@@ -172,3 +194,8 @@ def write_model_perf(location, prefix):
         line += f"{m}\t{low}\t{mid}\t{high}\n"
     f = open(location, "w")
     f.write(line)
+    f.close()
+
+write_model_perf("RNAndria_all_model_perf.txt", "all")
+write_model_perf("RNAndria_pri_model_perf.txt", "pri")
+write_model_perf("RNAndria_human_model_perf.txt", "human")

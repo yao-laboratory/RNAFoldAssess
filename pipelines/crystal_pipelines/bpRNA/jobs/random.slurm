@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --licenses=common
-#SBATCH --time=60:00:00          # Run time in hh:mm:ss
+#SBATCH --time=110:00:00          # Run time in hh:mm:ss
 #SBATCH --mem-per-cpu=64GB
 #SBATCH --job-name=ran_bp
 #SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/jobs/ran_bp.%J.err

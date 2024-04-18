@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 
-base_dir = "/common/yesselmanlab/ewhiting/reports/bprna"
+base_dir = "/common/yesselmanlab/ewhiting/reports/bprna/filtered"
 
 no_lenience_sensitivities = []
 one_bp_lenience_sensitivities = []

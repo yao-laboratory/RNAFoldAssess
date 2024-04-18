@@ -5,7 +5,7 @@ import pandas as pd
 base_dir = "/common/yesselmanlab/ewhiting/reports/rasp_data"
 
 def get_prediction_files(model_name, species):
-    predictions_dir = f"{base_dir}/{species}/{model_name}/filtered"
+    predictions_dir = f"{base_dir}/{species}/{model_name}/filtered/with_energies"
     all_files = os.listdir(predictions_dir)
     files = [f"{predictions_dir}/{f}" for f in all_files if f.endswith("predictions.txt")]
     return files
