@@ -89,7 +89,7 @@ def generate_eterna_data_evaluations(model,
         write_eterna_data_analysis(model_name, dms_evals, problem_datapoints, d_skipped, "DMS")
     print("DMS evaluation compelte")
 
-def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_mapping_method):
+def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_mapping_method, partition_number=None):
     count_problems = len(problems)
     accuracies = []
     lengths = []
@@ -114,7 +114,10 @@ def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_ma
             report += f"{p}\n"
         report += "\n"
     report += f"Report generated on: {datetime.datetime.now()}\n\n"
-    path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_analysis_report.txt"
+    if partition_number:
+        path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_partition-{partition_number}_analysis_report.txt"
+    else:
+        path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_analysis_report.txt"
     f = open(path, "w")
     f.write(report)
     f.close()
@@ -138,6 +141,8 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
+            elif model_name == "MXFold2":
+                model.execute(input_file_path)
             elif model_name == "RandomPredictor":
                 model.execute(input_file_path)
             else:
@@ -479,12 +484,12 @@ def generate_rasp_data(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "MXFold2"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
 
-            if model_name == "IPknot":
+            if model_name in ["IPknot", "IPKnot"]:
                 prediction = model.get_ss_prediction_ignore_pseudoknots()
             else:
                 prediction = model.get_ss_prediction()
@@ -721,6 +726,14 @@ def generate_dms_evaluations(model,
                                data_type_name="YesselmanDMS",
                                to_seq_file=False,
                                testing=False):
+    approved_chorots = [
+        "C014G",
+        "C014H",
+        "C014I",
+        "C014J",
+        "C014U",
+        "C014V"
+    ]
     headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value"
     skipped = 0
     lengths = []
@@ -733,6 +746,8 @@ def generate_dms_evaluations(model,
     data_points = []
     for dpf in data_point_files:
         cohort = dpf.split(".")[0]
+        if cohort not in approved_chorots:
+            continue
         print(f"Loading data points from {cohort} cohort")
         dps = DataPoint.factory(f"{dp_file_path}/{dpf}", cohort)
         for dp in dps:
@@ -778,7 +793,7 @@ def generate_dms_evaluations(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "MXFold2"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)

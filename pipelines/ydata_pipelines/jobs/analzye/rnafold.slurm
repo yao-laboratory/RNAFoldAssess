@@ -4,14 +4,13 @@
 #SBATCH --mem-per-cpu=64GB
 #SBATCH --job-name=rf_y
 #SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/rf_y.%J.err
-#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/rf_y%J.out
+#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ribonanza_pipelines/rf_y%J.out
 
 conda init bash
 source ~/.bashrc
 conda activate rna_fold_assess
 module load java
-module load viennarna
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines
-python generate_rnafold.py
+python analyze_rnafold.py
 

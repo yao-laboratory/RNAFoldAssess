@@ -16,6 +16,7 @@ models = [
     "EternaFold",
     "IPKnot",
     "MXFold",
+    "MXFold2",
     "RandomPredictor",
     "RNAFold",
     "SeqFold"

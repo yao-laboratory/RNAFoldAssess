@@ -2,16 +2,14 @@
 #SBATCH --licenses=common
 #SBATCH --time=60:00:00          # Run time in hh:mm:ss
 #SBATCH --mem-per-cpu=64GB
-#SBATCH --job-name=rf_y
-#SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/rf_y.%J.err
-#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/rf_y%J.out
+#SBATCH --job-name=mx2_yg
+#SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/mx2_yg.%J.err
+#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines/mx2_yg.%J.out
 
 conda init bash
 source ~/.bashrc
 conda activate rna_fold_assess
 module load java
-module load viennarna
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines
-python generate_rnafold.py
-
+python generate_mxfold2.py C014G
