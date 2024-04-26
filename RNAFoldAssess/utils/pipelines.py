@@ -141,9 +141,7 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name == "MXFold2":
-                model.execute(input_file_path)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)

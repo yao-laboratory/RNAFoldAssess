@@ -30,6 +30,10 @@ class RNAStructure:
         exec_string = f"{path_to_fold} --MFE {os.path.abspath(seq_file)} {destination}"
         self.path_to_ct_file = destination
         self.output = os.popen(exec_string).read()
+        try:
+            os.remove(seq_file)
+        except FileNotFoundError:
+            print(f"RNAStructure: Couldn't find {seq_file} files to delete")
 
     def get_ss_prediction(self):
         # The one loaded by `module load viennarna` hangs
