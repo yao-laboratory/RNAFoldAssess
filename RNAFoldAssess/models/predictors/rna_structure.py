@@ -17,17 +17,35 @@ class RNAStructure:
         self.output = ""
         self.path_to_ct_file = ""
 
-    def execute(self, path, fasta_file, output_path):
-        path_to_fold = os.path.abspath(path)
-        exec_string = f"{path_to_fold} {os.path.abspath(fasta_file)} ./{output_path}"
-        self.path_to_ct_file = os.path.abspath(output_path)
+    def execute(self, seq_file, output_path_base="/common/yesselmanlab/ewhiting/reports/rnastructure_ct_outputs", additional_output_dir=None):
+        # Don't need path if it's `module load`ed
+        # path_to_fold = os.path.abspath(path)
+        path_to_fold = "Fold"
+        sfile_name = os.path.basename(seq_file)
+        ct_name = f"{sfile_name.split(".")[0]}.ct"
+        if additional_output_dir:
+            destination = f"{output_path_base}/{additional_output_dir}/{ct_name}"
+        else:
+            destination = f"{output_path_base}/{ct_name}"
+        exec_string = f"{path_to_fold} --MFE {os.path.abspath(seq_file)} {destination}"
+        self.path_to_ct_file = destination
         self.output = os.popen(exec_string).read()
 
     def get_ss_prediction(self):
-        ct2db_path_string = "../ViennaRNA/src/Utils/ct2db"
+        # The one loaded by `module load viennarna` hangs
+        ct2db_path_string = "/home/yesselmanlab/ewhiting/ViennaRNA/bin/ct2db"
         exec_string = f"{ct2db_path_string} {self.path_to_ct_file}"
         output = os.popen(exec_string).read()
         strings = output.split("\n")
-        ss = strings[-2]
+        ss = strings[2]
         return ss
+
+    def get_mfe(self):
+        f = open(self.path_to_ct_file)
+        data = f.readlines()
+        f.close()
+        first_line = data[0]
+        strings = first_line.split()
+        mfe = strings[3]
+        return float(mfe)
 
