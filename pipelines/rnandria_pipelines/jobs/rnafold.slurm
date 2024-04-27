@@ -9,6 +9,7 @@
 conda init bash
 source ~/.bashrc
 conda activate rna_fold_assess
+module load viennarna
 module load java
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rnandria_pipelines/

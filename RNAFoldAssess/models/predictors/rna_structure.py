@@ -13,13 +13,20 @@ class RNAStructure:
     # though and as of right now, I'm not going to use it because
     # not every dataset will have reactivity data.
 
-    def __init__(self):
+    def __init__(self, delete_seq_file=True):
         self.output = ""
         self.path_to_ct_file = ""
+        self.mfe = None
+        self.delete_seq_file = delete_seq_file
 
-    def execute(self, seq_file, output_path_base="/common/yesselmanlab/ewhiting/reports/rnastructure_ct_outputs", additional_output_dir=None):
+    def execute(self,
+                seq_file,
+                output_path_base="/common/yesselmanlab/ewhiting/reports/rnastructure_ct_outputs",
+                additional_output_dir=None,
+                delete_ct_file_when_done=True):
         # Don't need path if it's `module load`ed
         # path_to_fold = os.path.abspath(path)
+        self.delete_ct_file_when_done = delete_ct_file_when_done
         path_to_fold = "Fold"
         sfile_name = os.path.basename(seq_file)
         ct_name = f"{sfile_name.split(".")[0]}.ct"
@@ -30,16 +37,25 @@ class RNAStructure:
         exec_string = f"{path_to_fold} --MFE {os.path.abspath(seq_file)} {destination}"
         self.path_to_ct_file = destination
         self.output = os.popen(exec_string).read()
-        try:
-            os.remove(seq_file)
-        except FileNotFoundError:
-            print(f"RNAStructure: Couldn't find {seq_file} files to delete")
+        if self.delete_seq_file:
+            try:
+                os.remove(seq_file)
+            except FileNotFoundError:
+                print(f"RNAStructure: Couldn't find {seq_file} files to delete")
 
     def get_ss_prediction(self):
+        if not os.path.isfile(self.path_to_ct_file):
+            raise Exception(f"RNAStructure exception: no .ct file generated")
         # The one loaded by `module load viennarna` hangs
         ct2db_path_string = "/home/yesselmanlab/ewhiting/ViennaRNA/bin/ct2db"
         exec_string = f"{ct2db_path_string} {self.path_to_ct_file}"
         output = os.popen(exec_string).read()
+        self.mfe = self.get_mfe()
+        if self.delete_ct_file_when_done:
+            try:
+                os.remove(self.path_to_ct_file)
+            except FileNotFoundError:
+                print(f"RNAStructure: Couldn't find {self.path_to_ct_file} to delete")
         strings = output.split("\n")
         ss = strings[2]
         return ss
@@ -50,6 +66,9 @@ class RNAStructure:
         f.close()
         first_line = data[0]
         strings = first_line.split()
-        mfe = strings[3]
-        return float(mfe)
+        if len(strings) > 3:
+            mfe = strings[3]
+            return float(mfe)
+        else:
+            return None
 

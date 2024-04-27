@@ -8,6 +8,7 @@ models = [
     "MXFold",
     "MXFold2",
     "RandomPredictor",
+    "RNAStructure",
     "RNAFold",
     "SeqFold"
 ]
@@ -110,6 +111,7 @@ for s in species:
         if m == "MXFold2":
             continue
         ms_report_dir = f"{report_dir}/{nf}/{m}"
+        print(ms_report_dir)
         files = os.listdir(ms_report_dir)
         files = [f for f in files if f.endswith("predictions.txt")]
         accs = []
@@ -123,7 +125,7 @@ for s in species:
                 acc = float(items[4])
                 accs.append(acc)
         if len(accs) > 0:
-            model_accuracies[m][f"rasp_data_{s}"] = round(sum(accs)/len(accs), 4)
+            model_accuracies[m][f"rasp_data_{s}"] = sum(accs)/len(accs)
 
 
 # Get Ribonanza
@@ -193,8 +195,24 @@ for m in models:
         accs.append(acc)
     model_accuracies[m]["ydata"] = round(sum(accs) / len(accs), 4)
 
+
+rf = open("all_model_accuracies.txt", "w")
+wrote_column = False
+line_to_write = ""
 for m in model_accuracies:
     ss = model_accuracies[m]
     print(m)
+    if not wrote_column:
+        line_to_write += "\t"
+        for i in ss:
+            line_to_write += f"{i}\t"
+        line_to_write += "\n"
+        wrote_column = True
+    line_to_write += f"{m}\t"
     for i in ss:
         print(f"  {i}: {ss[i]}")
+        line_to_write += f"{ss[i]}\t"
+    line_to_write += "\n"
+
+rf.write(line_to_write)
+rf.close()

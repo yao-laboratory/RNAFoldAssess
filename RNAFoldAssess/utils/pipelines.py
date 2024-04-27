@@ -131,7 +131,7 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
         counter += 1
         if counter % 150 == 0:
             print(f"Working on {counter} of {len(data_points)}")
-        if model_name not in ["ContextFold", "SeqFold"]:
+        if model_name not in ["ContextFold", "SeqFold", "NUPACK"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
             else:
@@ -143,8 +143,11 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
                 model.execute(model_path, dp.sequence)
             elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(input_file_path)
+            elif model_name == "NUPACK":
+                model.execute(dp.sequence)
             else:
                 model.execute(model_path, input_file_path)
+
             if model_name in ["IPKnot", "IPknot"]:
                 predicted_structure = model.get_ss_prediction_ignore_pseudoknots()
             else:
@@ -354,7 +357,7 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -482,7 +485,7 @@ def generate_rasp_data(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -667,7 +670,7 @@ def generate_ribonanza_evaluations(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "RNAStructure"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -696,7 +699,10 @@ def generate_ribonanza_evaluations(model,
             accuracy = round(score["accuracy"], 4)
             p = round(score["p"], 4)
             # Get free energy
-            fe = SecondaryStructureTools.get_free_energy(testable_seq, testable_prediction)
+            if model_name == "RNAStructure":
+                fe = model.mfe
+            else:
+                fe = SecondaryStructureTools.get_free_energy(testable_seq, testable_prediction)
             line_to_write = f"{model_name}, {dp.name}, {testable_seq}, {testable_prediction}, {accuracy}, {p}, {fe}\n"
             report_file.write(line_to_write)
             counter += 1
@@ -791,7 +797,7 @@ def generate_dms_evaluations(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -817,8 +823,8 @@ def generate_dms_evaluations(model,
             lengths.append(len(dp.sequence))
             counter += 1
 
-            if made_a_file:
-                os.remove(input_file_path)
+            # if made_a_file:
+            #     os.remove(input_file_path)
 
         except (DSCITypeError, DSCIValueError) as dsci_error:
             skipped += 1
@@ -1136,7 +1142,7 @@ def generate_bpRNA_evaluations(model,
             if model_name in ["ContextFold", "SeqFold"]:
                 # These models don't require an input file
                 model.execute(model_path, seq)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(f"{sequence_data_path}/{file}")
             else:
                 model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)
