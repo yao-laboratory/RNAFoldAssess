@@ -29,7 +29,7 @@ class RNAStructure:
         self.delete_ct_file_when_done = delete_ct_file_when_done
         path_to_fold = "Fold"
         sfile_name = os.path.basename(seq_file)
-        ct_name = f"{sfile_name.split(".")[0]}.ct"
+        ct_name = f"{sfile_name.split('.')[0]}.ct"
         if additional_output_dir:
             destination = f"{output_path_base}/{additional_output_dir}/{ct_name}"
         else:

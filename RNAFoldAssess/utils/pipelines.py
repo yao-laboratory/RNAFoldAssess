@@ -337,7 +337,7 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
                 report_file.write(r)
             rows_to_write = []
 
-        if model_name not in ["ContextFold", "SeqFold"]:
+        if model_name not in ["ContextFold", "SeqFold", "NUPACK"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
             else:
@@ -357,7 +357,7 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -465,7 +465,7 @@ def generate_rasp_data(model,
                 report_file.write(r)
             rows_to_write = []
 
-        if model_name not in ["ContextFold", "SeqFold"]:
+        if model_name not in ["ContextFold", "SeqFold", "NUPACK"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
             else:
@@ -485,7 +485,7 @@ def generate_rasp_data(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure"]:
+            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure", "NUPACK"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -652,13 +652,13 @@ def generate_ribonanza_evaluations(model,
         if counter % 200 == 0:
             print(f"Completed {counter} of {len(data)}")
 
-        if model_name not in ["ContextFold", "SeqFold"]:
+        if model_name not in ["ContextFold", "SeqFold", "NUPACK"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
             else:
                 input_file_path = dp.to_fasta_file()
         else:
-            # These two models can take string input
+            # These three models can take string input
             input_file_path = dp.sequence
         try:
             # Handle different model types
@@ -670,7 +670,7 @@ def generate_ribonanza_evaluations(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -701,6 +701,8 @@ def generate_ribonanza_evaluations(model,
             # Get free energy
             if model_name == "RNAStructure":
                 fe = model.mfe
+            elif model_name == "NUPACK":
+                fe = model.get_mfe()
             else:
                 fe = SecondaryStructureTools.get_free_energy(testable_seq, testable_prediction)
             line_to_write = f"{model_name}, {dp.name}, {testable_seq}, {testable_prediction}, {accuracy}, {p}, {fe}\n"
@@ -785,19 +787,21 @@ def generate_dms_evaluations(model,
             f.close()
             rows_to_write = []
 
-        if model_name not in ["ContextFold", "SeqFold"]:
+        if model_name not in ["ContextFold", "SeqFold", "NUPACK"]:
             if to_seq_file:
                 input_file_path = dp.to_seq_file()
                 made_a_file = True
             else:
                 input_file_path = dp.to_fasta_file()
                 made_a_file = True
+        else:
+            input_file_path = dp.sequence
         try:
             line_to_write = ""
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure"]:
+            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure", "NUPACK"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -1142,6 +1146,8 @@ def generate_bpRNA_evaluations(model,
             if model_name in ["ContextFold", "SeqFold"]:
                 # These models don't require an input file
                 model.execute(model_path, seq)
+            elif model_name == "NUPACK":
+                model.execute(seq)
             elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(f"{sequence_data_path}/{file}")
             else:

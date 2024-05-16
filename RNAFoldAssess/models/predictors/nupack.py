@@ -10,11 +10,11 @@ class NUPACK:
 
     def execute(self, sequence):
         mfe_ss = nupack.mfe(strands=[sequence], model=self.model)
-        self.output = mfe_ss[3]
+        self.output = mfe_ss[0]
 
     def get_ss_prediction(self):
-        return str(self.output[0])
+        return str(self.output.structure)
 
     def get_mfe(self):
-        return self.output[1]
+        return self.output.energy
 

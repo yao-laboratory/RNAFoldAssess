@@ -7,6 +7,7 @@ models = [
     "IPKnot",
     "MXFold",
     "MXFold2",
+    "NUPACK",
     "RandomPredictor",
     "RNAStructure",
     "RNAFold",
@@ -108,8 +109,6 @@ for s in species:
         nf = s
     s_report_dir = f"{report_dir}/{nf}"
     for m in models:
-        if m == "MXFold2":
-            continue
         ms_report_dir = f"{report_dir}/{nf}/{m}"
         print(ms_report_dir)
         files = os.listdir(ms_report_dir)
