@@ -61,7 +61,7 @@ class DecoratedDataPoint(DataPoint):
 
 
     @staticmethod
-    def factory(path, name_prefix):
+    def factory(path, name_prefix=None):
         f = open(path)
         json_data = json.loads(f.read())
         f.close()
