@@ -5,7 +5,7 @@ class RandomPredictor:
     def __init__(self):
         self.output = ""
 
-    def execute(self, fasta_file, path="/home/yesselmanlab/ewhiting/EternaFold/src/contrafold", remove_file_when_done=True):
+    def execute(self, fasta_file, path="/home/yesselmanlab/ewhiting/EternaFold/src/contrafold", remove_file_when_done=False):
         sampler = f"{path} sample"
         f = open("ss_file.txt", "w")
         f.close()

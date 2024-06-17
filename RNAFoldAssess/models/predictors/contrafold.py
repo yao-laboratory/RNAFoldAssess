@@ -5,7 +5,7 @@ class ContraFold:
     def __init__(self):
         self.output = ""
 
-    def execute(self, contra_path, seq_file, remove_file_when_done=True):
+    def execute(self, contra_path, seq_file, remove_file_when_done=False):
         # Note, ContraFold is just EternaFold with default params
         exec_string = f"{contra_path}/src/contrafold predict {seq_file}"
         self.output = os.popen(exec_string).read()
