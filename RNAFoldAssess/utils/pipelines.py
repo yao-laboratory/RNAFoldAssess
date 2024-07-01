@@ -308,7 +308,7 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
     counter = 0
     length_skip_threshold = 5
     problem_datapoints = []
-    report_dir = "/common/yesselmanlab/ewhiting/reports/rnandria"
+    report_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/rnandria"
     report_path = f"{model_name}_rnandria_{source_type}_predictions.txt"
     problem_path = f"{model_name}_rnandria_{source_type}_problems.txt"
     report_file = open(f"{report_dir}/{report_path}", "w")
@@ -421,8 +421,8 @@ def generate_rasp_data(model,
     skipped = 0
     lengths = []
     problem_datapoints = []
-    generated_report_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_predictions.txt"
-    problem_datapoint_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_problems.txt"
+    generated_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_predictions.txt"
+    problem_datapoint_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_problems.txt"
     print(f"Loading datapoints")
     dps = DataPoint.factory(data_path)
     # Remove data points that are only 1 nucleotide long
@@ -559,7 +559,7 @@ def generate_rasp_data(model,
     if testing:
         aux_data += f"Projected time to complete all files: {round(projected_time, 2)} hours\n"
 
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_aux_data.txt"
+    aux_data_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}/{model_name}_{file_prefix}_aux_data.txt"
     aux_data += f"Report generated on: {datetime.datetime.now()}\n\n"
     aux_file = open(aux_data_path, "w")
     aux_file.write(aux_data)
@@ -745,8 +745,8 @@ def generate_dms_evaluations(model,
     lengths = []
     problem_datapoints = []
     data_point_files = os.listdir(dp_file_path)
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_report.txt"
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_aux_data.txt"
+    analysis_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_report.txt"
+    aux_data_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{data_type_name}_aux_data.txt"
 
     print(f"Loading data points from {len(data_point_files)} files ...")
     data_points = []
@@ -1105,7 +1105,7 @@ def generate_bpRNA_evaluations(model,
                                leniences=[0, 1],
                                testing=False):
     data_type_name = "bpRNA-1m-90"
-    headers = "algo_name, datapoint_name, lenience, sequence, prediction, sensitivity, ppv, F1, data_point_type"
+    headers = "algo_name, datapoint_name, lenience, sequence,true_structure, prediction, sensitivity, ppv, F1, data_point_type"
     skipped = 0
     lengths = []
     weird_sequences = []
@@ -1133,6 +1133,9 @@ def generate_bpRNA_evaluations(model,
         name = file.split(".")[0]
         data_type = name.split("_")[1]
         dbn_file_path = f"{dbn_path}/{name}.dbn"
+        if not os.path.exists(dbn_file_path):
+            print(f"No DBN file for {name}")
+            continue
         dbn_file = open(dbn_file_path)
         data = dbn_file.readlines()
         dbn_file.close()
@@ -1152,7 +1155,7 @@ def generate_bpRNA_evaluations(model,
                 model.execute(f"{sequence_data_path}/{file}")
             else:
                 model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)
-            if model_name == "IPknot":
+            if model_name in ["IPknot", "IPKnot"]:
                 prediction = model.get_ss_prediction_ignore_pseudoknots()
             else:
                 prediction = model.get_ss_prediction()
@@ -1163,7 +1166,7 @@ def generate_bpRNA_evaluations(model,
                 s = scorer.sensitivity
                 p = scorer.ppv
                 f1 = scorer.f1
-                line_to_write += f"{seq}, {prediction}, {s}, {p}, {f1}\n"
+                line_to_write += f"{seq},{true_structure}, {prediction}, {s}, {p}, {f1}\n"
                 rows_to_write.append(line_to_write)
             lengths.append(len(seq))
             counter += 1

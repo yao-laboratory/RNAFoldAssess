@@ -4,17 +4,17 @@ from RNAFoldAssess.models import DataPointFromCrystal
 from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.utils import *
 
-model_name = "MXFold"
-model = MXFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/mxfold/build/mxfold")
-data_type_name = "bpRNA-1m-90"
+model_name = "ContraRetrainedAll"
+model = ContraRetrainedAll()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+data_type_name = "ydata"
 
 print("starting ...")
-generate_bpRNA_evaluations(
+generate_dms_evaluations(
     model=model,
     model_name=model_name,
     model_path=model_path,
-    sequence_data_path="/common/yesselmanlab/ewhiting/data/bprna/fastaFiles",
+    to_seq_file=True,
     testing=False
 )
 print("done")

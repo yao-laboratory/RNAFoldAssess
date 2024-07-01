@@ -6,9 +6,9 @@ from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.models.scorers import *
 
 
-model_name = "MXFold"
-model = MXFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/mxfold/build/mxfold")
+model_name = "ContraRetrainedAll"
+model = ContraRetrainedAll()
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
 
 pdb_fastas = "/common/yesselmanlab/ewhiting/data/crystal_all/longFastaFiles"
 fasta_files = [f for f in os.listdir(pdb_fastas) if f.endswith(".fasta")]
