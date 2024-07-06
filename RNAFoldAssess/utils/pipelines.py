@@ -61,8 +61,8 @@ def generate_eterna_data_evaluations(model,
     print(f"There were {fail_count} errors detecting chemical mapping experiment type")
 
     headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value, sequence_length"
-    shape_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_SHAPE_pipeline_report.txt"
-    dms_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_DMS_pipeline_report.txt"
+    shape_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_SHAPE_pipeline_report.txt"
+    dms_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_DMS_pipeline_report.txt"
 
     # Run SHAPE evals
     print("Starting SHAPE evaluations")
@@ -115,9 +115,9 @@ def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_ma
         report += "\n"
     report += f"Report generated on: {datetime.datetime.now()}\n\n"
     if partition_number:
-        path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_partition-{partition_number}_analysis_report.txt"
+        path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_partition-{partition_number}_analysis_report.txt"
     else:
-        path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_analysis_report.txt"
+        path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_{chemical_mapping_method}_analysis_report.txt"
     f = open(path, "w")
     f.write(report)
     f.close()
@@ -572,7 +572,7 @@ def generate_ribonanza_evaluations(model,
                                    to_seq_file=False,
                                    testing=False,
                                    part2=False):
-    ribo_data_csv = "/common/yesselmanlab/ewhiting/data/ribonanza/rmdb_data.v1.3.0.csv"
+    ribo_data_csv = "/mnt/nrdstor/yesselmanlab/ewhiting/rna_data/ribonanza/rmdb_data.v1.3.0.csv"
     f = open(ribo_data_csv)
     data = f.readlines()
     f.close()
@@ -596,7 +596,7 @@ def generate_ribonanza_evaluations(model,
         "deg_Mg_pH10": "SHAPE",
         "CMCT": "CMCT"
     }
-    report_path = "/common/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
+    report_path = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
 
     # Create report file map
     report_files = {}
