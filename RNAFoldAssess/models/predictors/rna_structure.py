@@ -13,7 +13,7 @@ class RNAStructure:
     # though and as of right now, I'm not going to use it because
     # not every dataset will have reactivity data.
 
-    def __init__(self, delete_seq_file=True):
+    def __init__(self, delete_seq_file=False):
         self.output = ""
         self.path_to_ct_file = ""
         self.mfe = None
