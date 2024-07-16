@@ -21,7 +21,7 @@ class RNAStructure:
 
     def execute(self,
                 seq_file,
-                output_path_base="/common/yesselmanlab/ewhiting/reports/rnastructure_ct_outputs",
+                output_path_base="/mnt/nrdstor/yesselmanlab/ewhiting/reports/rnastructure_ct_outputs",
                 additional_output_dir=None,
                 delete_ct_file_when_done=True):
         # Don't need path if it's `module load`ed

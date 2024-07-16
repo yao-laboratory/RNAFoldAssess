@@ -12,4 +12,4 @@ conda activate rna_fold_assess
 module load java
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/rnandria_pipelines/
-python crretrainall.py
+python cfretrainall.py

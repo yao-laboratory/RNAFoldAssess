@@ -566,6 +566,95 @@ def generate_rasp_data(model,
     aux_file.close()
 
 
+def parallel_bprna_predictions(model,
+                               model_name,
+                               model_path,
+                               partition_number,
+                               data_type_name="bpRNA-1m-90",
+                               to_seq_file=False,
+                               testing=False):
+    sequence_data_path = "/work/yesselmanlab/ewhiting/data/bprna/fastaFiles"
+    dbn_data_path = f"/work/yesselmanlab/ewhiting/data/bprna/dbnFiles_sep/part_{partition_number}/"
+    headers = "algo_name, datapoint_name, lenience, sequence, true_structure, prediction, sensitivity, ppv, F1\n"
+    skipped = 0
+    analysis_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/bprna/{model_name}_{data_type_name}_{partition_number}_report.txt"
+
+    # make the file
+    report = open(analysis_report_path, "w")
+    report.write(headers)
+    counter = 0
+
+    dbn_files = os.listdir(dbn_data_path)
+
+    if testing:
+        dbn_files = dbn_files[:10]
+
+    for file in dbn_files:
+        if counter % 250 == 0:
+            print(f"Working {counter}")
+
+        dbn_file = open(f"{dbn_data_path}/{file}")
+        dbn_data = [d.strip() for d in dbn_file.readlines()]
+        dbn_file.close()
+        seq = dbn_data[3]
+        dbn = dbn_data[4]
+        if not sequence_is_only_nts(seq):
+            print(f"{seq} sequence contains more than just ACUG nucleotides")
+            skipped += 1
+            continue
+
+        # Clean DBN
+        dbn = dbn.replace("<", ".").replace(">", ".").replace("{", ".").replace("}", ".")
+
+        created_fasta_file = False
+        name = file.split(".")[0]
+        seq_file_path = f"{sequence_data_path}/{name}.fasta"
+        if not os.path.exists(seq_file_path):
+            print(f"No fasta file at {seq_file_path}. Creating.")
+            fasta_data = f">{name}\n{seq}"
+            ff = open(f"{name}.fasta", "w")
+            ff.write(fasta_data)
+            ff.close()
+            created_fasta_file = True
+            seq_file_path = f"{name}.fasta"
+
+        try:
+            line_to_write = ""
+            if model_name in ["ContextFold", "SeqFold"]:
+                # These models don't require an input file
+                model.execute(model_path, seq)
+            elif model_name == "NUPACK":
+                model.execute(seq)
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
+                model.execute(seq_file_path)
+            else:
+                model.execute(model_path, seq_file_path, remove_file_when_done=False)
+            if model_name in ["IPknot", "IPKnot"]:
+                prediction = model.get_ss_prediction_ignore_pseudoknots()
+            else:
+                prediction = model.get_ss_prediction()
+            for lenience in [0, 1]:
+                line_to_write = f"{model_name}, {name}, {lenience}, "
+                scorer = BasePairScorer(dbn, prediction, lenience)
+                scorer.evaluate()
+                s = scorer.sensitivity
+                p = scorer.ppv
+                f1 = scorer.f1
+                line_to_write += f"{seq}, {dbn}, {prediction}, {s}, {p}, {f1}\n"
+                report.write(line_to_write)
+            if created_fasta_file:
+                print(f"Removing {seq_file_path}")
+                os.remove(seq_file_path)
+            counter += 1
+        except Exception as e:
+            print(f"Exception in {file}: {e}")
+            skipped += 1
+            # continue
+
+    print(f"Skipped {skipped}")
+    report.close()
+
+
 def generate_ribonanza_evaluations(model,
                                    model_name,
                                    model_path,
