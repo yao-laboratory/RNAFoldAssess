@@ -14,3 +14,4 @@ from .nupack import *
 from .cf_retrained import *
 from .cf_retrained2 import *
 from .cf_retrained_all import *
+from .cf_test_retrained import *
