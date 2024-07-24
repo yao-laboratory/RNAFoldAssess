@@ -627,6 +627,8 @@ def parallel_bprna_predictions(model,
                 model.execute(seq)
             elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
                 model.execute(seq_file_path)
+            elif model_name.lower() == "pknots":
+                model.execute(seq_file_path, "bprna")
             else:
                 model.execute(model_path, seq_file_path, remove_file_when_done=False)
             if model_name in ["IPknot", "IPKnot"]:
