@@ -118,6 +118,31 @@ class SecondaryStructureTools:
             return fe
         return fe
 
+    @staticmethod
+    def ct2db(ct_file_path):
+        # The vienna binaris are so finnicky, I'm just implementing this myself
+        f = open(ct_file_path)
+        data = f.readlines()
+        f.close()
+
+        data = data[4:-1]
+        data = [d.split() for d in data]
+        seq = "".join([s[1] for s in data])
+
+        dbn = ["." for _ in range(len(seq))]
+        pairs = [(int(d[2]), int(d[4]) - 1) for d in data if d[4] != "0"]
+        pairs = [p for p in pairs if p[0] < p[1]]
+
+        for p in pairs:
+            db = dbn[p[0]]
+            if db == ".":
+                dbn[p[0]] = "("
+                dbn[p[1]] = ")"
+
+        dbn = "".join(dbn)
+
+        return dbn
+
 
 class SecondaryStructureToolsException(Exception):
     pass
