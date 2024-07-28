@@ -143,6 +143,49 @@ class SecondaryStructureTools:
 
         return dbn
 
+    @staticmethod
+    def parse_structure(structure):
+        # structure exampe: "..((((...))))..((..))."
+        bps = []
+        for i1, c1 in enumerate(structure):
+            if c1 != '(':
+                continue
+            count = 1
+            for i2, c2 in enumerate(structure[i1 + 1:]):
+                if c2 == '(':
+                    count += 1
+                elif c2 == ')':
+                    count -= 1
+                    if count == 0:
+                        bps.append((i1, i1 + i2 + 1))
+                        break
+        return bps
+
+    @staticmethod
+    def bpseq_string(name, seq, ss):
+        base_pairs = SecondaryStructureTools.parse_structure(ss)
+        lines = ""
+        for i, nt in enumerate(seq):
+            pos = i + 1
+            conn = 0
+            for bp in base_pairs:
+                if bp[0] == i:
+                    conn = bp[1] + 1
+                elif bp[1] == i:
+                    conn = bp[0] + 1
+            lines += f"{pos} {nt} {conn}\n"
+        return lines
+
+    @staticmethod
+    def write_bpseq_file(name, seq, ss, path="."):
+        bpseq_string = SecondaryStructureTools.bpseq_string(name, seq, ss)
+        file_path = f"{path}/{name}.bpseq"
+        f = open(file_path, "w")
+        f.write(bpseq_string)
+        f.close()
+        return file_path
+
+
 
 class SecondaryStructureToolsException(Exception):
     pass
