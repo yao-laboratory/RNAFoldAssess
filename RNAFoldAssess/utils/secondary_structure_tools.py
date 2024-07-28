@@ -159,6 +159,19 @@ class SecondaryStructureTools:
                     if count == 0:
                         bps.append((i1, i1 + i2 + 1))
                         break
+        # Now check for pseudoknots
+        for i1, c1 in enumerate(structure):
+            if c1 != '[':
+                continue
+            count = 1
+            for i2, c2 in enumerate(structure[i1 + 1:]):
+                if c2 == '[':
+                    count += 1
+                elif c2 == ']':
+                    count -= 1
+                    if count == 0:
+                        bps.append((i1, i1 + i2 + 1))
+                        break
         return bps
 
     @staticmethod
