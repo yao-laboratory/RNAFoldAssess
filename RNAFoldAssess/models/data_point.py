@@ -37,6 +37,17 @@ class DataPoint:
         self.path = os.path.abspath(f"{file_safe_name}.fasta")
         return self.path
 
+    def fasta_to_scratch_dir(self, path=""):
+        data = self.to_fasta_string()
+        path = f"/scratch/{path}"
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        if len(file_safe_name) > 200:
+            file_safe_name = file_safe_name[0:200]
+        f = open(f"{path}/{file_safe_name}.fasta", "w")
+        f.write(data)
+        f.close()
+        return f"{path}/{file_safe_name}.fasta"
+
     def to_fasta_string(self):
         return f">{self.name} en=0.00\n{self.sequence}\n"
 
