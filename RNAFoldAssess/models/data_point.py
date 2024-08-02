@@ -51,7 +51,7 @@ class DataPoint:
     def to_fasta_string(self):
         return f">{self.name} en=0.00\n{self.sequence}\n"
 
-    def to_constraint_file(self, destination_dir=None):
+    def to_constraint_file(self, destination_dir=None, experiment_type="DMS"):
         # Make the name safe to be a filename
         file_safe_name = "".join(c for c in self.name if c.isalnum())
         if len(file_safe_name) > 200:
@@ -63,7 +63,9 @@ class DataPoint:
         f = open(file_path, "w")
         for i in range(len(self.reactivities)):
             mu = str(self.reactivities[i])
-            if self.sequence[i] in ["T", "G"]:
+            if self.sequence[i] in ["T", "G", "U"] and experiment_type == "DMS":
+                mu = "-999"
+            if self.sequence[i] in ["A", "C"] and experiment_type == "CMCT":
                 mu = "-999"
             f.write(str(i + 1) + "\t" + mu + "\n")
         f.close()

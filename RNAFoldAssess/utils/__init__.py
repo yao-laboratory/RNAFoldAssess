@@ -5,3 +5,4 @@ from .secondary_structure_tools import *
 from .pipelines import *
 from .one_at_a_time_pipelines import *
 from .rasp_tools import *
+from .chem_map_tools import *
