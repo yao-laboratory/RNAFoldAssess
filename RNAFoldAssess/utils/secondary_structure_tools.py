@@ -176,6 +176,8 @@ class SecondaryStructureTools:
 
     @staticmethod
     def bpseq_string(name, seq, ss):
+        if len(seq) != len(ss):
+            raise SecondaryStructureToolsException(f"Mismatch in {name}: {seq} and {ss} are not equal length")
         base_pairs = SecondaryStructureTools.parse_structure(ss)
         lines = ""
         for i, nt in enumerate(seq):
