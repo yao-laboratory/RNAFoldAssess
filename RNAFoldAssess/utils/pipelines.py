@@ -141,7 +141,7 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "MXFold2RetrainedYData"]:
                 model.execute(input_file_path)
             elif model_name == "NUPACK":
                 model.execute(dp.sequence)
@@ -357,7 +357,7 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK", "MXFold2RetrainedYData"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -625,7 +625,7 @@ def parallel_bprna_predictions(model,
                 model.execute(model_path, seq)
             elif model_name == "NUPACK":
                 model.execute(seq)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "MXFold2RetrainedYData"]:
                 model.execute(seq_file_path)
             elif model_name.lower() == "pknots":
                 model.execute(seq_file_path, "bprna")
@@ -761,7 +761,7 @@ def generate_ribonanza_evaluations(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK", "MXFold2RetrainedYData"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
