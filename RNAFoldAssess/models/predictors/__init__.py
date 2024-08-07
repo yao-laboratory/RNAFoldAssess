@@ -17,3 +17,5 @@ from .cf_retrained_all import *
 from .cf_test_retrained import *
 from .pknots import *
 from .rnandria_retrained import *
+from .mxfold2_retrained_ydata import *
+from .mxfold2_retrained_rnandria import *
