@@ -17,5 +17,5 @@ class ContraFold:
         if self.output == "":
             raise Exception(f"ContraFold exception: no output generated")
         strings = self.output.split("\n")
-        ss = strings[strings.index('>structure') + 1]
+        ss = strings[2]
         return ss

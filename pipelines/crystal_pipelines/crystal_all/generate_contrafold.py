@@ -8,15 +8,15 @@ from RNAFoldAssess.models.scorers import *
 
 model_name = "ContraFold"
 model = ContraFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/contrafold")
 
-pdb_fastas = "/common/yesselmanlab/ewhiting/data/crystal_all/longFastaFiles"
+pdb_fastas = "/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/longFastaFiles"
 fasta_files = [f for f in os.listdir(pdb_fastas) if f.endswith(".fasta")]
 
 headers = "algo_name, datapoint_name, lenience, sequence, true_structure, prediction, sensitivity, ppv, f1\n"
-dbn_path = "/common/yesselmanlab/ewhiting/data/crystal_all/symmetric_chains_no_pseudoknot"
+dbn_path = "/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/symmetric_chains_no_pseudoknot"
 dps = DataPointFromCrystal.factory_from_dbn_files(dbn_path)
-report_base = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/crystal_all"
+report_base = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/crystal_release_2024"
 r0 = open(f"{report_base}/{model_name}_predictions_0_lenience.txt", "w")
 r1 = open(f"{report_base}/{model_name}_predictions_1_lenience.txt", "w")
 r0.write(headers)
@@ -52,7 +52,8 @@ for dp in dps:
 
         r0.write(line_to_write0)
         r1.write(line_to_write1)
-    except:
+    except Exception as e:
+        print(f"There's been an exception: {e}")
         continue
 
 

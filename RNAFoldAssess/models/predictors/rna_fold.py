@@ -16,6 +16,10 @@ class RNAFold:
         exec_string = f"{path} -i {fasta_file}"
         self.output = os.popen(exec_string).read()
         file_name_base = fasta_file.split(".")[0]
+        try:
+            os.remove(f"{file_name_base}.ps")
+        except FileNotFoundError:
+            print(f"Couln't delete {file_name_base}.ps")
         if remove_file_when_done:
             try:
                 os.system(f"rm {file_name_base}*")
@@ -23,7 +27,8 @@ class RNAFold:
                 print(f"RNAFold: Couldn't find {file_name_base} files to delete")
 
     def get_ss_prediction(self):
-        if self.output == "":            raise Exception(f"RNAFold exception: no output generated. Is viennarna loaded?")
+        if self.output == "":
+            raise Exception(f"RNAFold exception: no output generated. Is viennarna loaded?")
         strings = self.output.split("\n")
         ss = strings[2]
         ss = ss.split()[0]
