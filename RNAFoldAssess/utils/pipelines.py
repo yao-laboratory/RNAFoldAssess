@@ -167,9 +167,9 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
 def crystal_evals(model,
                   model_name,
                   model_path,
-                  dbn_path="/common/yesselmanlab/ewhiting/data/crystal_all/symmetric_chains_no_pseudoknot",
+                  dbn_path="/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/long_dbns",
                   data_type_name="crystal",
-                  fasta_file_location="/common/yesselmanlab/ewhiting/data/crystal1_all/fasta_files",
+                  fasta_file_location="/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/longFastaFiles",
                   to_seq_file=False,
                   leniences=[0, 1],
                   testing=False):
@@ -194,8 +194,8 @@ def crystal_evals(model,
         lowest_ppv[f"{lenience}"] = [1.0, ""]
         lowest_f1[f"{lenience}"] = [1.0, ""]
 
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal_all/{model_name}_{data_type_name}_report.txt"
-    pipeline_report_path = f"/common/yesselmanlab/ewhiting/reports/crystal_all/{model_name}_{data_type_name}.txt"
+    analysis_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/crystal_release_2024/{model_name}_{data_type_name}_report.txt"
+    pipeline_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/crystal_release_2024/{model_name}_{data_type_name}.txt"
 
     f = open(analysis_report_path, "w")
     f.write(f"{headers}\n")
@@ -225,12 +225,12 @@ def crystal_evals(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name == "RandomPredictor":
+            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK", "MXFold2RetrainedYData"]:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
 
-            if model_name == "IPknot":
+            if model_name == "IPKnot":
                 prediction = model.get_ss_prediction_ignore_pseudoknots()
             else:
                 prediction = model.get_ss_prediction()
@@ -762,7 +762,7 @@ def generate_ribonanza_evaluations(model,
                     continue
                 model.execute(model_path, dp.sequence)
             elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK", "MXFold2RetrainedYData"]:
-                model.execute(input_file_path)
+                model.execute(input_file_path, remove_file_when_done=True)
             else:
                 model.execute(model_path, input_file_path)
 
