@@ -41,6 +41,26 @@ class EternaDataPoint:
         self.fasta_path = os.path.abspath(f"{self.name}.fasta")
         return self.fasta_path
 
+    def to_constraint_file(self, destination_dir=None, experiment_type="DMS"):
+        # Make the name safe to be a filename
+        file_safe_name = "".join(c for c in self.name if c.isalnum())
+        if len(file_safe_name) > 200:
+            file_safe_name = file_safe_name[0:200]
+        file_name = f"{file_safe_name}_struc_constraint.txt"
+        if not destination_dir:
+            destination_dir = "."
+        file_path = f"{destination_dir}/{file_name}"
+        f = open(file_path, "w")
+        for i in range(len(self.reactivities)):
+            mu = str(self.reactivities[i])
+            if self.sequence[i] in ["T", "G", "U"] and experiment_type == "DMS":
+                mu = "-999"
+            if self.sequence[i] in ["A", "C"] and experiment_type == "CMCT":
+                mu = "-999"
+            f.write(str(i + 1) + "\t" + mu + "\n")
+        f.close()
+        return file_path
+
     # We have to implement DSCI in a special way with these data points
     # becase there isn't reactivity for every data point
     def assess_prediction(self, ss_prediction):

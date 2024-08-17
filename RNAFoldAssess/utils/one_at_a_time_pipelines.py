@@ -183,8 +183,8 @@ def generate_dms_evaluations_by_cohort(model,
     skipped = 0
     lengths = []
     problem_datapoints = []
-    analysis_report_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{cohort}_{data_type_name}_report.txt"
-    aux_data_path = f"/common/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{cohort}_{data_type_name}_aux_data.txt"
+    analysis_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{cohort}_{data_type_name}_report.txt"
+    aux_data_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/{reports_dir}/{model_name}_{cohort}_{data_type_name}_aux_data.txt"
 
     if testing:
         data_points = data_points[:20]
@@ -225,8 +225,9 @@ def generate_dms_evaluations_by_cohort(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2"]:
+            elif model_name in ["RandomPredictor"] or "MXFold2" in model_name:
                 model.execute(input_file_path)
+                os.system(f"rm {input_file_path}")
             else:
                 model.execute(model_path, input_file_path)
 

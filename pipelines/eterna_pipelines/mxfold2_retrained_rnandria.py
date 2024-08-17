@@ -4,8 +4,8 @@ from RNAFoldAssess.utils import *
 from RNAFoldAssess.models.predictors import *
 
 
-model = MXFold2RetrainedYData(remove_file_when_done=True)
-model_name = "MXFold2RetrainedYData"
+model = MXFold2RetrainedRNAndria()
+model_name = "MXFold2RetrainedRNAndria"
 
 dp_path = "/common/yesselmanlab/ewhiting/data/translated_eterna_data/eterna.json"
 

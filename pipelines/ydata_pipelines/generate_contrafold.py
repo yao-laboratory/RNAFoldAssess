@@ -6,7 +6,7 @@ from RNAFoldAssess.utils import *
 
 model_name = "ContraFold"
 model = ContraFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+model_path = model_path = "/home/yesselmanlab/ewhiting/contrafold"
 data_type_name = "ydata"
 
 print("starting ...")

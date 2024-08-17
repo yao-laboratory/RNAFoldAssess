@@ -4,9 +4,9 @@ from RNAFoldAssess.utils import *
 from RNAFoldAssess.models.predictors import *
 
 
-model_name = "ContraRetrained2"
-model = ContraRetrained2()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+model_name = "ContraRetrainedYData"
+model = ContraRetrainedYData()
+model_path = model_path = "/home/yesselmanlab/ewhiting/contrafold"
 
 base_path = "/common/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed"
 pri_miRNA = f"{base_path}/pri_miRNA_datapoints.json"

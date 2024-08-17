@@ -87,7 +87,7 @@ def generate_eterna_data_evaluations(model,
             df.write(line)
         df.close()
         write_eterna_data_analysis(model_name, dms_evals, problem_datapoints, d_skipped, "DMS")
-    print("DMS evaluation compelte")
+    print("DMS evaluation complete")
 
 def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_mapping_method, partition_number=None):
     count_problems = len(problems)
@@ -122,7 +122,7 @@ def write_eterna_data_analysis(model_name, evals, problems, skipped, chemical_ma
     f.write(report)
     f.close()
 
-def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
+def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file, delete_seq_file=True):
     retvals = []
     problem_datapoints = []
     skipped = 0
@@ -141,12 +141,14 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "MXFold2RetrainedYData"]:
-                model.execute(input_file_path)
+            elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
+                model.execute(input_file_path, remove_file_when_done=True)
             elif model_name == "NUPACK":
                 model.execute(dp.sequence)
             else:
                 model.execute(model_path, input_file_path)
+                if delete_seq_file:
+                    os.remove(input_file_path)
 
             if model_name in ["IPKnot", "IPknot"]:
                 predicted_structure = model.get_ss_prediction_ignore_pseudoknots()
@@ -160,6 +162,7 @@ def eterna_data_evals(model, model_name, model_path, data_points, to_seq_file):
             print(f"Encountered DSCI error on {dp.name}: {str(dsci_error)}")
             continue
         except Exception as e:
+            print(e)
             skipped += 1
             continue
     return retvals, problem_datapoints, skipped
@@ -225,8 +228,8 @@ def crystal_evals(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK", "MXFold2RetrainedYData"]:
-                model.execute(input_file_path)
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
+                model.execute(input_file_path, remove_file_when_done=True)
             else:
                 model.execute(model_path, input_file_path)
 
@@ -357,8 +360,8 @@ def generate_rnandria_evaluations(model, model_name, model_path, source_data_pat
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "NUPACK", "MXFold2RetrainedYData"]:
-                model.execute(input_file_path)
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
+                model.execute(input_file_path, remove_file_when_done=True)
             else:
                 model.execute(model_path, input_file_path)
 
@@ -485,7 +488,7 @@ def generate_rasp_data(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure", "NUPACK"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
                 model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
@@ -625,7 +628,7 @@ def parallel_bprna_predictions(model,
                 model.execute(model_path, seq)
             elif model_name == "NUPACK":
                 model.execute(seq)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2", "MXFold2RetrainedYData"]:
+            elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
                 model.execute(seq_file_path)
             elif model_name.lower() == "pknots":
                 model.execute(seq_file_path, "bprna")
@@ -761,7 +764,7 @@ def generate_ribonanza_evaluations(model,
                     problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
                     continue
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK", "MXFold2RetrainedYData"]:
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
                 model.execute(input_file_path, remove_file_when_done=True)
             else:
                 model.execute(model_path, input_file_path)
@@ -892,8 +895,8 @@ def generate_dms_evaluations(model,
             # Handle different model types
             if model_name in ["ContextFold", "SeqFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "MXFold2", "RNAStructure", "NUPACK"]:
-                model.execute(input_file_path)
+            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
+                model.execute(input_file_path, remove_file_when_done=True)
             else:
                 model.execute(model_path, input_file_path)
 
@@ -1242,7 +1245,7 @@ def generate_bpRNA_evaluations(model,
                 model.execute(model_path, seq)
             elif model_name == "NUPACK":
                 model.execute(seq)
-            elif model_name in ["RandomPredictor", "RNAStructure", "MXFold2"]:
+            elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
                 model.execute(f"{sequence_data_path}/{file}")
             else:
                 model.execute(model_path, f"{sequence_data_path}/{file}", remove_file_when_done=False)

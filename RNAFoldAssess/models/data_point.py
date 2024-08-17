@@ -19,10 +19,12 @@ class DataPoint:
         file_safe_name = "".join(c for c in self.name if c.isalnum())
         if len(file_safe_name) > 200:
             file_safe_name = file_safe_name[0:200]
-        f = open(f"{file_safe_name}.seq", "w")
+        # Use HCC Swan $WORK directory
+        work_path = "/work/yesselmanlab/ewhiting"
+        f = open(f"{work_path}/{file_safe_name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.path = os.path.abspath(f"{file_safe_name}.seq")
+        self.path = os.path.abspath(f"{work_path}/{file_safe_name}.seq")
         return self.path
 
     def to_fasta_file(self):
@@ -30,11 +32,13 @@ class DataPoint:
         file_safe_name = "".join(c for c in self.name if c.isalnum())
         if len(file_safe_name) > 200:
             file_safe_name = file_safe_name[0:200]
+        # Use HCC Swan $WORK directory
         data = f">{file_safe_name}\n{self.sequence}"
-        f = open(f"{file_safe_name}.fasta", "w")
+        work_path = "/work/yesselmanlab/ewhiting"
+        f = open(f"{work_path}/{file_safe_name}.fasta", "w")
         f.write(data)
         f.close()
-        self.path = os.path.abspath(f"{file_safe_name}.fasta")
+        self.path = os.path.abspath(f"{work_path}/{file_safe_name}.fasta")
         return self.path
 
     def fasta_to_scratch_dir(self, path=""):

@@ -4,14 +4,14 @@ from RNAFoldAssess.utils import *
 from RNAFoldAssess.models.predictors import *
 
 
-model_name = "ContraFold"
-model = ContraFold()
-model_path = os.path.abspath("/home/yesselmanlab/ewhiting/EternaFold")
+model = MXFold2RetrainedRNAndria()
+model_name = "MXFold2RetrainedRNAndria"
+model_path = ""
 
 generate_ribonanza_evaluations(
     model,
     model_name,
     model_path,
-    to_seq_file=True,
     testing=False
 )
+
