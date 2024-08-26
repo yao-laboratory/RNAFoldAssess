@@ -6,8 +6,8 @@ from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.models.scorers import *
 
 
-model_name = "CFRetrainedRNAndria"
-model = CFRetrainedRNAndria()
+model_name = "CFRetrainedRibonanza"
+model = CFRetrainedRibonanza()
 model_path = "/home/yesselmanlab/ewhiting/contrafold"
 
 pdb_fastas = "/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/longFastaFiles"

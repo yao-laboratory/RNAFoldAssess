@@ -6,9 +6,9 @@ from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.models.scorers import *
 
 
-model_name = "CFRetrainedRNAndria"
-model = CFRetrainedRNAndria()
-model_path = "/home/yesselmanlab/ewhiting/contrafold"
+model_name = "MXFold2RetrainedRNAndria"
+model = MXFold2RetrainedRNAndria()
+model_path = ""
 
 pdb_fastas = "/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/longFastaFiles"
 fasta_files = [f for f in os.listdir(pdb_fastas) if f.endswith(".fasta")]
@@ -33,7 +33,7 @@ for dp in dps:
         line_to_write0 = ""
         line_to_write1 = ""
         input_file_path = f"{pdb_fastas}/{dp.name}.fasta"
-        model.execute(model_path, input_file_path)
+        model.execute(input_file_path)
         prediction = model.get_ss_prediction()
         r0_scorer = BasePairScorer(dp.true_structure, prediction, 0)
         r1_scorer = BasePairScorer(dp.true_structure, prediction, 1)

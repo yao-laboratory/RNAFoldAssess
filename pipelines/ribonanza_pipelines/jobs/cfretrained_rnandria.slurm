@@ -12,5 +12,5 @@ conda activate rna_fold_assess
 module load java
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ribonanza_pipelines/
-python cfretrained_rnandria.py
+python cf_retrained_rnandria.py
 rm *.seq

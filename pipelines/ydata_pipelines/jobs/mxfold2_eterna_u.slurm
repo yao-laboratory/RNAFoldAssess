@@ -12,4 +12,4 @@ conda activate rna_fold_assess
 module load java
 
 cd /home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ydata_pipelines
-python generate_mxfold2_retrained_ribo.py C014U
+python generate_mxfold2_retrained_eterna.py C014U

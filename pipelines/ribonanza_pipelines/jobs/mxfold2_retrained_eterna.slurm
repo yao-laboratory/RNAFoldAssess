@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --licenses=common
-#SBATCH --time=96:00:00          # Run time in hh:mm:ss
+#SBATCH --time=168:00:00          # Run time in hh:mm:ss
 #SBATCH --mem-per-cpu=64GB
 #SBATCH --job-name=mxre_ribo
 #SBATCH --error=mxre_ribo.%J.err

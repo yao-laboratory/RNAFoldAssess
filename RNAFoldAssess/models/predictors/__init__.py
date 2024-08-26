@@ -14,6 +14,7 @@ from .nupack import *
 from .cf_retrained_ydata import *
 from .pknots import *
 from .cf_retrained_rnandria import *
+from .cf_retrained_ribonanza import *
 from .mxfold2_retrained_ydata import *
 from .mxfold2_retrained_rnandria import *
 from .mxfold2_retrained_ribonanza import *

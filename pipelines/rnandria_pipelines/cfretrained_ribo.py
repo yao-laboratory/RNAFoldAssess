@@ -4,8 +4,8 @@ from RNAFoldAssess.utils import *
 from RNAFoldAssess.models.predictors import *
 
 
-model_name = "ContraRetrainedYData"
-model = ContraRetrainedYData()
+model_name = "CFRetrainedRibonanza"
+model = CFRetrainedRibonanza()
 model_path = "/home/yesselmanlab/ewhiting/contrafold"
 
 base_path = "/common/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed"
