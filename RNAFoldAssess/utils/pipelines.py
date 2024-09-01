@@ -774,6 +774,9 @@ def generate_ribonanza_evaluations(model,
             else:
                 prediction = model.get_ss_prediction()
 
+            if to_seq_file:
+                os.remove(input_file_path)
+
             testable_prediction = prediction[:len(sequence)]
             if chemical_mapping_method in ["DMS4", "SHAPE"]:
                 score = DSCI.score(
