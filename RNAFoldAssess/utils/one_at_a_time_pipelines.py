@@ -361,8 +361,8 @@ def generate_eterna_data_evaluations_by_partition(model,
     print(f"There were {fail_count} errors detecting chemical mapping experiment type")
 
     headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value, sequence_length"
-    shape_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_partition-{partition_number}_SHAPE_pipeline_report.txt"
-    dms_report_path = f"/common/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_partition-{partition_number}_DMS_pipeline_report.txt"
+    shape_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_partition-{partition_number}_SHAPE_pipeline_report.txt"
+    dms_report_path = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/{model_name}_partition-{partition_number}_DMS_pipeline_report.txt"
 
     # Run SHAPE evals
     print("Starting SHAPE evaluations")
