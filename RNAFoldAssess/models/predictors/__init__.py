@@ -11,10 +11,11 @@ from .ipknot import *
 from .seqfold import *
 from .mxfold2 import *
 from .nupack import *
-from .cf_retrained_ydata import *
 from .pknots import *
+from .cf_retrained_ydata import *
 from .cf_retrained_rnandria import *
 from .cf_retrained_ribonanza import *
+from .cf_retrained_eterna import *
 from .mxfold2_retrained_ydata import *
 from .mxfold2_retrained_rnandria import *
 from .mxfold2_retrained_ribonanza import *
