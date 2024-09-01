@@ -16,7 +16,8 @@ class PKnots:
 
         if "/.ct" in fasta_file:
             fasta_file = fasta_file.replace("/.ct", ".ct")
-        ct_path = f"{self.ct_dir}/{output_subfolder}/{fasta_file}.ct"
+        short_fasta_name = fasta_file.split("/")[-1]
+        ct_path = f"{self.ct_dir}/{output_subfolder}/{short_fasta_name}.ct"
         exec_string = f"{path} -g {fasta_file} {ct_path}"
         os.system(exec_string)
         self.output = SecondaryStructureTools.ct2db(ct_path)
