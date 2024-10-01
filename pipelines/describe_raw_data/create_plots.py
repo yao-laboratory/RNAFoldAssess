@@ -8,7 +8,7 @@ desc_dir = "/common/yesselmanlab/ewhiting/data/descriptions"
 
 all_files = os.listdir(desc_dir)
 
-ln_files = [f for f in all_files if f.endswith("legnths.txt")]
+ln_files = [f for f in all_files if f.endswith("lengths.txt")]
 gc_files = [f for f in all_files if f.endswith("gc_content.txt")]
 
 datasets = [
@@ -50,7 +50,8 @@ for ds in datasets:
     ln_data = ln_file.readlines()
     ln_file.close()
     ln_data = [int(d.strip()) for d in ln_data]
-    lens[ds] = ln_data
+    if ds != "ydata":
+        lens[ds] = ln_data
 
     gc_data = gc_file.readlines()
     gc_file.close()
@@ -67,7 +68,8 @@ f.close()
 
 all_len_data = []
 for s in lens:
-    all_len_data.append(lens[s])
+    if s != "ydata":
+        all_len_data.append(lens[s])
 
 fig = plt.figure(figsize =(10, 7))
 ax = fig.add_subplot(111)
@@ -80,7 +82,7 @@ for p in bp["boxes"]:
 for whisker in bp['whiskers']:
     whisker.set(color ='#000000', linewidth = 1.5, linestyle =":")
 
-ax.set_yticklabels(pretty_names)
+ax.set_yticklabels([p for p in pretty_names if p != "Yesselman Lab Data"])
 plt.title("Sequence Lengths")
 
 plt.savefig(fname="sequence_lengths.jpg", format="jpg")

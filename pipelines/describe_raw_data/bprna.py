@@ -1,6 +1,6 @@
 import os
 
-sequence_data_path = "/common/yesselmanlab/ewhiting/data/bprna/dbnFiles"
+sequence_data_path = "/work/yesselmanlab/ewhiting/data/bprna/dbnFiles"
 
 dbn_files = os.listdir(sequence_data_path)
 dbn_files = [f for f in dbn_files if f.endswith("dbn")]
@@ -31,7 +31,7 @@ for sf in dbn_files:
         print(f"Working {counter}")
     data = open(f"{sequence_data_path}/{sf}")
     data = data.readlines()
-    sequence = data[-1].strip()
+    sequence = data[3].strip()
     slen = len(sequence)
     gc = get_gc_content(sequence)
     lf.write(f"{slen}\n")

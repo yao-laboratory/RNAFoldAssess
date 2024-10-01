@@ -3,7 +3,7 @@ import os
 from RNAFoldAssess.models import DataPoint
 
 
-ribo_data_csv = "/common/yesselmanlab/ewhiting/data/ribonanza/rmdb_data.v1.3.0.csv"
+ribo_data_csv = "/mnt/nrdstor/yesselmanlab/ewhiting/rna_data/ribonanza/rmdb_data.v1.3.0.csv"
 f = open(ribo_data_csv)
 datapoints = f.readlines()
 f.close()
