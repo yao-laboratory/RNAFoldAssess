@@ -9,17 +9,19 @@ class RNAFold:
     def __int__(self):
         self.output = ""
 
-    def execute(self, path, fasta_file, remove_file_when_done=True):
+    def execute(self, path, fasta_file, remove_file_when_done=False):
         # Overwrite any path passed to this model and use the
         # local one loaded by `module load viennarna`.
         path = "RNAfold"
         exec_string = f"{path} -i {fasta_file}"
         self.output = os.popen(exec_string).read()
         file_name_base = fasta_file.split(".")[0]
+        if "scratch" in file_name_base:
+            file_name_base = file_name_base.replace("/scratch/", "")
         try:
-            os.remove(f"{file_name_base}.ps")
+            os.remove(f"/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/bprna_redo/{file_name_base}_ss.ps")
         except FileNotFoundError:
-            print(f"Couln't delete {file_name_base}.ps")
+            print(f"Couln't delete {file_name_base}_ss.ps")
         if remove_file_when_done:
             try:
                 os.system(f"rm {file_name_base}*")
