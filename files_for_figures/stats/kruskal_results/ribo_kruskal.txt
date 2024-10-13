@@ -1,0 +1,4 @@
+Kruskal H-test on ribo predictions
+Statistic: 27913.5478
+p-value: 0.0000
+Reject the null hypothesis: at least one group is different.

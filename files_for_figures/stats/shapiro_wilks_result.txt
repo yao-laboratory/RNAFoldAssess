@@ -1,0 +1,330 @@
+RNAStructure on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9925665259361267
+Shapiro-Wilk Test p-value: 2.534278428356629e-05
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold2 on ydata
+Shapiro-Wilk Test Statistic: 0.8080145716667175
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+ContextFold on ydata
+Shapiro-Wilk Test Statistic: 0.8217607140541077
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+IPKnot on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9956771731376648
+Shapiro-Wilk Test p-value: 0.00036009628092870116
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold2 on ribo
+Shapiro-Wilk Test Statistic: 0.990013837814331
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+NUPACK on ydata
+Shapiro-Wilk Test Statistic: 0.8195058107376099
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAStructure on eterna
+Shapiro-Wilk Test Statistic: 0.9749169945716858
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RandomPredictor on ydata
+Shapiro-Wilk Test Statistic: 0.9111183285713196
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+EternaFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.994303286075592
+Shapiro-Wilk Test p-value: 2.3295042410609312e-05
+Reject the null hypothesis: the data is not normally distributed.
+
+NeuralFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9976345896720886
+Shapiro-Wilk Test p-value: 0.03100736439228058
+Reject the null hypothesis: the data is not normally distributed.
+
+NUPACK on ribo
+Shapiro-Wilk Test Statistic: 0.9924768209457397
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+NeuralFold on ribo
+Shapiro-Wilk Test Statistic: 0.9967615604400635
+Shapiro-Wilk Test p-value: 2.1622035304531927e-42
+Reject the null hypothesis: the data is not normally distributed.
+
+NUPACK on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9969720840454102
+Shapiro-Wilk Test p-value: 0.006444132886826992
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAFold on ribo
+Shapiro-Wilk Test Statistic: 0.990999698638916
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+IPKnot on ribo
+Shapiro-Wilk Test Statistic: 0.9883500337600708
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+Simfold on eterna
+Shapiro-Wilk Test Statistic: 0.9765536785125732
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+ContextFold on ribo
+Shapiro-Wilk Test Statistic: 0.991377592086792
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+pKnots on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9985201358795166
+Shapiro-Wilk Test p-value: 0.24594804644584656
+Fail to reject the null hypothesis: the data is normally distributed.
+
+RNAStructure on ribo
+Shapiro-Wilk Test Statistic: 0.9910831451416016
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold2 on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9980747699737549
+Shapiro-Wilk Test p-value: 1.228866608471435e-06
+Reject the null hypothesis: the data is not normally distributed.
+
+IPKnot on eterna
+Shapiro-Wilk Test Statistic: 0.9781401753425598
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+ContraFold on ribo
+Shapiro-Wilk Test Statistic: 0.9893465638160706
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+SPOT-RNA on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9931809902191162
+Shapiro-Wilk Test p-value: 3.008383373526158e-06
+Reject the null hypothesis: the data is not normally distributed.
+
+ContextFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.99770587682724
+Shapiro-Wilk Test p-value: 0.036789603531360626
+Reject the null hypothesis: the data is not normally distributed.
+
+SPOT-RNA on ydata
+Shapiro-Wilk Test Statistic: 0.8928919434547424
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+NUPACK on eterna
+Shapiro-Wilk Test Statistic: 0.9827035665512085
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+IPKnot on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9778534173965454
+Shapiro-Wilk Test p-value: 6.8251953568021495e-12
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9928474426269531
+Shapiro-Wilk Test p-value: 5.333867054022816e-16
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9900621771812439
+Shapiro-Wilk Test p-value: 9.020169500217889e-07
+Reject the null hypothesis: the data is not normally distributed.
+
+NeuralFold on ydata
+Shapiro-Wilk Test Statistic: 0.9668201804161072
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold on eterna
+Shapiro-Wilk Test Statistic: 0.9756814241409302
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+ContextFold on eterna
+Shapiro-Wilk Test Statistic: 0.9847279787063599
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+EternaFold on ydata
+Shapiro-Wilk Test Statistic: 0.828292965888977
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAFold on ydata
+Shapiro-Wilk Test Statistic: 0.7914415597915649
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+NUPACK on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9919395446777344
+Shapiro-Wilk Test p-value: 1.0511387699807528e-05
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold2 on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.992962121963501
+Shapiro-Wilk Test p-value: 6.733279027653499e-14
+Reject the null hypothesis: the data is not normally distributed.
+
+EternaFold on eterna
+Shapiro-Wilk Test Statistic: 0.9732019901275635
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold2 on eterna
+Shapiro-Wilk Test Statistic: 0.9757739305496216
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+SPOT-RNA on eterna
+Shapiro-Wilk Test Statistic: 0.9890835881233215
+Shapiro-Wilk Test p-value: 7.006492321624085e-45
+Reject the null hypothesis: the data is not normally distributed.
+
+SPOT-RNA on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9859732389450073
+Shapiro-Wilk Test p-value: 8.96445495612852e-09
+Reject the null hypothesis: the data is not normally distributed.
+
+ContextFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.976718544960022
+Shapiro-Wilk Test p-value: 2.7814332868164593e-12
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold on ribo
+Shapiro-Wilk Test Statistic: 0.9887720346450806
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+ContraFold on eterna
+Shapiro-Wilk Test Statistic: 0.9763801097869873
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+IPKnot on ydata
+Shapiro-Wilk Test Statistic: 0.7664176821708679
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+Simfold on ydata
+Shapiro-Wilk Test Statistic: 0.7748193144798279
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+EternaFold on ribo
+Shapiro-Wilk Test Statistic: 0.988629937171936
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+pKnots on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9940516352653503
+Shapiro-Wilk Test p-value: 0.00023401968064717948
+Reject the null hypothesis: the data is not normally distributed.
+
+pKnots on ydata
+Shapiro-Wilk Test Statistic: 0.82016921043396
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAFold on eterna
+Shapiro-Wilk Test Statistic: 0.9741188287734985
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+NeuralFold on eterna
+Shapiro-Wilk Test Statistic: 0.9955445528030396
+Shapiro-Wilk Test p-value: 1.1719403612020114e-31
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9974281191825867
+Shapiro-Wilk Test p-value: 8.048691713113953e-10
+Reject the null hypothesis: the data is not normally distributed.
+
+Simfold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9968254566192627
+Shapiro-Wilk Test p-value: 0.004584361799061298
+Reject the null hypothesis: the data is not normally distributed.
+
+ContraFold on ydata
+Shapiro-Wilk Test Statistic: 0.8197966814041138
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+pKnots on ribo
+Shapiro-Wilk Test Statistic: 0.9866006374359131
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RandomPredictor on eterna
+Shapiro-Wilk Test Statistic: 0.9895164370536804
+Shapiro-Wilk Test p-value: 7.006492321624085e-45
+Reject the null hypothesis: the data is not normally distributed.
+
+pKnots on eterna
+Shapiro-Wilk Test Statistic: 0.9819709062576294
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+MXFold on ydata
+Shapiro-Wilk Test Statistic: 0.8121741414070129
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAStructure on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9975087642669678
+Shapiro-Wilk Test p-value: 0.0229425560683012
+Reject the null hypothesis: the data is not normally distributed.
+
+ContraFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9854474663734436
+Shapiro-Wilk Test p-value: 5.252907886443836e-09
+Reject the null hypothesis: the data is not normally distributed.
+
+ContraFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.994215190410614
+Shapiro-Wilk Test p-value: 2.060824044747278e-05
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAFold on rnandria_human_mRNA
+Shapiro-Wilk Test Statistic: 0.9973245859146118
+Shapiro-Wilk Test p-value: 0.014787238091230392
+Reject the null hypothesis: the data is not normally distributed.
+
+Simfold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.990115761756897
+Shapiro-Wilk Test p-value: 9.642178611102281e-07
+Reject the null hypothesis: the data is not normally distributed.
+
+NeuralFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9987286925315857
+Shapiro-Wilk Test p-value: 0.6320752501487732
+Fail to reject the null hypothesis: the data is normally distributed.
+
+EternaFold on rnandria_pri_miRNA
+Shapiro-Wilk Test Statistic: 0.9850361347198486
+Shapiro-Wilk Test p-value: 3.485125077418161e-09
+Reject the null hypothesis: the data is not normally distributed.
+
+RNAStructure on ydata
+Shapiro-Wilk Test Statistic: 0.8317195177078247
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+
+RandomPredictor on ribo
+Shapiro-Wilk Test Statistic: 0.9935227632522583
+Shapiro-Wilk Test p-value: 0.0
+Reject the null hypothesis: the data is not normally distributed.
+

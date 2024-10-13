@@ -1,0 +1,4 @@
+Friedman test on ydata predictions
+Statistic: 37078.9778
+p-value: 0.0000
+Reject the null hypothesis: at least one group is different.

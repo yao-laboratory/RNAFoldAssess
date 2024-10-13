@@ -1,0 +1,396 @@
+RNAStructure on rnandria_pri_miRNA
+Statistic: 1.891243276527348
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold2 on ydata
+Statistic: 17547.286240063608
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContextFold on ydata
+Statistic: 7050.321139954729
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+IPKnot on rnandria_human_mRNA
+Statistic: 1.8349293961402964
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold2 on ribo
+Statistic: 993.3926550976466
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NUPACK on ydata
+Statistic: 6126.471720544912
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAStructure on eterna
+Statistic: 226.85343843942974
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RandomPredictor on ydata
+Statistic: 3015.7000406630395
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+EternaFold on rnandria_human_mRNA
+Statistic: 2.245980273849227
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NeuralFold on rnandria_human_mRNA
+Statistic: 0.896731828751399
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NUPACK on ribo
+Statistic: 195.24505538822268
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NeuralFold on ribo
+Statistic: 98.7380648846447
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NUPACK on rnandria_human_mRNA
+Statistic: 1.0500118797835967
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAFold on ribo
+Statistic: 225.07361212134128
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+IPKnot on ribo
+Statistic: 322.81953809424886
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+Simfold on eterna
+Statistic: 206.39061088465678
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContextFold on ribo
+Statistic: 165.78029933772632
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+pKnots on rnandria_human_mRNA
+Statistic: 0.5520726703771288
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is normally distributed.
+
+RNAStructure on ribo
+Statistic: 231.27585988334613
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold2 on rnandria_human_mRNA
+Statistic: 2.4850565599481342
+Critical values: [0.576 0.656 0.786 0.917 1.091]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+IPKnot on eterna
+Statistic: 172.41544690946466
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContraFold on ribo
+Statistic: 317.06183051364496
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+SPOT-RNA on rnandria_human_mRNA
+Statistic: 2.6238101286983238
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContextFold on rnandria_human_mRNA
+Statistic: 0.565021219317714
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is normally distributed.
+
+SPOT-RNA on ydata
+Statistic: 3470.07037024913
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NUPACK on eterna
+Statistic: 137.77751714328042
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+IPKnot on rnandria_pri_miRNA
+Statistic: 4.741170732984074
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold on rnandria_pri_miRNA
+Statistic: 10.646582606401353
+Critical values: [0.576 0.656 0.786 0.917 1.091]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAFold on rnandria_pri_miRNA
+Statistic: 2.4787253244769545
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NeuralFold on ydata
+Statistic: 1055.5310652614571
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold on eterna
+Statistic: 1747.6333893600968
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContextFold on eterna
+Statistic: 118.90369819830084
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+EternaFold on ydata
+Statistic: 449.19092433264814
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAFold on ydata
+Statistic: 10935.810329251224
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NUPACK on rnandria_pri_miRNA
+Statistic: 2.023836009884235
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold2 on rnandria_pri_miRNA
+Statistic: 7.912680998491851
+Critical values: [0.575 0.655 0.786 0.917 1.091]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+EternaFold on eterna
+Statistic: 246.47680629813112
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold2 on eterna
+Statistic: 1525.4103883541538
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+SPOT-RNA on eterna
+Statistic: 67.15443736275483
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+SPOT-RNA on rnandria_pri_miRNA
+Statistic: 2.102003582843736
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContextFold on rnandria_pri_miRNA
+Statistic: 6.331002823753124
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold on ribo
+Statistic: 1187.007134692627
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContraFold on eterna
+Statistic: 203.22310953700799
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+IPKnot on ydata
+Statistic: 9742.612805955287
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+Simfold on ydata
+Statistic: 8505.382615066163
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+EternaFold on ribo
+Statistic: 306.02754290559096
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+pKnots on rnandria_pri_miRNA
+Statistic: 1.2189464377242984
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+pKnots on ydata
+Statistic: 6671.875729893713
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAFold on eterna
+Statistic: 235.86231478181435
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NeuralFold on eterna
+Statistic: 38.068966065126006
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold on rnandria_human_mRNA
+Statistic: 3.9626745856239722
+Critical values: [0.576 0.656 0.787 0.917 1.091]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+Simfold on rnandria_human_mRNA
+Statistic: 1.1914416468116542
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContraFold on ydata
+Statistic: 6029.498168685823
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+pKnots on ribo
+Statistic: 362.5362183676334
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RandomPredictor on eterna
+Statistic: 42.300307238154346
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+pKnots on eterna
+Statistic: 151.43723622550897
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+MXFold on ydata
+Statistic: 23732.944044775213
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAStructure on rnandria_human_mRNA
+Statistic: 1.0961718562007263
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContraFold on rnandria_pri_miRNA
+Statistic: 3.657871760452963
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+ContraFold on rnandria_human_mRNA
+Statistic: 1.3776202904859929
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAFold on rnandria_human_mRNA
+Statistic: 1.1999613599282384
+Critical values: [0.574 0.654 0.785 0.915 1.089]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+Simfold on rnandria_pri_miRNA
+Statistic: 2.8336419336576455
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+NeuralFold on rnandria_pri_miRNA
+Statistic: 0.37257317123771827
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is normally distributed.
+
+EternaFold on rnandria_pri_miRNA
+Statistic: 3.3345402831562296
+Critical values: [0.574 0.654 0.784 0.915 1.088]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RNAStructure on ydata
+Statistic: 5708.74587195745
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+
+RandomPredictor on ribo
+Statistic: 108.6467936974368
+Critical values: [0.576 0.656 0.787 0.918 1.092]
+Significance Level: [15.  10.   5.   2.5  1. ]
+The data is not normally distributed.
+

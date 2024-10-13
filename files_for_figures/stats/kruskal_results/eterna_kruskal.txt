@@ -1,0 +1,4 @@
+Kruskal H-test on eterna predictions
+Statistic: 18230.0271
+p-value: 0.0000
+Reject the null hypothesis: at least one group is different.

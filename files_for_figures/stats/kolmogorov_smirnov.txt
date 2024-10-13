@@ -1,0 +1,264 @@
+RNAStructure on rnandria_pri_miRNA
+KS Statistic: 0.03748592481996166, p-value: 0.0890919920172133
+The data is normally distributed.
+
+MXFold2 on ydata
+KS Statistic: 0.1704811971776955, p-value: 0.0
+The data is not normally distributed.
+
+ContextFold on ydata
+KS Statistic: 0.15901338057781578, p-value: 0.0
+The data is not normally distributed.
+
+IPKnot on rnandria_human_mRNA
+KS Statistic: 0.034355754421954265, p-value: 0.06283413741564603
+The data is normally distributed.
+
+MXFold2 on ribo
+KS Statistic: 0.029737612946854952, p-value: 0.0
+The data is not normally distributed.
+
+NUPACK on ydata
+KS Statistic: 0.16465497910055293, p-value: 0.0
+The data is not normally distributed.
+
+RNAStructure on eterna
+KS Statistic: 0.0538408665265907, p-value: 1.702757054243117e-98
+The data is not normally distributed.
+
+RandomPredictor on ydata
+KS Statistic: 0.0928946683817532, p-value: 0.0
+The data is not normally distributed.
+
+EternaFold on rnandria_human_mRNA
+KS Statistic: 0.039643401054489824, p-value: 0.020153006941101434
+The data is not normally distributed.
+
+NeuralFold on rnandria_human_mRNA
+KS Statistic: 0.022455073057044972, p-value: 0.4485178218157301
+The data is normally distributed.
+
+NUPACK on ribo
+KS Statistic: 0.026895205659142607, p-value: 2.3636717863536372e-90
+The data is not normally distributed.
+
+NeuralFold on ribo
+KS Statistic: 0.017696656831853064, p-value: 4.5423271524086547e-39
+The data is not normally distributed.
+
+NUPACK on rnandria_human_mRNA
+KS Statistic: 0.02647562728573588, p-value: 0.25467249816771453
+The data is normally distributed.
+
+RNAFold on ribo
+KS Statistic: 0.027983093431182993, p-value: 8.923084792096425e-98
+The data is not normally distributed.
+
+IPKnot on ribo
+KS Statistic: 0.03609513464255232, p-value: 2.311206455696436e-162
+The data is not normally distributed.
+
+Simfold on eterna
+KS Statistic: 0.05088409629069501, p-value: 5.152227608222129e-88
+The data is not normally distributed.
+
+ContextFold on ribo
+KS Statistic: 0.021216441519143037, p-value: 2.201101432863537e-56
+The data is not normally distributed.
+
+pKnots on rnandria_human_mRNA
+KS Statistic: 0.01647224954419213, p-value: 0.8180483426787224
+The data is normally distributed.
+
+RNAStructure on ribo
+KS Statistic: 0.02890236890362541, p-value: 2.8078803452666295e-104
+The data is not normally distributed.
+
+MXFold2 on rnandria_human_mRNA
+KS Statistic: 0.0170118976530238, p-value: 0.0679279520089342
+The data is normally distributed.
+
+IPKnot on eterna
+KS Statistic: 0.0446651933033253, p-value: 6.860724972906409e-68
+The data is not normally distributed.
+
+ContraFold on ribo
+KS Statistic: 0.035565640082018124, p-value: 1.0840702064807722e-157
+The data is not normally distributed.
+
+SPOT-RNA on rnandria_human_mRNA
+KS Statistic: 0.04260948292201633, p-value: 0.009853760115253168
+The data is not normally distributed.
+
+ContextFold on rnandria_human_mRNA
+KS Statistic: 0.01881309851527102, p-value: 0.674072080389424
+The data is normally distributed.
+
+SPOT-RNA on ydata
+KS Statistic: 0.11465065220175685, p-value: 0.0
+The data is not normally distributed.
+
+NUPACK on eterna
+KS Statistic: 0.041761964463520096, p-value: 2.0444734490388337e-59
+The data is not normally distributed.
+
+IPKnot on rnandria_pri_miRNA
+KS Statistic: 0.051247145896408774, p-value: 0.006096614082606032
+The data is not normally distributed.
+
+MXFold on rnandria_pri_miRNA
+KS Statistic: 0.03562281551575536, p-value: 1.7299239295470122e-06
+The data is not normally distributed.
+
+RNAFold on rnandria_pri_miRNA
+KS Statistic: 0.04133406605187451, p-value: 0.0456398045775227
+The data is not normally distributed.
+
+NeuralFold on ydata
+KS Statistic: 0.057847702854597505, p-value: 0.0
+The data is not normally distributed.
+
+MXFold on eterna
+KS Statistic: 0.05192277828817493, p-value: 0.0
+The data is not normally distributed.
+
+ContextFold on eterna
+KS Statistic: 0.03776796513705494, p-value: 1.1396162294183289e-48
+The data is not normally distributed.
+
+EternaFold on ydata
+KS Statistic: 0.1566154704564242, p-value: 4.069930364161857e-236
+The data is not normally distributed.
+
+RNAFold on ydata
+KS Statistic: 0.18011041489970037, p-value: 0.0
+The data is not normally distributed.
+
+NUPACK on rnandria_pri_miRNA
+KS Statistic: 0.03368793973074169, p-value: 0.16167657140322056
+The data is normally distributed.
+
+MXFold2 on rnandria_pri_miRNA
+KS Statistic: 0.036430034421059965, p-value: 1.684153711337372e-05
+The data is not normally distributed.
+
+EternaFold on eterna
+KS Statistic: 0.05641250360560679, p-value: 4.2958113745977256e-108
+The data is not normally distributed.
+
+MXFold2 on eterna
+KS Statistic: 0.051845313076124055, p-value: 0.0
+The data is not normally distributed.
+
+SPOT-RNA on eterna
+KS Statistic: 0.027757288028618543, p-value: 2.754908197088161e-25
+The data is not normally distributed.
+
+SPOT-RNA on rnandria_pri_miRNA
+KS Statistic: 0.037825613385234436, p-value: 0.08420490882217524
+The data is normally distributed.
+
+ContextFold on rnandria_pri_miRNA
+KS Statistic: 0.06208092500782603, p-value: 0.0004027043152922411
+The data is not normally distributed.
+
+MXFold on ribo
+KS Statistic: 0.02929735588172777, p-value: 0.0
+The data is not normally distributed.
+
+ContraFold on eterna
+KS Statistic: 0.05030845237437731, p-value: 4.9237044346870905e-86
+The data is not normally distributed.
+
+IPKnot on ydata
+KS Statistic: 0.20344118716621384, p-value: 0.0
+The data is not normally distributed.
+
+Simfold on ydata
+KS Statistic: 0.19753442490589346, p-value: 0.0
+The data is not normally distributed.
+
+EternaFold on ribo
+KS Statistic: 0.03431397584222762, p-value: 8.091485098843443e-147
+The data is not normally distributed.
+
+pKnots on rnandria_pri_miRNA
+KS Statistic: 0.025937813358883677, p-value: 0.4436172960003235
+The data is normally distributed.
+
+pKnots on ydata
+KS Statistic: 0.16919480419085775, p-value: 0.0
+The data is not normally distributed.
+
+RNAFold on eterna
+KS Statistic: 0.05364099031270786, p-value: 9.085503278264406e-98
+The data is not normally distributed.
+
+NeuralFold on eterna
+KS Statistic: 0.019586590050551855, p-value: 2.118572940342016e-13
+The data is not normally distributed.
+
+MXFold on rnandria_human_mRNA
+KS Statistic: 0.017305476552049837, p-value: 0.025248927029435708
+The data is not normally distributed.
+
+Simfold on rnandria_human_mRNA
+KS Statistic: 0.03231807126672237, p-value: 0.09346132271751939
+The data is normally distributed.
+
+ContraFold on ydata
+KS Statistic: 0.16341356341779867, p-value: 0.0
+The data is not normally distributed.
+
+pKnots on ribo
+KS Statistic: 0.033887312350394216, p-value: 3.3630101385710433e-143
+The data is not normally distributed.
+
+RandomPredictor on eterna
+KS Statistic: 0.02181024469763404, p-value: 1.6365823179781095e-16
+The data is not normally distributed.
+
+pKnots on eterna
+KS Statistic: 0.04028946111419207, p-value: 2.501771834127322e-55
+The data is not normally distributed.
+
+MXFold on ydata
+KS Statistic: 0.1681284258627005, p-value: 0.0
+The data is not normally distributed.
+
+RNAStructure on rnandria_human_mRNA
+KS Statistic: 0.026312703788862746, p-value: 0.2611180768157534
+The data is normally distributed.
+
+ContraFold on rnandria_pri_miRNA
+KS Statistic: 0.040727914832238366, p-value: 0.05093108349399611
+The data is normally distributed.
+
+ContraFold on rnandria_human_mRNA
+KS Statistic: 0.032784302824389766, p-value: 0.08701163253691668
+The data is normally distributed.
+
+RNAFold on rnandria_human_mRNA
+KS Statistic: 0.03278693061462734, p-value: 0.08548503095654536
+The data is normally distributed.
+
+Simfold on rnandria_pri_miRNA
+KS Statistic: 0.045359574130323155, p-value: 0.021141616952415267
+The data is not normally distributed.
+
+NeuralFold on rnandria_pri_miRNA
+KS Statistic: 0.021115073840305087, p-value: 0.7035214317652971
+The data is normally distributed.
+
+EternaFold on rnandria_pri_miRNA
+KS Statistic: 0.04267859144364883, p-value: 0.0355766758759023
+The data is not normally distributed.
+
+RNAStructure on ydata
+KS Statistic: 0.15684147271038196, p-value: 0.0
+The data is not normally distributed.
+
+RandomPredictor on ribo
+KS Statistic: 0.01991223343201709, p-value: 1.0251247832129078e-49
+The data is not normally distributed.
+

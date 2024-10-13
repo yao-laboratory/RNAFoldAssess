@@ -1,0 +1,4 @@
+Friedman test on rnandria_human_mRNA predictions
+Statistic: 9317.6243
+p-value: 0.0000
+Reject the null hypothesis: at least one group is different.
