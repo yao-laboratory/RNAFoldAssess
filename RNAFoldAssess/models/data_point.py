@@ -19,12 +19,11 @@ class DataPoint:
         file_safe_name = "".join(c for c in self.name if c.isalnum())
         if len(file_safe_name) > 200:
             file_safe_name = file_safe_name[0:200]
-        # Use HCC Swan $WORK directory
-        work_path = "/work/yesselmanlab/ewhiting"
-        f = open(f"{work_path}/{file_safe_name}.seq", "w")
+        # Use HCC Swan scratch directory
+        f = open(f"/scratch/{file_safe_name}.seq", "w")
         f.write(self.sequence)
         f.close()
-        self.path = os.path.abspath(f"{work_path}/{file_safe_name}.seq")
+        self.path = os.path.abspath(f"/scratch/{file_safe_name}.seq")
         return self.path
 
     def to_fasta_file(self):
