@@ -1,4 +1,4 @@
 Kruskal H-test on ydata predictions
-Statistic: 402429.9302
+Statistic: 407174.7578
 p-value: 0.0000
 Reject the null hypothesis: at least one group is different.

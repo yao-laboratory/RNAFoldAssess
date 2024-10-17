@@ -1,4 +1,4 @@
 Kruskal H-test on rnandria_human_mRNA predictions
-Statistic: 2771.2440
+Statistic: 2930.1107
 p-value: 0.0000
 Reject the null hypothesis: at least one group is different.

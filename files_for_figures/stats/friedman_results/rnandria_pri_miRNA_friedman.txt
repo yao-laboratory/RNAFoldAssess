@@ -1,4 +1,4 @@
 Friedman test on rnandria_pri_miRNA predictions
-Statistic: 6023.7952
-p-value: 0.0000
+Statistic: 6192.9745
+p-value: 0.0000000000
 Reject the null hypothesis: at least one group is different.

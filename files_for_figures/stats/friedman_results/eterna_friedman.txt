@@ -1,4 +1,4 @@
 Friedman test on eterna predictions
 Statistic: 155391.9034
-p-value: 0.0000
+p-value: 0.0000000000
 Reject the null hypothesis: at least one group is different.

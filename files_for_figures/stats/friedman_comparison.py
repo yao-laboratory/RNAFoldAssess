@@ -38,7 +38,7 @@ for dataset in divided_data:
     # Build the result message
     result_message = f"Friedman test on {dataset} predictions\n"
     result_message += f"Statistic: {stat:.4f}\n"
-    result_message += f"p-value: {p:.4f}\n"
+    result_message += f"p-value: {p:.10f}\n"
     if p > alpha:
         result_message += "Fail to reject the null hypothesis: the groups are likely from the same distribution.\n"
     else:

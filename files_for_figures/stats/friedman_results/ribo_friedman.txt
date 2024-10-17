@@ -1,4 +1,4 @@
 Friedman test on ribo predictions
-Statistic: 216254.7954
-p-value: 0.0000
+Statistic: 220727.4098
+p-value: 0.0000000000
 Reject the null hypothesis: at least one group is different.
