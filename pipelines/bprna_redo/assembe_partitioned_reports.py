@@ -5,7 +5,7 @@ report_path = "/work/yesselmanlab/ewhiting/bprna_preds/redo_reports"
 headers = "model_name, dp_name, lenience, sequence, true_structure, predicted_structure, sensitivity, ppv, f1\n"
 
 for lenience in [0, 1]:
-    reports = [ff for ff in os.listdir(report_path) if model in ff and f"{lenience}_lenience.txt" in ff and "master" not in ff]
+    reports = [ff for ff in os.listdir(report_path) if f"{model}_" in ff and f"{lenience}_lenience.txt" in ff and "master" not in ff]
     master_data = []
     for report in reports:
         with open(f"{report_path}/{report}") as f:
