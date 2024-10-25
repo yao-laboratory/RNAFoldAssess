@@ -16,7 +16,6 @@ models = [
     "ContextFold",
     "ContraFold",
     "EternaFold",
-    "RandomPredictor",
     "IPKnot",
     "NeuralFold",
     "NUPACK",
@@ -37,7 +36,7 @@ all_pred_file = open(f"{all_pred_dir}/chemical_mapping_master_file.txt", "w")
 for m in models:
     print(f"Working {m} predictions")
     for i, ds in enumerate(datasets):
-        print(f"\tWorking {ds} - {i} of {ds_len}")
+        print(f"\tWorking {ds} - {i + 1} of {ds_len}")
         loc = datasets[ds]
         all_preds = [f for f in os.listdir(loc) if f"{m}_" in f] # Underscore to prevent double counting MXFold
         # Filter to just the prediction files
@@ -78,7 +77,7 @@ for m in models:
                         if cohort not in ["C014G", "C014H", "C014I", "C014J", "C014U", "C014V"]:
                             continue
 
-                    line = f"{m}, {name}, {seq}, {pred}, {acc}\n"
+                    line = f"{ds}, {m}, {name}, {seq}, {pred}, {acc}\n"
                     all_pred_file.write(line)
                 except IndexError:
                     print(f"Index error in {m}, {ds}, {pred_file}, {d}")

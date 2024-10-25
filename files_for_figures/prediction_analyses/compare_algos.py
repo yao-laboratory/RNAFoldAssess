@@ -11,7 +11,7 @@ model_map = {}
 print("Reading data ...")
 for d in data:
     # datapoint = d.split(", ")[1]
-    model = d.split(", ")[0]
+    model = d.split(", ")[1]
     try:
         model_map[model] += 1
     except KeyError:

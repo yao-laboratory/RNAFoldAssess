@@ -10,8 +10,8 @@ model_map = {}
 
 print("Reading data ...")
 for d in data:
-    datapoint = d.split(", ")[1]
-    model = d.split(", ")[0]
+    datapoint = d.split(", ")[2]
+    model = d.split(", ")[1]
     try:
         datapoints[datapoint] += 1
     except KeyError:
@@ -24,9 +24,6 @@ for d in data:
 for m, vals in model_map.items():
     print(f"{m}: {vals}")
 
-for dp, c in datapoints.items():
-    if c > 14:
-        print(dp)
 
 all_counts = list(datapoints.values())
 print(f"Max count: {max(all_counts)}")
@@ -40,9 +37,9 @@ for d in data:
     counter += 1
     if counter % 150000 == 0:
         print(f"Working {counter} of {len(data)}")
-    dp = d.split(", ")[1]
+    dp = d.split(", ")[2]
     count = datapoints[dp]
-    if count == 14:
+    if count == 13:
         matched_set_file.write(d)
 
 matched_set_file.close()
