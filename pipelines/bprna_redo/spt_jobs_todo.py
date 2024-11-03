@@ -13,6 +13,6 @@ for i in range(103):
 
 with open(f"{prediction_dirs}/empty_dirs.txt", "w") as fh:
     for d in empty_dirs:
-        fh.write(f"{d}\n")
+        fh.write(f"{d.split('_')[1]}\n")
 
 print(f"Found {len(empty_dirs)} empty directories")
