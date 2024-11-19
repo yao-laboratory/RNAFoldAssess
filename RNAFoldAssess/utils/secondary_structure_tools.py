@@ -200,6 +200,18 @@ class SecondaryStructureTools:
         f.close()
         return file_path
 
+    @staticmethod
+    def bpseq_to_dbn_string(bpseq_file):
+        with open(bpseq_file) as fh:
+            data = [d.strip() for d in fh.readlines()]
+        data = [d.split(" ") for d in data]
+        pairs = [(int(d[0]) - 1, int(d[2]) - 1) for d in data if d[2] != "0"]
+        pairs = [p for p in pairs if p[0] < p[1]]
+        dbn = ["." for _ in range(len(data))]
+        for start, end in pairs:
+            dbn[start] = "("
+            dbn[end] = ")"
+        return "".join(dbn)
 
 
 class SecondaryStructureToolsException(Exception):
