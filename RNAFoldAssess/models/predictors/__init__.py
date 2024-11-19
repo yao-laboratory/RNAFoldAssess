@@ -20,3 +20,4 @@ from .mxfold2_retrained_ydata import *
 from .mxfold2_retrained_rnandria import *
 from .mxfold2_retrained_ribonanza import *
 from .mxfold2_retrained_eterna import *
+from .mxfold2_retrained_curated import *
