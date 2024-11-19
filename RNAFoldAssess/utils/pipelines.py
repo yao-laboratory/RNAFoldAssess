@@ -1,4 +1,4 @@
-import os, datetime, time
+import os, datetime, time, json
 
 import pandas as pd
 
@@ -567,6 +567,97 @@ def generate_rasp_data(model,
     aux_file = open(aux_data_path, "w")
     aux_file.write(aux_data)
     aux_file.close()
+
+
+def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_file=False):
+    base_dir = "/common/yesselmanlab/ewhiting/data/rasp_data"
+    json_dir = f"{base_dir}/{species}/json_files"
+    json_files = os.listdir(json_dir)
+    ch_map = {}
+    for jf in json_files:
+        ch = jf.replace("_exons.json", "")
+        with open(f"{json_dir}/{jf}") as fh:
+            ch_map[ch] = json.load(fh)
+
+    headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value\n"
+
+    for ch in ch_map:
+        # if ch in ["chromosome_1", "chromosome_3", "chromosome_4", "chromosome_Mt", "chromosome_Pt"]:
+        # if ch not in ["chromosome_4"]:
+        #     continue
+        print(f"Working {ch} in {species}")
+        report_file = open(f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{ch}_report.txt", "w")
+        report_file.write(headers)
+        data = ch_map[ch]
+        counter = 0
+        len_data = len(data)
+        for dp in data:
+            counter += 1
+            if counter % 250 == 0:
+                print(f"Working {counter} of {len_data}")
+            if len(dp["sequence"]) < 10:
+                continue
+            try:
+                if model_name in ["ContextFold"]:
+                    model.execute(model_path, dp["sequence"])
+                elif model_name == "RNAStructure":
+                    fasta_string = f">{dp['name']}\n{dp['sequence']}"
+                    with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
+                        ff.write(fasta_string)
+                    input_file_path = f"/scratch/{dp['name']}.fasta"
+                    model.execute(input_file_path, output_path_base="/scratch", delete_ct_file_when_done=False)
+                elif "MXFold2" in model_name:
+                    fasta_string = f">{dp['name']}\n{dp['sequence']}"
+                    with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
+                        ff.write(fasta_string)
+                    input_file_path = f"/scratch/{dp['name']}.fasta"
+                    model.execute(input_file_path)
+                else:
+                    fasta_string = f">{dp['name']}\n{dp['sequence']}"
+                    with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
+                        ff.write(fasta_string)
+                    input_file_path = f"/scratch/{dp['name']}.fasta"
+                    model.execute(model_path, input_file_path)
+
+                if model_name != "IPKnot":
+                    prediction = model.get_ss_prediction()
+                else:
+                    prediction = model.get_ss_prediction_ignore_pseudoknots()
+
+                chem_map_method = dp["chem_map_type"]
+                reactivity_map = dp["reactivity_map"]
+                testable_seq = ""
+                testable_dbn = ""
+                reactivities = [float(d[1]) for d in reactivity_map]
+                for i, _reactivity in reactivity_map:
+                    testable_seq += dp["sequence"][i]
+                    testable_dbn += prediction[i]
+
+                if chem_map_method == "DMS":
+                    score = DSCI.score(
+                        testable_seq,
+                        testable_dbn,
+                        reactivities,
+                        DMS=True
+                    )
+                elif chem_map_method == "SHAPE":
+                    score = DSCI.score(
+                        testable_seq,
+                        testable_dbn,
+                        reactivities,
+                        SHAPE=True
+                    )
+
+                accuracy = score["accuracy"]
+                p = score["p"]
+
+                line_to_write = f"{model_name}, {dp['name']}, {dp['sequence']}, {prediction}, {accuracy}, {p}\n"
+                report_file.write(line_to_write)
+            except Exception as e:
+                print(f"datapoint {dp['name']} raised an exception: {e}")
+                continue
+    report_file.close()
+
 
 
 def parallel_bprna_predictions(model,
