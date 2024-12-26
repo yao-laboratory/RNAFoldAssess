@@ -1,6 +1,6 @@
 import pytest
 
-from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer, BasePairPseudoknotScorer
+from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer, BasePairPseudoknotScorer, CanonicalBasePairScorer
 from RNAFoldAssess.models import DSCIException, DSCITypeError, DSCIValueError
 
 class TestBaseClass:
@@ -309,6 +309,49 @@ class TestBasePairScorer:
         assert(scorer.ppv == 1.0)
         assert(scorer.f1 == 1.0)
 
+
+class TestCanonicalBasePairScorer:
+    real = ".(..)..(.(..))."
+    predicted = ".(...).(.(..))."
+    good_sequence = "AUGCAAUGGUCUAUGC"
+    bad_sequence = "AAGCAAUGGUCUAUGC"
+
+    # Regression tests
+    def test_with_no_lenience(self):
+        scorer = CanonicalBasePairScorer(self.good_sequence, self.real, self.predicted)
+        scorer.evaluate()
+        expected_report = "Sensitivity: 0.667, PPV: 0.667, F1: 0.667"
+        assert(scorer.report() == expected_report)
+
+    def test_report_precision(self):
+        scorer = CanonicalBasePairScorer(self.good_sequence, self.real, self.predicted)
+        scorer.evaluate()
+        expected_report = "Sensitivity: 0.66667, PPV: 0.66667, F1: 0.66667"
+        assert(scorer.report(precision=5) == expected_report)
+
+    def test_with_1_lenience(self):
+        scorer = CanonicalBasePairScorer(self.good_sequence, self.real, self.predicted, 1)
+        scorer.evaluate()
+        expected_report = "Sensitivity: 1.0, PPV: 1.0, F1: 1.0"
+        assert(scorer.report() == expected_report)
+    
+    # Test non-canonical structure
+    def test_structure_not_transformed(self):
+        transformed_structure = CanonicalBasePairScorer.transform_structure(self.real, self.good_sequence)
+        expected_structure = ".(..)..(.(..))."
+        assert(transformed_structure == expected_structure)
+
+    def test_structure_is_transformed(self):
+        transformed_structure = CanonicalBasePairScorer.transform_structure(self.real, self.bad_sequence)
+        expected_structure = ".......(.(..))."
+        assert(transformed_structure == expected_structure)
+
+    def test_report_stats_bad_sequence(self):
+        scorer = CanonicalBasePairScorer(self.bad_sequence, self.real, self.predicted)
+        scorer.evaluate()
+        expected_report = "Sensitivity: 1.0, PPV: 0.66667, F1: 0.8"
+        actual_report = scorer.report(precision=5)
+        assert(actual_report == expected_report)
 
 
 class TestBasePairPseudoknotScorer:
