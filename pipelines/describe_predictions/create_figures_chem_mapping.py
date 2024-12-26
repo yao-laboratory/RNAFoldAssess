@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 
 
 class Predictions:
-    def __init__(self, dataset_name, ds_name_index, seq_index, pred_index, acc_index, pred_file, go_immediately=True):
+    def __init__(self, dataset_name, ds_name_index, dp_name_index, seq_index, pred_index, acc_index, pred_file, go_immediately=True):
         self.dataset_name = dataset_name
         self.ds_name_index = ds_name_index
+        self.dp_name_index = dp_name_index
         self.seq_index = seq_index
         self.pred_index = pred_index
         self.acc_index = acc_index
@@ -24,6 +25,7 @@ class Predictions:
         if go_immediately:
             self.calculate_stats()
             self.separate_predictions()
+            self.create_separated_pred_files(self.dataset_name)
             self.create_figures()
 
 
@@ -36,7 +38,14 @@ class Predictions:
 
         print("Assembling data")
         self.data = [d.split(", ") for d in data]
-        self.data = [d for d in self.data if d[self.ds_name_index] == self.dataset_name]
+        if self.dataset_name.startswith("RNAndria"):
+            # pri_miRNA is hash, human_mRNA is hsa-mir
+            if "mRNA" in self.dataset_name:
+                self.data = [d for d in self.data if  d[self.ds_name_index] == "RNAndria" and "hsa-mir" in d[self.dp_name_index]]
+            else:
+                self.data = [d for d in self.data if d[self.ds_name_index] == "RNAndria" and "hsa-mir" not in d[self.dp_name_index]]
+        else:
+            self.data = [d for d in self.data if d[self.ds_name_index] == self.dataset_name]
         self.accs = [float(d[self.acc_index].strip()) for d in self.data]
 
         self.q2 = statistics.median(self.accs)
@@ -60,6 +69,23 @@ class Predictions:
                 self.easy_data_points.append(d)
             else:
                 self.other_data_points.append(d)
+
+    
+    def create_separated_pred_files(self, fname_prefix):
+        if self.easy_data_points == []:
+            raise Exception("You need to run `separate_predictions` first")
+
+        with open(f"{fname_prefix}_easy.txt", "w") as fh:
+            for edp in self.easy_data_points:
+                fh.write("".join(edp))
+
+        with open(f"{fname_prefix}_hard.txt", "w") as fh:
+            for hdp in self.hard_data_points:
+                fh.write("".join(hdp))
+
+        with open(f"{fname_prefix}_other.txt", "w") as fh:
+            for odp in self.other_data_points:
+                fh.write("".join(odp))
 
 
     def create_figures(self):
@@ -148,7 +174,12 @@ class Predictions:
 
 
 file_path = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/higher_level_analysis/latest/all_predictions/chemical_mapping_matched_set.txt"
-# eterna_preds = Predictions("EternaData", 0, 3, 4, 5, file_path)
-ydata_preds = Predictions("YesselmanLab", 0, 3, 4, 5, file_path)
-ribo_preds = Predictions("Ribonanza", 0, 3, 4, 5, file_path)
-rnandria_preds = Predictions("RNAndria", 0, 3, 4, 5, file_path)
+# eterna_preds = Predictions("EternaData", 0, 2, 3, 4, 5, file_path)
+# ydata_preds = Predictions("YesselmanLab", 0, 2, 3, 4, 5, file_path)
+# ribo_preds = Predictions("Ribonanza", 0, 2, 3, 4, 5, file_path)
+rnandria_preds = Predictions("RNAndria_human_mRNA", 0, 2, 3, 4, 5, file_path)
+rnandria_preds = Predictions("RNAndria_pri_miRNA", 0, 2, 3, 4, 5, file_path)
+
+# Make fasta files
+dirs = ["EternaData", "YesselmanLab", "Ribonanza", "RNAndria"]
+
