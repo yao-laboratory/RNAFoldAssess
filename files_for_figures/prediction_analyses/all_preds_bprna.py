@@ -4,7 +4,7 @@ import os, shutil
 import pandas as pd
 
 
-bprna_loc = "/work/yesselmanlab/ewhiting/bprna_preds/redo_reports"
+bprna_loc = "/work/yesselmanlab/ewhiting/bprna_canonical_reports"
 
 def get_file_loc(model, lenience):
     return f"{bprna_loc}/{model}_master_{lenience}_lenience.txt"

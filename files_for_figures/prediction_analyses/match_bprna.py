@@ -4,9 +4,6 @@ import os, shutil
 import pandas as pd
 
 
-def get_file_loc(model):
-    return f"{bprna_loc}/{model}_master_1_lenience.txt"
-
 models = [
     "ContextFold",
     "ContraFold",
