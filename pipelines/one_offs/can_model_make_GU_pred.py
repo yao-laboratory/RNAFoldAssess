@@ -42,7 +42,7 @@ with open(all_bprna_preds) as fh:
 
 data = [d.split(", ") for d in data]
 
-WOBBLE_PAIRS = ["AG", "GU"]
+WOBBLE_PAIRS = ["UG", "GU"]
 
 model_index = 0
 seq_index = 3
@@ -65,3 +65,19 @@ for m, can_predict_wobble in model_gu.items():
         print(f"{m} can make Wobble predictions")
     else:
         print(f"{m} has NOT made Wobble predictions in bprna set")
+
+# Output
+# ContextFold can make Wobble predictions
+# ContraFold can make Wobble predictions
+# EternaFold can make Wobble predictions
+# IPKnot can make Wobble predictions
+# MXFold can make Wobble predictions
+# MXFold2 can make Wobble predictions
+# NeuralFold can make Wobble predictions
+# NUPACK can make Wobble predictions
+# pKnots can make Wobble predictions
+# RNAFold can make Wobble predictions
+# RNAStructure can make Wobble predictions
+# Simfold can make Wobble predictions
+# SPOT-RNA can make Wobble predictions
+
