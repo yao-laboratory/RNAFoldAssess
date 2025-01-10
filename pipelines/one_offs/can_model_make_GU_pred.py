@@ -54,7 +54,7 @@ for d in data:
     pred = d[pred_index]
     base_pair_coordinates = parse_structure(pred)
     base_pair_nts = [f"{seq[i]}{seq[j]}" for i, j in base_pair_coordinates]
-    for bp in WOBBLE_PAIRS:
+    for bp in base_pair_nts:
         if bp in WOBBLE_PAIRS:
             model_gu[model] = True
             break
