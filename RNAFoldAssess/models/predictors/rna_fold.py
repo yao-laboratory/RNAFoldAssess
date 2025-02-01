@@ -1,53 +1,64 @@
-import os
+import ViennaRNA
 
 
 class RNAFold:
     """
-    This predictor model is provided as an example, but is capable of being
-    used as well. In order to use the RNAFold predictor class, you must first
-    install the ViennaRNA package. Installation instructions for this package
-    can be found at the following link:
+    This class is provided as an example and for the convenience of the user. The
+    RNAFold tool is present in the ViennaRNA package from PyPI, so we install it here.
+    If you would rather use a local installation, you will have to make a new class
+    and call the tool from there, probably with `os.system(<execution string>)` or
+    something like that.
 
-        https://www.tbi.univie.ac.at/RNA/ViennaRNA/doc/html/install.html
-
-    Once you have ViennaRNA installed, you have access to RNAFold. You will
-    use the path to the RNAFold executable when running the `execute` method
-    of this class.
-
-    To make a prediction with the RNAFold class from a FASTA file, consider
-    the following example code:
-
-    ```python
-    model = RNAFold()
-    path_to_rnafold_binary = os.path.abspath("/home/user/tools/ViennaRNA/bin/RNAfold")
-    fasta_file_path = os.path.abspath("/home/user/data/some_rna_file.fasta")
-
-    model.execute(path_to_rnafold_binary, fasta_file_path)
-    prediction = model.get_ss_prediction()
-    ```
-
-    Note that running `execute` sets the model's `output` attribute to the
-    predicted secondary structure in dot-bracket notation. To retrieve that
-    dot-bracket string, you have to run the `get_ss_prediction` method.
+    Assuming you have install the necessary requirements, you can use this class
+    as follows:
+        1. Instantiate an `RNAFold` object
+        2. Call the `execute` method, passing it an RNA sequence source and source type
+            a. The acceptable source types are "input" for a raw string or
+               "fasta" for a fasta file.
+            b. The default source type is "input," so this class expects a raw string
+               if you do not specify the input is a fasta file.
+            c. If you set source type as fasta and the fasta file is not at the path
+               you specified, this class will raise an `RNAFoldExecutionException`
+        3. To get the secondary structure prediction after execution:
+            a. Use the `get_ss_prediction` method. This will return a dot-brack
+               notation (dbn) string of the prediction.
+            b. If the `execute` method failed for some reason besides a missing file
+               path. The `get_ss_prediction` method will raise an
+               `RNAFoldExecutionException`
     """
+
+    RNA_INPUT_SOURCE_TYPES = ["input", "fasta"]
     def __int__(self):
         self.output = ""
 
-    def execute(self, path_to_rnafold, fasta_file, remove_file_when_done=False):
-        exec_string = f"{path_to_rnafold} {fasta_file}"
-        self.output = os.popen(exec_string).read()
-        file_name_base = fasta_file.split(".")[0]
-        if remove_file_when_done:
+    def execute(self, rna_sequece_source, source_type="input"):
+        rna_source_type = source_type.lower()
+        if rna_source_type not in self.RNA_INPUT_SOURCE_TYPES:
+            raise Exception(f"Source type for RNAFold must be in `{self.RNA_INPUT_SOURCE_TYPES}`. Not {source_type}")
+        
+        if rna_source_type == "input":
+            sequence = rna_sequece_source
+        elif rna_source_type == "fasta":
             try:
-                os.system(f"rm {file_name_base}*")
+                with open(rna_sequece_source) as fh:
+                    seq_data = [line.strip() for line in fh.readlines()]
             except FileNotFoundError:
-                print(f"RNAFold: Couldn't find {file_name_base} files to delete")
+                raise RNAFoldExecutionException(f"Could not find file at {rna_sequece_source}")
+            sequence = seq_data[1]
+
+        self.output = ViennaRNA.fold(sequence)
+
 
     def get_ss_prediction(self):
         if self.output == "":
-            # Please note that RNAFold requires Java in the path
-            raise Exception(f"RNAFold exception: no output generated. Is Java in the path?")
-        strings = self.output.split("\n")
-        ss = strings[2]
-        ss = ss.split()[0]
+            raise RNAFoldExecutionException(f"RNAFold exception: no output generated. Have you installed it?")
+        ss = self.output[0]
         return ss
+    
+    def get_mfe(self):
+        if self.output == "":
+            raise RNAFoldExecutionException(f"RNAFold exception: no output generated. Have you installed it?")
+        mfe = self.output[1]
+        return mfe
+
+class RNAFoldExecutionException: pass
