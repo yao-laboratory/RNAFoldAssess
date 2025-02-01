@@ -1,7 +1,5 @@
 import os
 
-import pytest
-
 from RNAFoldAssess.models import RNAFold, DataPoint
 from RNAFoldAssess.models import DSCI
 
@@ -18,6 +16,7 @@ class TestRNAFold:
         scorer = DSCI(self.datum, prediction, 'RNAFold', evaluate_immediately=True, DMS=True)
         metrics = scorer.metrics
         assert(metrics['accuracy'] > 0.7)
+        os.remove(input_file_path)
 
     def test_prediction_with_string_input(self):
         base_data_path = "./tests/fixtures"
