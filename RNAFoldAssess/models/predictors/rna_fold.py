@@ -1,7 +1,9 @@
 import ViennaRNA
 
+from .predictor import Predictor
 
-class RNAFold:
+
+class RNAFold(Predictor):
     """
     This class is provided as an example and for the convenience of the user. The
     RNAFold tool is present in the ViennaRNA package from PyPI, so we install it here.
