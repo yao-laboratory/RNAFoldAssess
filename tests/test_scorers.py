@@ -24,7 +24,7 @@ class TestBaseClass:
 
 class TestDSCI:
     # Testing with C009C
-    datum = DataPoint(
+    datum = DataPoint.init_from_dict(
         {
             "name": "DataPointMock",
             "sequence": "ACUGACUGAAAAAAAA",
