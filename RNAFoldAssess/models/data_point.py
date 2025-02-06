@@ -1,148 +1,265 @@
-import os, json, heapq
+import math, json
 
+from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
-    def __init__(self, data_hash, cohort=None, normalize_reactivities_on_init=False):
-        self.name = data_hash["name"]
-        if cohort:
-            self.name = f"{cohort}_{self.name}"
-        self.sequence = data_hash["sequence"]
-        self.reactivities = data_hash["data"]
-        self.reads = data_hash["reads"]
+    CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
+
+    def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
+        self.name = name
+        self.sequence = sequence
+        self.ground_truth_type = ground_truth_type
+        self.ground_truth_data = ground_truth_data
         self.cohort = cohort
-        if normalize_reactivities_on_init:
-            self.__normalize_reactivities()
+        self.reads = reads
 
-    def to_seq_file(self):
-        # Make the name safe to be a filename
-        file_safe_name = "".join(c for c in self.name if c.isalnum())
-        if len(file_safe_name) > 200:
-            file_safe_name = file_safe_name[0:200]
-        f = open(f"{file_safe_name}.seq", "w")
-        f.write(self.sequence)
-        f.close()
-        self.path = os.path.abspath(f"{file_safe_name}.seq")
-        return self.path
+    @property
+    def reactivities(self):
+        if self.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+            return self.ground_truth_data
+        else:
+            raise Exception(f"Datapoint {self.name} does not have reactivities")
 
-    def to_fasta_file(self):
-        # Make the name safe to be a filename
-        file_safe_name = "".join(c for c in self.name if c.isalnum())
-        if len(file_safe_name) > 200:
-            file_safe_name = file_safe_name[0:200]
-        data = f">{file_safe_name}\n{self.sequence}"
-        f = open(f"{file_safe_name}.fasta", "w")
-        f.write(data)
-        f.close()
-        self.path = os.path.abspath(f"{file_safe_name}.fasta")
-        return self.path
+    # ---------------------------------------------------------------
+    # Utility methods
+    # ---------------------------------------------------------------
 
-    def to_fasta_string(self):
-        return f">{self.name} en=0.00\n{self.sequence}\n"
+    def get_gc_content(self):
+        g_count = self.sequence.upper.count("G")
+        c_count = self.sequence.upper.count("C")
+        return (g_count + c_count) / len(self.sequence)
 
-    def to_constraint_file(self, destination_dir=None):
-        # Make the name safe to be a filename
-        file_safe_name = "".join(c for c in self.name if c.isalnum())
-        if len(file_safe_name) > 200:
-            file_safe_name = file_safe_name[0:200]
-        file_name = f"{file_safe_name}_struc_constraint.txt"
-        if not destination_dir:
-            destination_dir = "."
-        file_path = f"{destination_dir}/{file_name}"
-        f = open(file_path, "w")
-        for i in range(len(self.reactivities)):
-            mu = str(self.reactivities[i])
-            if self.sequence[i] in ["T", "G"]:
+
+    def get_sequence_entropy(self, log_base=4):
+        sequence = self.sequence.upper()
+
+        if len(sequence) == 0:
+            return 0
+
+        nt_counts = {"A": 0, "C": 0, "U": 0, "G": 0}
+
+        for nt in sequence:
+            if nt in nt_counts:
+                nt_counts[nt] += 1
+
+        seq_len = len(sequence)
+        nt_values = nt_counts.values()
+
+        entropy_value = sum(
+            (count / seq_len) * math.log(count / seq_len, log_base)
+            for count in nt_values if count > 0
+        )
+
+        return -entropy_value
+
+    def evaluate_prediction(self, prediction, lenience=0):
+        if self.ground_truth_type == "dbn":
+            return self.evaluate_prediction_with_known_dbn(prediction, lenience)
+        else:
+            return self.evaluate_prediction_with_mapping_data(prediction)
+
+    def evaluate_prediction_with_known_dbn(self, prediction, lenience=0):
+        scorer = BasePairScorer(self.ground_truth_data, prediction, lenience)
+        scorer.evaluate()
+        return {
+            "sensitivity": scorer.sensitivity,
+            "PPV": scorer.ppv,
+            "F1": scorer.f1
+        }
+
+    def evaluate_prediction_with_mapping_data(self, prediction):
+        if self.ground_truth_type == "DMS":
+            return DSCI.score(
+                self.sequence,
+                prediction,
+                self.ground_truth_data,
+                DMS=True
+            )
+        elif self.ground_truth_data == "SHAPE":
+            return DSCI.score(
+                self.sequence,
+                prediction,
+                self.ground_truth_data,
+                DMS=True
+            )
+        else:
+            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")
+
+
+    # ---------------------------------------------------------------
+    # File-writing methods
+    # ---------------------------------------------------------------
+
+    def to_seq_file(self, path=None):
+        file_name = f"{self.name}.seq"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        sequence_grouping = 8
+        line_grouping = 4
+
+        fstring = ""
+        counter = 0
+        for i in range(0, len(self.sequence), sequence_grouping):
+            counter += 1
+            if counter == line_grouping:
+                counter = 0
+                trailing = "\n"
+            else:
+                trailing = " "
+            fstring += self.sequence[i:i+8] + trailing
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring.strip())
+
+        return file_name
+
+    def to_fasta_file(self, path=None):
+        file_name = f"{self.name}.fasta"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        fstring = f">{self.name}\n{self.sequence}"
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
+
+        return file_name
+
+    def to_dbn_file(self, path=None, dbn=None):
+        if self.ground_truth_type != "dbn" and not dbn:
+            raise Exception(f"Cannot write .dbn file for {self.name}: no dbn given")
+
+        if not dbn:
+            dbn = self.ground_truth_data
+
+        file_name = f"{self.name}.dbn"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        fstring = f">{self.name}\n{self.sequence}\n{dbn}"
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
+
+        return file_name
+
+    def to_constraint_file(self, path=None, reactivities=None):
+        if self.ground_truth_data not in self.CHEMICAL_MAPPING_TYPES and not reactivities:
+            raise Exception(f"Cannot write constraint file for {self.name}: no reactivities given")
+
+        if not reactivities:
+            reactivities = self.ground_truth_data
+
+        file_name = f"{self.name}.cf"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        is_dms = self.ground_truth_type == "DMS"
+        is_cmct = self.ground_truth_type = "CMCT"
+
+        if is_dms:
+            non_reactants = ["G", "T", "U"]
+        elif is_cmct:
+            non_reactants = ["A", "C", "G"]
+        else:
+            # Otherwise, it's SHAPE
+            non_reactants = []
+
+        fstring = ""
+        for i in range(len(reactivities)):
+            mu = str(reactivities[i])
+            if self.sequence[i] in non_reactants:
                 mu = "-999"
-            f.write(str(i + 1) + "\t" + mu + "\n")
-        f.close()
-        return file_path
+            fstring += str(i + 1) + "\t" + mu + "\n"
 
-    def __str__(self):
-        return f"{self.name}, {self.sequence}, {self.reactivities}"
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
 
-    @staticmethod
-    def write_large_fasta_file(path, cohort, name_suffix):
-        file_name = f"{cohort}_{name_suffix}.fa"
-        data_points = DataPoint.factory(path, cohort)
-        f = open(file_name, "w")
-        for dp in data_points:
-            f.write(dp.to_fasta_string())
-        f.close()
+        return file_name
+
+    # ---------------------------------------------------------------
+    # Initialization methods
+    # ---------------------------------------------------------------
 
     @staticmethod
-    def factory(path, name_prefix=None):
-        f = open(path)
-        json_data = json.loads(f.read())
-        f.close()
-        data_points = []
+    def init_from_dict(dict_object, name=None, cohort=None):
+        if not name:
+            if "name" in dict_object.keys():
+                name = dict_object["name"]
+            else:
+                name = list(dict_object.keys())[0]
+        if cohort:
+            name = f"{cohort}_{name}"
+        seq = dict_object.get("sequence", None)
+        reads = dict_object.get("reads", None)
+        reactivities = dict_object.get("data", None)
+        dbn_string = dict_object.get("dbn", None)
+        if reactivities:
+            ground_truth_type = dict_object.get("experiment_type", "DMS") # default to DMS since it is the least harmful assumption
+            ground_truth_data = reactivities
+        elif dbn_string:
+            ground_truth_type = "dbn"
+            ground_truth_data = dbn_string
+
+        dp = DataPoint(name, seq, ground_truth_type, ground_truth_data, cohort, reads)
+        return dp
+
+    @staticmethod
+    def init_from_fasta(path_to_fasta, cohort=None):
+        data = DataPoint.extract_data_from_file(path_to_fasta)
+
+        name = data[0].replace(">", "")
+        if cohort:
+            name = f"{cohort}_{name}"
+        seq = data[1]
+        dp = DataPoint(name, seq, cohort=cohort)
+        return dp
+
+    @staticmethod
+    def init_from_dbn_file(path_to_dbn, cohort=None):
+        data = DataPoint.extract_data_from_file(path_to_dbn)
+        name_line = data[0]
+        name = name_line.replace(">", "").replace(" ", "_")
+        seq = data[1]
+        dbn = data[2]
+        dp = DataPoint(name, seq, cohort=cohort, ground_truth_type="dbn", ground_truth_data=dbn)
+        return dp
+
+
+    @staticmethod
+    def init_from_seq_file(path_to_seq, cohort=None):
+        data = DataPoint.extract_data_from_file(path_to_seq)
+        title_line = data.pop(0)
+        name = title_line.replace(" ", "_")
+        if title_line[-1].endswith(" 1"):
+            title_line[-1] = title_line[-1].replace(" 1", "")
+        seq = ""
+        for sequence_line in data:
+            seq += "".join(sequence_line)
+
+        dp = DataPoint(name, seq, cohort=cohort)
+        return dp
+
+    @staticmethod
+    def factory_from_json(path, name_prefix=None):
+        with open(path) as fh:
+            json_data = json.load(fh)
+
+        datapoints = []
         for datum in json_data:
-            data_points.append(DataPoint(datum, name_prefix))
-        return data_points
+            datapoints.append(DataPoint.init_from_dict(datum, name_prefix))
 
-    @staticmethod
-    def get_structure_probabilities(path, name_prefix=None):
-        f = open(path)
-        json_data = json.loads(f.read())
-        f.close()
-        sequence_scores = []
-        for i in range(65):
-            sequence_scores.append({
-                "A": [0, 0.0],
-                "C": [0, 0.0],
-                "U": [0, 0.0],
-                "G": [0, 0.0]
-            })
-        for datum in json_data:
-            seq = datum["sequence"]
-            for i in range(65):
-                nt = seq[i]
-                sequence_scores[i][nt][0] += 1
-        for score in sequence_scores:
-            for nt in score:
-                score[nt][1] = round(score[nt][0] / len(json_data), 2)
-        consensus_sequence = ""
-        for score in sequence_scores:
-            consensus_sequence += max(score, key=score.get)
-        return { "consensus": consensus_sequence, "probabilities": sequence_scores }
+        return datapoints
 
 
     @staticmethod
-    def combined_structure_probabilities(paths, name_prefixes=[]):
-        data = []
-        for path in paths:
-            f = open(path)
-            data.append(json.loads(f.read()))
-            f.close()
-        flattened_data = []
-        for item in data:
-            for datum in item:
-                flattened_data.append(datum)
-        del(data)
-        sequence_scores = []
-        for i in range(65):
-            sequence_scores.append({
-                "A": [0, 0.0],
-                "C": [0, 0.0],
-                "U": [0, 0.0],
-                "G": [0, 0.0]
-            })
-        for datum in flattened_data:
-            seq = datum["sequence"]
-            for i in range(65):
-                nt = seq[i]
-                sequence_scores[i][nt][0] += 1
-        for score in sequence_scores:
-            for nt in score:
-                score[nt][1] = round(score[nt][0] / len(flattened_data), 2)
-        consensus_sequence = ""
-        for score in sequence_scores:
-            consensus_sequence += max(score, key=score.get)
-        return { "consensus": consensus_sequence, "probabilities": sequence_scores }
+    def extract_data_from_file(file_path):
+        with open(file_path) as fh:
+            data = [line.strip() for line in fh.readlines()]
+        relevant_lines = []
+        for d in data:
+            if not d.startswith(";"):
+                relevant_lines.append(d)
 
-    def __normalize_reactivities(self):
-        # Using a simple normalizer
-        largest = heapq.nlargest(1, self.reactivities)[0]
-        if largest > 0:
-            for i, r in enumerate(self.reactivities):
-                new_val = round(r / largest, 6)
-                self.reactivities[i] = new_val
+        return relevant_lines
