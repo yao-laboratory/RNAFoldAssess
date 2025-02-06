@@ -4,14 +4,27 @@ from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
     CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
+    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN"]
 
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
         self.sequence = sequence
-        self.ground_truth_type = ground_truth_type
+        self._ground_truth_type = ground_truth_type
         self.ground_truth_data = ground_truth_data
         self.cohort = cohort
         self.reads = reads
+
+    @property
+    def ground_truth_type(self):
+        return self._ground_truth_type
+
+    @ground_truth_type.setter
+    def ground_truth_type(self, gt_type):
+        type = gt_type.upper()
+        if gt_type not in DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES:
+            raise Exception(f"The ground-truth type {gt_type} is not acceptable, must be one of {DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES}")
+        else:
+            self._ground_truth_type = type
 
     @property
     def reactivities(self):
@@ -19,6 +32,13 @@ class DataPoint:
             return self.ground_truth_data
         else:
             raise Exception(f"Datapoint {self.name} does not have reactivities")
+
+    @property
+    def structure(self):
+        if self.ground_truth_type == "dbn":
+            return self.ground_truth_data
+        else:
+            raise Exception(f"Datapoint {self.name} does not have a DBN string")
 
     # ---------------------------------------------------------------
     # Utility methods
@@ -189,6 +209,7 @@ class DataPoint:
                 name = dict_object["name"]
             else:
                 name = list(dict_object.keys())[0]
+                dict_object = dict_object[name]
         if cohort:
             name = f"{cohort}_{name}"
         seq = dict_object.get("sequence", None)
