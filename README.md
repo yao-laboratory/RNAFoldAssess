@@ -155,7 +155,7 @@ When a lenience parameter is given, the scorer calculates a list of "acceptable 
 [
   (1, 3), # Actual coordinate
   (0, 3), (1, 2), (2, 3), (1, 4),
-  
+
   (6, 14), # Actual coordinate
   (5, 14), (6, 13), (7, 14), (6, 15),
 
@@ -221,4 +221,68 @@ The `RNAStructure` class is provided as an example to users who wish to evaluate
 
 ## DataPoint
 
+The `DataPoint` class is meant to encapsulate different representations of RNAs and provide several convenience features to users.
+
+### Attributes
+
+**`name`**: What an RNA is referred to. For example, 5NXT_chain_A might be the name of a datapoint.
+
+**`sequence`**: The nucleotide sequence of an RNA.
+
+**`ground_truth_type`**: The concept of "ground truth" is what this framework uses to evaluate the efficacy of secondary structure predictions. Currently, the framework supports two kinds of ground truth data: dot-bracket notation string, and chemical mapping reactivities (either DMS, SHAPE, or CMCT). The acceptable values for this attribute are "DMS", "SHAPE", "CMCT", or "dbn".
+
+**`ground_truth_data`**: This attribute is the representation of the ground truth data for an RNA's secondary structure. If the `ground_truth_type` is `"dbn"`, then the `ground_truth_data` value should be a string in dot-bracket notation. If the `ground_truth_type` is one of the chemical mapping values, the `ground_truth_data` attribute is a list of reactivities from a chemical mapping experiment; the order of reactivites must line up with the order of nucleotides. That is, reactivities must be ordered from 5' to 3'.
+
+**`cohort`**: This attribute is for organization purposes and is used as a prefix to the `DataPoint` object's name. For example, if you have three sets of data called "DMS1", "DMS2", and "DMS3", you may want to differentiate those in your analysis. In such case, you would set the `cohort` attribute to the name of the data set. For example, if you have an RNA in DMS2 called "hairpin_structure_11", its `name` attribute would be `DMS2_hairpin_structure_11`.
+
+**`reads`**: Chemical mapping data sometimes includes a number of reads, if the user wants to capture that data, this attribute supports it.
+
+**`reactivities`**: If the `ground_truth_type` is of a chemical mapping type, the `reactivities` attribute will return the same thing the `ground_truth_data` returns; i.e., a list of reactivities. If not, trying to access this attribute will raise an exception.
+
+**`structure`**: If the `ground_truth_type` is "dbn", the `structure` attribute will return the same thing as the `ground_truth_data`, which should be a dot-brack notation string. e.g., `...(((...)))...`. If not, trying to access this attribute will raise an exception.
+
+### Initialization methods
+
+A `DataPoint` object can be initialized in many ways, the only required attributes at initialization are a name and nucleotide sequence. You can initialize it with the default constructor method such as:
+
+```python
+dp = DataPoint(
+  "hairpin_11",
+  "AAAACCCCAAAAGGGGUUUU",
+  ground_truth_type="dbn",
+  ground_truth_data="....((((....))))....",
+  cohort="lab_data"
+)
+```
+
+There are also several initialization methods:
+
+**`init_from_dict`**: This method takes a dictionary object and optional `name` or `cohort` as parameters. The dictionary will look for the keys `name`, `sequence`, `reads`, `data`, and `dbn`. If those are not found, they are set to `None`. If a `name` parameter is provided to the method, it will overwrite the `name` value in the dictionary. If there is no `name` parameter provided and no `name` key in the dictionary, this method assume the dictionary is of type `{ "some_name": {"sequence": "*some sequence*", ..., }}` and use the first key of the object as the datapoint's name and extract the values from that key. Here's an example of initializing a datapoint from this method:
+
+```python
+data = {
+  "hairpin_11": {
+    "sequence": "AAAACCCCAAAAGGGGUUUU",
+    "dbn": "....((((....))))....",
+    }
+}
+```
+
+TODO:
+
+**`init_from_fasta`**:
+
+**`init_from_dbn_file`**:
+
+**`init_from_seq_file`**:
+
+**`factory_from_json`**
+
+
+## Example Pipeline
+
 TODO
+
+# Contact
+
+For any questions, please contact Erik Whiting at `ewhiting4@unl.edu`
