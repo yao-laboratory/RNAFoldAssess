@@ -1,6 +1,6 @@
 import pytest
 
-from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer, BasePairPseudoknotScorer
+from RNAFoldAssess.models import Scorer, DSCI, DataPoint2, BasePairScorer, BasePairPseudoknotScorer
 from RNAFoldAssess.models import DSCIException, DSCIValueError
 
 class TestBaseClass:
@@ -24,7 +24,7 @@ class TestBaseClass:
 
 class TestDSCI:
     # Testing with C009C
-    datum = DataPoint(
+    datum = DataPoint2.init_from_dict(
         {
             "name": "DataPointMock",
             "sequence": "ACUGACUGAAAAAAAA",

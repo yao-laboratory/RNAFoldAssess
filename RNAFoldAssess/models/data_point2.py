@@ -13,6 +13,12 @@ class DataPoint2:
         self.cohort = cohort
         self.reads = reads
 
+    @property
+    def reactivities(self):
+        if self.ground_truth_type in DataPoint2.CHEMICAL_MAPPING_TYPES:
+            return self.ground_truth_data
+        else:
+            raise Exception(f"Datapoint {self.name} does not have reactivities")
 
     # ---------------------------------------------------------------
     # Utility methods
@@ -179,7 +185,10 @@ class DataPoint2:
     @staticmethod
     def init_from_dict(dict_object, name=None, cohort=None):
         if not name:
-            name = list(dict_object.keys())[0]
+            if "name" in dict_object.keys():
+                name = dict_object["name"]
+            else:
+                name = list(dict_object.keys())[0]
         seq = dict_object.get("sequence", None)
         reads = dict_object.get("reads", None)
         reactivities = dict_object.get("data", None)
