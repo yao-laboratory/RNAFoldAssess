@@ -1,4 +1,6 @@
 class DataPoint2:
+    CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
+
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
         self.sequence = sequence
@@ -7,6 +9,94 @@ class DataPoint2:
         self.cohort = cohort
         self.reads = reads
 
+
+    def to_seq_file(self, path=None):
+        file_name = f"{self.name}.seq"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        sequence_grouping = 8
+        line_grouping = 4
+
+        fstring = ""
+        counter = 0
+        for i in range(0, len(self.sequence), sequence_grouping):
+            counter += 1
+            if counter == line_grouping:
+                counter = 0
+                trailing = "\n"
+            else:
+                trailing = " "
+            fstring += self.sequence[i:i+8] + trailing
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring.strip())
+
+        return file_name
+
+    def to_fasta_file(self, path=None):
+        file_name = f"{self.name}.fasta"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        fstring = f">{self.name}\n{self.sequence}"
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
+
+        return file_name
+
+    def to_dbn_file(self, path=None, dbn=None):
+        if self.ground_truth_type != "dbn" and not dbn:
+            raise Exception(f"Cannot write .dbn file for {self.name}: no dbn given")
+
+        if not dbn:
+            dbn = self.ground_truth_data
+
+        file_name = f"{self.name}.dbn"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        fstring = f">{self.name}\n{self.sequence}\n{dbn}"
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
+
+        return file_name
+
+    def to_constraint_file(self, path=None, reactivities=None):
+        if self.ground_truth_data not in self.CHEMICAL_MAPPING_TYPES and not reactivities:
+            raise Exception(f"Cannot write constraint file for {self.name}: no reactivities given")
+
+        if not reactivities:
+            reactivities = self.ground_truth_data
+
+        file_name = f"{self.name}.cf"
+        if path:
+            file_name = f"{path}/{file_name}"
+
+        is_dms = self.ground_truth_type == "DMS"
+        is_cmct = self.ground_truth_type = "CMCT"
+
+        if is_dms:
+            non_reactants = ["G", "T", "U"]
+        elif is_cmct:
+            non_reactants = ["A", "C", "G"]
+        else:
+            # Otherwise, it's SHAPE
+            non_reactants = []
+
+        fstring = ""
+        for i in range(len(reactivities)):
+            mu = str(reactivities[i])
+            if self.sequence[i] in non_reactants:
+                mu = "-999"
+            fstring += str(i + 1) + "\t" + mu + "\n"
+
+        with open(file_name, "w") as fh:
+            fh.write(fstring)
+
+        return file_name
 
     # Initialization methods
     @staticmethod
