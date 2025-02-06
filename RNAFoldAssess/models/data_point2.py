@@ -1,3 +1,7 @@
+import math
+
+from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
+
 class DataPoint2:
     CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
 
@@ -9,6 +13,76 @@ class DataPoint2:
         self.cohort = cohort
         self.reads = reads
 
+
+    # ---------------------------------------------------------------
+    # Utility methods
+    # ---------------------------------------------------------------
+
+    def get_gc_content(self):
+        g_count = self.sequence.upper.count("G")
+        c_count = self.sequence.upper.count("C")
+        return (g_count + c_count) / len(self.sequence)
+
+
+    def get_sequence_entropy(self, log_base=4):
+        sequence = self.sequence.upper()
+
+        if len(sequence) == 0:
+            return 0
+
+        nt_counts = {"A": 0, "C": 0, "U": 0, "G": 0}
+
+        for nt in sequence:
+            if nt in nt_counts:
+                nt_counts[nt] += 1
+
+        seq_len = len(sequence)
+        nt_values = nt_counts.values()
+
+        entropy_value = sum(
+            (count / seq_len) * math.log(count / seq_len, log_base)
+            for count in nt_values if count > 0
+        )
+
+        return -entropy_value
+
+    def evaluate_prediction(self, prediction, lenience=0):
+        if self.ground_truth_type == "dbn":
+            return self.evaluate_prediction_with_known_dbn(prediction, lenience)
+        else:
+            return self.evaluate_prediction_with_mapping_data(prediction)
+
+    def evaluate_prediction_with_known_dbn(self, prediction, lenience=0):
+        scorer = BasePairScorer(self.ground_truth_data, prediction, lenience)
+        scorer.evaluate()
+        return {
+            "sensitivity": scorer.sensitivity,
+            "PPV": scorer.ppv,
+            "F1": scorer.f1
+        }
+
+    def evaluate_prediction_with_mapping_data(self, prediction):
+        if self.ground_truth_type == "DMS":
+            return DSCI.score(
+                self.sequence,
+                prediction,
+                self.ground_truth_data,
+                DMS=True
+            )
+        elif self.ground_truth_data == "SHAPE":
+            return DSCI.score(
+                self.sequence,
+                prediction,
+                self.ground_truth_data,
+                DMS=True
+            )
+        else:
+            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")
+
+
+    # ---------------------------------------------------------------
+    # File-writing methods
+    # ---------------------------------------------------------------
 
     def to_seq_file(self, path=None):
         file_name = f"{self.name}.seq"
@@ -98,7 +172,10 @@ class DataPoint2:
 
         return file_name
 
+    # ---------------------------------------------------------------
     # Initialization methods
+    # ---------------------------------------------------------------
+
     @staticmethod
     def init_from_dict(dict_object, name=None, cohort=None):
         if not name:
