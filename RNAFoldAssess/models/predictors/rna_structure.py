@@ -40,7 +40,7 @@ class RNAStructure(Predictor):
         this tool requires the following pattern from the command line:
 
             ./src/rnastructure/bin/Fold --MFE path/to/a/seq_file.seq path/to/output.ct
-        
+
         We need to build the execution string as well as save the location of the output
         file so we can parse it later.
 
@@ -53,7 +53,7 @@ class RNAStructure(Predictor):
         attribute called `path_to_ct_file` so that it can be parsed later in the
         `get_ss_prediction` and `get_mfe` methods.
         """
-        
+
         self.path_to_rnastructure = os.path.abspath(path_to_rnastructure)
 
         sfile_name = os.path.basename(seq_file)
@@ -61,7 +61,7 @@ class RNAStructure(Predictor):
 
         ct_name = f"{sfile_name.split('.')[0]}.ct"
         self.path_to_ct_file = f"{output_path_base}/{ct_name}"
-        
+
         exec_string = f"{fold_path} --MFE {os.path.abspath(seq_file)} {self.path_to_ct_file}"
         self.output = os.popen(exec_string).read()
 
@@ -80,7 +80,7 @@ class RNAStructure(Predictor):
         path to the generated .ct file in the `path_to_ct_file` attribute. We pass that
         execution string to `os.popen` and read and parse the output to return the dbn.
         """
-        
+
         if not os.path.isfile(self.path_to_ct_file):
             raise Exception(f"RNAStructure exception: no .ct file generated")
 
@@ -108,7 +108,7 @@ class RNAStructure(Predictor):
             return float(mfe)
         else:
             return None
-    
+
     def delete_ct_file(self):
         """
         This method is provided as a convenience method to the user. Because the tool
