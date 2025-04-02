@@ -283,6 +283,53 @@ TODO:
 
 TODO
 
+# Specialized Installation Instructions
+
+Several of the tools used in our analysis require specialized installation. This repository ships with the tool `RNAFold` ready to be used right away. However, many tools require installation beyond a simple `pip install` command and some tools used in our benchmarking project conflict with each other. As such, we provide installation instruction for each specific tool below:
+
+## ContextFold
+
+Follow the [ContextFold download instructions](https://mybiosoftware.com/context-fold-1-0-rna-secondary-structure-prediction-tool.html) to install the tool. You also need to make sure `java` is in your path. From there, you can use the `ContextFold` class to wrap the tool and use it within this framework. Examle script:
+
+
+## ContraFold
+
+To use ContraFold, we used the EternaFold package, but with the ContraFold parameters. To do this, follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `ContraFold` class.
+
+## EternaFold
+
+To use EternaFold, simply follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `Eterna` class.
+
+## IPKnot
+
+To use IPKnot, follow the [IPKnot installation instructions](https://github.com/satoken/ipknot) and use the `IPKnot` class. Note that IPKnot has an optional `remove_file_when_done` parameter that defaults to `False`. If you set this to true, the fasta file will be deleted after the prediction is made.
+
+## MXFold
+
+For MXFold, follow the [MXFold installation instructions](https://github.com/mxfold/mxfold) and use the `MXFold` class.
+
+## MXFold2
+
+To use MXFold2, you need pytorch and possibly a GPU. Follow the [installation instructions for MXFold2](https://github.com/mxfold/mxfold2) and use the `MXFold2` class. Note that unlike most of the other preictor classes, `MXFold2` does not require you to pass it an executable path.
+
+## NeuralFold
+
+TODO
+
+## NUPACK
+
+TODO make NUPACK supported out of the box
+
+## RNAStructure
+
+To use RNAStructure, follow [the installation guide](https://rna.urmc.rochester.edu/RNAstructure.html) and make sure the `Fold` command is in your path.
+
+## pKnots
+
+## Simfold
+
+## SPOT-RNA
+
 # Contact
 
 For any questions, please contact Erik Whiting at `ewhiting4@unl.edu`
