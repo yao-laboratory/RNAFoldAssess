@@ -1,0 +1,11 @@
+
+CTDIR=/common/yesselmanlab/ewhiting/spot_outputs/rasp
+CT2DB=/home/yesselmanlab/ewhiting/ViennaRNA/bin/ct2db
+
+for SPECIES in covid ecoli hiv; do
+    echo Working $SPECIES
+    mkdir $CTDIR/$SPECIES/dbn_files
+    for CTF in $(ls $CTDIR/$SPECIES); do
+        $CT2DB $CTDIR/$SPECIES/$CTF > $CTDIR/$SPECIES/dbn_files/$CTF.dbn
+    done
+done

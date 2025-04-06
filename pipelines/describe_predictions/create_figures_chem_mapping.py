@@ -180,6 +180,7 @@ file_path = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/higher_level_analysis/la
 rnandria_preds = Predictions("RNAndria_human_mRNA", 0, 2, 3, 4, 5, file_path)
 rnandria_preds = Predictions("RNAndria_pri_miRNA", 0, 2, 3, 4, 5, file_path)
 
+# TODO
 # Make fasta files
 dirs = ["EternaData", "YesselmanLab", "Ribonanza", "RNAndria"]
 
