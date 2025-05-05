@@ -18,7 +18,7 @@ for jf in json_files:
         "coords": f"{master_coords_dir}/{chromosome}.coords",
         "seq": f"{seq_dir}/{chromosome}.seq"
     }
-    
+
 # For testing
 exon_locs_raw = {}
 ch_1_coord_loc = chromosome_map["chromosome_1"]["coords"]

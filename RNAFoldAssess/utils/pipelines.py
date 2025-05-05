@@ -569,22 +569,23 @@ def generate_rasp_data(model,
     aux_file.close()
 
 
-def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_file=False):
+def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_file=False, specific_chrs=[]):
     base_dir = "/common/yesselmanlab/ewhiting/data/rasp_data"
     json_dir = f"{base_dir}/{species}/json_files"
     json_files = os.listdir(json_dir)
     ch_map = {}
     for jf in json_files:
         ch = jf.replace("_exons.json", "")
+        if len(specific_chrs) > 0 and ch not in specific_chrs:
+            continue
+        if species == "human" and ch not in ["chr1", "chr2", "chr18", "chr19"]:
+            continue
         with open(f"{json_dir}/{jf}") as fh:
             ch_map[ch] = json.load(fh)
 
     headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value\n"
 
     for ch in ch_map:
-        # if ch in ["chromosome_1", "chromosome_3", "chromosome_4", "chromosome_Mt", "chromosome_Pt"]:
-        # if ch not in ["chromosome_4"]:
-        #     continue
         print(f"Working {ch} in {species}")
         report_file = open(f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/rasp_data/{species}/{model_name}_{ch}_report.txt", "w")
         report_file.write(headers)
@@ -593,6 +594,9 @@ def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_fil
         len_data = len(data)
         for dp in data:
             counter += 1
+            # NUPACK and IPKnot testing
+            if model_name in ["NUPACK", "IPKnot", "RNAStructure"] and len(dp["sequence"]) > 800:
+                continue
             if counter % 250 == 0:
                 print(f"Working {counter} of {len_data}")
             if len(dp["sequence"]) < 10:
@@ -600,6 +604,8 @@ def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_fil
             try:
                 if model_name in ["ContextFold"]:
                     model.execute(model_path, dp["sequence"])
+                elif model_name == "NUPACK":
+                    model.execute(dp["sequence"])
                 elif model_name == "RNAStructure":
                     fasta_string = f">{dp['name']}\n{dp['sequence']}"
                     with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
@@ -617,7 +623,10 @@ def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_fil
                     with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
                         ff.write(fasta_string)
                     input_file_path = f"/scratch/{dp['name']}.fasta"
-                    model.execute(model_path, input_file_path)
+                    if model_name in ["pKnots"]:
+                        model.execute(input_file_path)
+                    else:
+                        model.execute(model_path, input_file_path)
 
                 if model_name != "IPKnot":
                     prediction = model.get_ss_prediction()
