@@ -1,0 +1,1 @@
+RNAFold took 100.95195007324219 to predict 100 structures

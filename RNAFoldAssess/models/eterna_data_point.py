@@ -12,6 +12,7 @@ class EternaDataPoint:
         self.reactivities = data_hash["reactivities"]
         self.unnegate_negatives()
         self.index_reactivities()
+        self.make_reactivity_map()
         if normalize_reactivities_on_init:
             self.normalize_reactivities()
 
@@ -94,6 +95,12 @@ class EternaDataPoint:
         for i, pos in enumerate(self.positions):
             pos_map[pos] = i
         self.reactivities_index = pos_map
+
+    def make_reactivity_map(self):
+        self.reactivity_map = []
+        for p, r in zip(self.positions, self.reactivities):
+            self.reactivity_map.append((p, r))
+
 
     @staticmethod
     def factory(path):

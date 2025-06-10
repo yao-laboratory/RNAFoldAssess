@@ -1,7 +1,7 @@
 import os
 
 
-report_dir = "/work/yesselmanlab/ewhiting/bprna_canonical_reports"
+report_dir = "/work/yesselmanlab/ewhiting/bprna_canonical_reports/acug_preds"
 
 models = [
     "ContextFold",
@@ -25,7 +25,7 @@ for m in models:
         fname = f"{m}_master_{lenience}_lenience.txt"
         with open(f"{report_dir}/{fname}") as fh:
             data = fh.readlines()
-        data.pop(0)
+    
         data = [d.split(", ") for d in data]
         # 6, 7, 8
         n = len(data)

@@ -1,4 +1,4 @@
-import os, datetime, time, json
+import os, datetime, time, json, shutil
 
 import pandas as pd
 
@@ -595,12 +595,16 @@ def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_fil
         for dp in data:
             counter += 1
             # NUPACK and IPKnot testing
-            if model_name in ["NUPACK", "IPKnot", "RNAStructure"] and len(dp["sequence"]) > 800:
+            if len(dp["sequence"]) > 4000:
                 continue
             if counter % 250 == 0:
                 print(f"Working {counter} of {len_data}")
             if len(dp["sequence"]) < 10:
                 continue
+
+            seq = dp["sequence"]
+            seq = seq.upper().replace("T", "U")
+            dp["sequence"] = seq
             try:
                 if model_name in ["ContextFold"]:
                     model.execute(model_path, dp["sequence"])
@@ -623,7 +627,7 @@ def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_fil
                     with open(f"/scratch/{dp['name']}.fasta", "w") as ff:
                         ff.write(fasta_string)
                     input_file_path = f"/scratch/{dp['name']}.fasta"
-                    if model_name in ["pKnots"]:
+                    if model_name.lower() in ["pknots"]:
                         model.execute(input_file_path)
                     else:
                         model.execute(model_path, input_file_path)
@@ -1410,3 +1414,45 @@ def sequence_is_only_nts(seq):
         if sc not in nucleotides:
             return False
     return True
+
+
+def benchmark_prediction_speed(model,
+                               model_name,
+                               model_path,
+                               sequence_data_path="/work/yesselmanlab/ewhiting/data/bprna/speed_dataset_fasta"):
+
+    sequence_files = os.listdir(sequence_data_path)
+    # Copy files to scratch
+    print("Copying files")
+    for f in sequence_files:
+        seq_file = f"{sequence_data_path}/{f}"
+        dest = f"/scratch/{f}"
+        shutil.copy(seq_file, dest)
+
+    print("Starting evaluation")
+    start = time.time()
+
+    for file in sequence_files:
+        seq_file = f"{sequence_data_path}/{file}"
+        with open(seq_file) as fh:
+            data = fh.readlines()
+        seq = data[1].strip()
+        if model_name in ["ContextFold", "SeqFold"]:
+            # These models don't require an input file
+            model.execute(model_path, seq)
+        elif model_name == "NUPACK":
+            model.execute(seq)
+        elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
+            model.execute(f"{sequence_data_path}/{file}")
+        else:
+            input_file_path = f"/scratch/{file}"
+            if model_name.lower() in ["pknots"]:
+                model.execute(input_file_path)
+            else:
+                model.execute(model_path, input_file_path)
+
+    end = time.time()
+    elapsed = end - start
+
+    with open(f"{model_name}_speed_test.txt", "w") as fh:
+        fh.write(f"{model_name} took {elapsed} to predict 100 structures")

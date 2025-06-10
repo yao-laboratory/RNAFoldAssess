@@ -1,0 +1,1 @@
+NUPACK took 538.3766188621521 to predict 100 structures

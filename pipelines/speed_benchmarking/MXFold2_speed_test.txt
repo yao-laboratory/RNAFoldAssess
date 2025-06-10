@@ -1,0 +1,1 @@
+MXFold2 took 2971.1559598445892 to predict 100 structures

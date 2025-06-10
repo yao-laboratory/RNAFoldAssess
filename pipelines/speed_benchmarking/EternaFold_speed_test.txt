@@ -1,0 +1,1 @@
+EternaFold took 1444.320212841034 to predict 100 structures

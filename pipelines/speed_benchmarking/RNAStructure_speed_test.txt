@@ -1,0 +1,1 @@
+RNAStructure took 1663.2415945529938 to predict 100 structures

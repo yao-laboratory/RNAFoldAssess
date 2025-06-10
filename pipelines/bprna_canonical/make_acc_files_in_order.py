@@ -1,7 +1,7 @@
 import os
 
 
-base_dir = "/work/yesselmanlab/ewhiting/bprna_canonical_reports"
+base_dir = "/work/yesselmanlab/ewhiting/bprna_canonical_reports/acug_preds"
 dest_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/higher_level_analysis/latest/all_predictions"
 
 models = [
@@ -38,21 +38,28 @@ models = [
 
 
 # Match predictions
-model_index = 0
-dp_name_index = 1
-seq_index = 3
-real_stc_index = 4
-pred_stc_index = 5
-sen_index = 6
-ppv_index = 7
-f1_index = 8
+model_index = 1
+dp_name_index = 3
+seq_index = 4
+real_stc_index = 5
+pred_stc_index = 6
+sen_index = 7
+ppv_index = 8
+f1_index = 9
 
 def clean_structure(stc):
     stc = list(stc)
     for i in range(len(stc)):
-        if stc[i] not in "().":
+        nt = stc[i]
+        if nt in "().":
+            stc[i] = nt
+        elif nt == "<":
+            stc[i] = "("
+        elif nt == ">":
+            stc[i] = ")"
+        else:
             stc[i] = "."
-
+    
     stc = "".join(stc)
     return stc
 
@@ -86,6 +93,7 @@ for lenience in [0, 1]:
     datapoints = {}
     with open(f"{dest_dir}/bprna_master_file_{lenience}.txt") as fh:
         predictions = [line.split(", ") for line in fh.readlines()]
+        predictions.pop(0)
         print(f"\tBuilding datapoint map from {len(predictions)} predictions")
         dp_map = build_dp_map(predictions)
 

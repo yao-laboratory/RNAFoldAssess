@@ -38,12 +38,12 @@ for lenience in [0, 1]:
         counter += 1
         if counter % 1000 == 0:
             print(f"Working {counter} of {len_data}")
-        model = d[1]
+        model = d[0]
         if model == "RandomPredictor":
             continue
-        s = float(d[7])
-        p = float(d[8])
-        f = float(d[9])
+        s = float(d[6])
+        p = float(d[7])
+        f = float(d[8])
         model_map[model]["sens"].append(s)
         model_map[model]["ppv"].append(p)
         model_map[model]["f1"].append(f)

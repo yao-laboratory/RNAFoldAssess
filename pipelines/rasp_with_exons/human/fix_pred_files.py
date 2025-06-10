@@ -12,12 +12,12 @@ models = [
     # "MXFold",
     # "MXFold2",
     # "NeuralFold",
-    "NUPACK",
+    # "NUPACK",
     # "pKnots",
     # "RNAFold",
     # "RNAStructure",
     # "Simfold",
-    # "SPOT-RNA"
+    "SPOT-RNA"
 ]
 
 headers = "algo_name, datapoint_name, sequence, prediction, accuracy, p_value\n"

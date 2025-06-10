@@ -1,0 +1,1 @@
+pKnots took 9563.081100702286 to predict 100 structures

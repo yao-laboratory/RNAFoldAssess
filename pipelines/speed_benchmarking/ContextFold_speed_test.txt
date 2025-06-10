@@ -1,0 +1,1 @@
+ContextFold took 304.38902282714844 to predict 100 structures
