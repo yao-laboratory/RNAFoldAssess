@@ -334,7 +334,7 @@ class TestCanonicalBasePairScorer:
         scorer.evaluate()
         expected_report = "Sensitivity: 1.0, PPV: 1.0, F1: 1.0"
         assert(scorer.report() == expected_report)
-    
+
     # Test non-canonical structure
     def test_structure_not_transformed(self):
         transformed_structure = CanonicalBasePairScorer.transform_structure(self.real, self.good_sequence)

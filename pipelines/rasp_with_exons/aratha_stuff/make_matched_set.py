@@ -59,7 +59,6 @@ for m in most_model_counts:
 
 print()
 
-breakpoint()
 
 matched_lines = []
 for line in lines:

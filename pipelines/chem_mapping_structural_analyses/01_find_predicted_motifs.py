@@ -39,7 +39,8 @@ for line in predictions:
     dataset = line[0]
     datasets.add(dataset)
     dp_name = line[2]
-    dp_pred_map[dp_name] = {"dataset": dataset}
+    seq = line[3]
+    dp_pred_map[dp_name] = {"dataset": dataset, "sequence": seq}
     for m in models:
         dp_pred_map[dp_name][m] = {}
 
@@ -55,17 +56,20 @@ for line in predictions:
         continue
 
     for k, v in motif_data.motifs.items():
-        if len(v.sequence) <= 10:
-            # Skip short sequence motifs
-            continue
+        # if len(v.sequence) <= 10:
+        #     # Skip short sequence motifs
+        #     continue
         key = v.m_type + "_" + v.sequence + "_" + v.structure
         positions = v.positions
-        dp_pred_map[dp_name][m][key] = positions
+        dp_pred_map[dp_name][model][key] = positions
 
 print("Note these datasets:")
 for ds in datasets:
     print(ds)
 
 
-with open(f"{base_dir}/predicted_motifs_chemical_mapping.json", "w") as fh:
+# with open(f"{base_dir}/predicted_motifs_chemical_mapping.json", "w") as fh:
+#     json.dump(dp_pred_map, fh)
+
+with open(f"{base_dir}/predicted_motifs_all_chemical_mapping.json", "w") as fh:
     json.dump(dp_pred_map, fh)

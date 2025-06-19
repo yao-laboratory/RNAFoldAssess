@@ -25,17 +25,19 @@ print("Making master file")
 all_preds = []
 for m in models:
     files = [f for f in all_pred_files if m in f]
+    print(f"{m} -")
     for f in files:
         with open(f"{report_dir}/{f}") as fh:
             lines = fh.readlines()
-    
+        
+        print(f"{f} - {len(lines)}")
         if len(lines) <= 0:
             continue
             
         if lines[0].startswith("algo_name"):
             lines.pop(0)
     
-    all_preds += lines
+        all_preds += lines
 
 dest_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/higher_level_analysis/latest/all_predictions"
 with open(f"{dest_dir}/all_rasp_arabidopsis_preds.txt", "w") as fh:

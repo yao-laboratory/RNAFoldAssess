@@ -13,6 +13,9 @@ predict_rasp_with_exons(
     model,
     model_name,
     "",
-    "ara-tha"
+    "ara-tha",
+    specific_chrs=[
+        "chromosome_1"
+    ]
 )
 

@@ -570,7 +570,7 @@ def generate_rasp_data(model,
 
 
 def predict_rasp_with_exons(model, model_name, model_path, species, make_seq_file=False, specific_chrs=[]):
-    base_dir = "/common/yesselmanlab/ewhiting/data/rasp_data"
+    base_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data"
     json_dir = f"{base_dir}/{species}/json_files"
     json_files = os.listdir(json_dir)
     ch_map = {}

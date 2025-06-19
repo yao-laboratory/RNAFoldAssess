@@ -15,7 +15,7 @@ class PKnots:
     def execute(self, fasta_file, output_subfolder="", path="", remove_file_when_done=False):
         self.output_subfolder = output_subfolder
         if path == "":
-            path = "/common/yesselmanlab/ewhiting/pknots_v1.2/bin/pknots"
+            path = "/mnt/nrdstor/yesselmanlab/ewhiting/pknots_v1.2/bin/pknots"
 
         if "/.ct" in fasta_file:
             fasta_file = fasta_file.replace("/.ct", ".ct")
