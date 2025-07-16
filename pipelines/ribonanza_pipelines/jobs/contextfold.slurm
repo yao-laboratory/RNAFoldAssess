@@ -3,8 +3,8 @@
 #SBATCH --time=60:00:00          # Run time in hh:mm:ss
 #SBATCH --mem-per-cpu=64GB
 #SBATCH --job-name=cf_ribo
-#SBATCH --error=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ribonanza_pipelines/cf_ribo.%J.err
-#SBATCH --output=/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ribonanza_pipelines/cf_ribo.%J.out
+#SBATCH --error=cf_ribo.%J.err
+#SBATCH --output=cf_ribo.%J.out
 
 conda init bash
 source ~/.bashrc

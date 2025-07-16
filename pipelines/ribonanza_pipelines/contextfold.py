@@ -4,13 +4,14 @@ from RNAFoldAssess.utils import *
 from RNAFoldAssess.models.predictors import *
 
 
-model_name = "IPKnot"
-model = IPknot()
-model_path = os.path.abspath("/mnt/nrdstor/yesselmanlab/ewhiting/ipknot-1.1.0-x86_64-linux/ipknot")
+model = ContextFold()
+model_name = "ContextFold"
+model_path = os.path.abspath("/home/yesselmanlab/ewhiting/ContextFold_1_00")
 
 generate_ribonanza_evaluations(
     model,
     model_name,
     model_path,
+    to_seq_file=False,
     testing=False
 )
