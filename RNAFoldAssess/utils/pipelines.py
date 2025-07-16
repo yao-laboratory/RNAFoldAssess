@@ -768,18 +768,16 @@ def generate_ribonanza_evaluations(model,
                                    model_name,
                                    model_path,
                                    to_seq_file=False,
-                                   testing=False,
-                                   part2=False):
+                                   testing=False):
     ribo_data_csv = "/mnt/nrdstor/yesselmanlab/ewhiting/rna_data/ribonanza/rmdb_data.v1.3.0.csv"
-    f = open(ribo_data_csv)
-    data = f.readlines()
-    f.close()
+    with open(ribo_data_csv) as fh:
+        data = fh.readlines()
+    
     # Get rid of headers
     data.pop(0)
     data = [d.split(",") for d in data]
     r1_index = 7
-    # Experiment types:
-    # {'BzCN_cotx', 'deg_Mg_50C', 'BzCN', 'DMS_M2_seq', 'deg_pH10', 'deg_Mg_pH10', 'DMS_cotx', 'deg_50C', 'NMIA', 'DMS', 'CMCT', '1M7'
+
     experiment_map = {
         "BzCN_cotx": "DMS4",
         "DMS_M2_seq": "DMS4",
@@ -794,25 +792,13 @@ def generate_ribonanza_evaluations(model,
         "deg_Mg_pH10": "SHAPE",
         "CMCT": "CMCT"
     }
-    report_path = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
+    report_path = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/canonical"
 
     # Create report file map
     report_files = {}
     for k in experiment_map:
-        if part2:
-            f = open(f"{report_path}/{model_name}_{k}_predictions2.txt", "w")
-        else:
-            f = open(f"{report_path}/{model_name}_{k}_predictions.txt", "w")
+        f = open(f"{report_path}/{model_name}_{k}_predictions.txt", "w")
         report_files[k] = f
-
-    # Create problem file map
-    problem_files = {}
-    for k in experiment_map:
-        if part2:
-            f = open(f"{report_path}/{model_name}_{k}_problems2.txt", "w")
-        else:
-            f = open(f"{report_path}/{model_name}_{k}_problems.txt", "w")
-        problem_files[k] = f
 
     if testing:
         data = data[:10]
@@ -822,23 +808,14 @@ def generate_ribonanza_evaluations(model,
     counter = 0
     for d in data:
         name = d[0]
-        seq = d[1]
+        sequence = d[1]
         experiment_type = d[2]
         chemical_mapping_method = experiment_map[experiment_type]
         report_file = report_files[experiment_type]
-        problem_file = problem_files[experiment_type]
-        reactivities = d[r1_index:len(seq) + r1_index]
-        testable_seq = ""
-        testable_reactivities = []
-        for i, reactivity in enumerate(reactivities):
-            if reactivity != "":
-                testable_seq += seq[i]
-                testable_reactivities.append(float(reactivity))
+        reactivities = d[r1_index:len(sequence) + r1_index]
 
-        sequence = testable_seq
-        reactivities = testable_reactivities
-        if len(sequence) < 2:
-            # Can't predict secondary structure on one nucleotide
+        if len(sequence) < 10:
+            # Some models can't handle this
             continue
 
         dp = DataPoint({
@@ -860,16 +837,10 @@ def generate_ribonanza_evaluations(model,
             input_file_path = dp.sequence
         try:
             # Handle different model types
-            if model_name in ["ContextFold", "SeqFold"]:
-                if model_name == "ContextFold" and len(dp.sequence) < 10:
-                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 10\n")
-                    continue
-                if model_name == "SeqFold" and len(dp.sequence) < 2:
-                    problem_file.write(f"Can't predict for {dp.name} of sequence \"{dp.sequence}\" - nt must be > 2\n")
-                    continue
+            if model_name in ["ContextFold"]:
                 model.execute(model_path, dp.sequence)
-            elif model_name in ["RandomPredictor", "RNAStructure", "NUPACK"] or "MXFold2" in model_name:
-                model.execute(input_file_path, remove_file_when_done=True)
+            elif model_name in ["RNAStructure", "NUPACK"] or "MXFold2" in model_name:
+                model.execute(input_file_path)
             else:
                 model.execute(model_path, input_file_path)
 
@@ -877,51 +848,45 @@ def generate_ribonanza_evaluations(model,
                 prediction = model.get_ss_prediction_ignore_pseudoknots()
             else:
                 prediction = model.get_ss_prediction()
+            
+            prediction = CanonicalBasePairScorer.transform_structure(prediction, sequence)
+            testable_sequence = ""
+            testable_prediction = ""
+            testable_reactivities = []
+            
+            # Get testable positions
+            for i, reactivity in enumerate(reactivities):
+                if reactivity != "":
+                    testable_sequence += sequence[i]
+                    testable_prediction += prediction[i]
+                    testable_reactivities.append(float(reactivity))
 
-            if to_seq_file:
-                os.remove(input_file_path)
-
-            testable_prediction = prediction[:len(sequence)]
             if chemical_mapping_method in ["DMS4", "SHAPE"]:
                 score = DSCI.score(
-                    sequence,
+                    testable_sequence,
                     testable_prediction,
-                    reactivities,
+                    testable_reactivities,
                     SHAPE=True
                 )
             else:
                 score = DSCI.score(
-                    sequence,
+                    testable_sequence,
                     testable_prediction,
-                    reactivities,
+                    testable_reactivities,
                     CMCT=True
                 )
 
-            accuracy = round(score["accuracy"], 4)
-            p = round(score["p"], 4)
-            # Get free energy
-            if model_name == "RNAStructure":
-                fe = model.mfe
-            elif model_name == "NUPACK":
-                fe = model.get_mfe()
-            else:
-                fe = SecondaryStructureTools.get_free_energy(testable_seq, testable_prediction)
-            line_to_write = f"{model_name}, {dp.name}, {testable_seq}, {testable_prediction}, {accuracy}, {p}, {fe}\n"
+            accuracy = score["accuracy"]
+            p = score["p"]
+            line_to_write = f"{model_name}, {dp.name}, {sequence}, {prediction}, {accuracy}, {p}\n"
             report_file.write(line_to_write)
             counter += 1
 
         except (DSCITypeError, DSCIValueError) as dsci_error:
-            problem_to_write = f"{dp.name}, {dsci_error}, {prediction}\n"
-            problem_file.write(problem_to_write)
             continue
-
-        except Exception as e:
-            problem_to_write = f"{dp.name}, {e}\n"
-            problem_file.write(problem_to_write)
 
     for k in experiment_map:
         report_files[k].close()
-        problem_files[k].close()
 
 
 def generate_dms_evaluations(model,

@@ -19,9 +19,9 @@ class RNAFold:
         if "scratch" in file_name_base:
             file_name_base = file_name_base.replace("/scratch/", "")
         try:
-            os.remove(f"/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/bprna_redo/{file_name_base}_ss.ps")
-        except FileNotFoundError:
-            print(f"Couln't delete {file_name_base}_ss.ps")
+            os.remove(f"/home/yesselmanlab/ewhiting/RNAFoldAssess/pipelines/ribonanza_pipelines/*ss.ps")
+        except FileNotFoundError as e:
+            print(f"os.remove failed. Exception: {e}")
         if remove_file_when_done:
             try:
                 os.system(f"rm {file_name_base}*")
