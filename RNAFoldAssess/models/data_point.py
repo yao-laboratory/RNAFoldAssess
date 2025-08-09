@@ -11,6 +11,7 @@ class DataPoint:
         self.sequence = sequence
         self._ground_truth_type = None
         self.ground_truth_type = ground_truth_type
+        self._ground_truth_data = None
         self.ground_truth_data = ground_truth_data
         self.cohort = cohort
         self.reads = reads
@@ -33,7 +34,53 @@ class DataPoint:
         self._ground_truth_type = given_type
 
     @property
+    def ground_truth_data(self):
+        return self._ground_truth_data
+
+    @ground_truth_data.setter
+    def ground_truth_data(self, gt_data):
+        if self.ground_truth_type not in DataPoint.CHEMICAL_MAPPING_TYPES:
+            self._ground_truth_data = gt_data
+        else:
+            if type(gt_data) == list:
+                if len(gt_data) == len(self.sequence):
+                    new_gt_data = {}
+                    for i in range(len(self.sequence)):
+                        new_gt_data[i] = gt_data[i]
+                    self._ground_truth_data = new_gt_data
+                else:
+                    err_msg = f"DataPoint cannot accept list of reactivities unless list " \
+                              f"is of equal size to sequence length. Please use a reactivity " \
+                              f"map or use list equal in size to datapoint sequence.\n" \
+                              f"DataPoint: {self.name}\nSequence: {self.sequence}\nProvided reactivities: {gt_data}"
+                    raise Exception(err_msg)
+            elif type(gt_data) == dict:
+                positions = [int (i) for i in list(gt_data.keys())]
+                seq_len = len(self.sequence)
+                for p in positions:
+                    if p > seq_len:
+                        err_msg = f"Reactivitiy map is out of range. Encountered position {p} for " \
+                                  f"sequence of length {seq_len}.\nSequence: {self.sequence}\n" \
+                                  f"Note that DataPoint expects 0-indexed reactivities"
+                        raise Exception(err_msg)
+                    elif p < 0:
+                        err_msg = f"Provided a negative position for reactivity map ({p}). " \
+                                   "Please provide a zero-indexed reactivity map"
+                        raise Exception(err_msg)
+                new_gt_data = {}
+                for p in positions:
+                    new_gt_data[p] = gt_data[p]
+                self._ground_truth_data = new_gt_data
+
+    @property
     def reactivities(self):
+        if self.ground_truth_data is not None and self.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+            return list(self.ground_truth_data.values())
+        else:
+            raise Exception(f"Datapoint {self.name} does not have reactivities")
+
+    @property
+    def reactivity_map(self):
         if self.ground_truth_data is not None and self.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
             return self.ground_truth_data
         else:
