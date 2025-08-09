@@ -34,7 +34,7 @@ class DataPoint:
 
     @property
     def reactivities(self):
-        if self.ground_truth_data is not None and self.ground_truth_data in DataPoint.CHEMICAL_MAPPING_TYPES:
+        if self.ground_truth_data is not None and self.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
             return self.ground_truth_data
         else:
             raise Exception(f"Datapoint {self.name} does not have reactivities")
