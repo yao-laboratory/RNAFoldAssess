@@ -141,19 +141,38 @@ class DataPoint:
         }
 
     def evaluate_prediction_with_mapping_data(self, prediction):
+        if self.ground_truth_type not in DataPoint.CHEMICAL_MAPPING_TYPES:
+            raise Exception("DataPoint does not have reactivity data")
+
+        reactivity_map = self.reactivity_map
+        testable_reactivities = []
+        testable_seq = ""
+        testable_dbn = ""
+        for pos, reactivity in reactivity_map.items():
+            testable_reactivities.append(reactivity)
+            testable_seq += self.sequence[pos]
+            testable_dbn += prediction[pos]
+
         if self.ground_truth_type == "DMS":
             return DSCI.score(
-                self.sequence,
-                prediction,
-                self.ground_truth_data,
+                testable_seq,
+                testable_dbn,
+                testable_reactivities,
                 DMS=True
             )
         elif self.ground_truth_data == "SHAPE":
             return DSCI.score(
-                self.sequence,
-                prediction,
-                self.ground_truth_data,
+                testable_seq,
+                testable_dbn,
+                testable_reactivities,
                 SHAPE=True
+            )
+        elif self.ground_truth_data == "CMCT":
+            return DSCI.score(
+                testable_seq,
+                testable_dbn,
+                testable_reactivities,
+                CMCT=True
             )
         else:
             raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")

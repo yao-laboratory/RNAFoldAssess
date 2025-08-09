@@ -152,10 +152,18 @@ class DSCI(Scorer):
 
 
     def evaluate(self, precision=4):
+        reactivity_map = self.data_point.reactivity_map
+        testable_reactivities = []
+        testable_seq = ""
+        testable_dbn = ""
+        for pos, reactivity in reactivity_map.items():
+            testable_reactivities.append(reactivity)
+            testable_seq += self.data_point.sequence[pos]
+            testable_dbn += self.secondary_structure[pos]
         score = DSCI.score(
-            self.data_point.sequence,
-            self.secondary_structure,
-            self.data_point.reactivities,
+            testable_seq,
+            testable_dbn,
+            testable_reactivities,
             self.DMS,
             self.SHAPE
         )
