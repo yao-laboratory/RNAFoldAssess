@@ -9,7 +9,8 @@ class DataPoint:
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
         self.sequence = sequence
-        self._ground_truth_type = ground_truth_type
+        self._ground_truth_type = None
+        self.ground_truth_type = ground_truth_type
         self.ground_truth_data = ground_truth_data
         self.cohort = cohort
         self.reads = reads
@@ -20,22 +21,27 @@ class DataPoint:
 
     @ground_truth_type.setter
     def ground_truth_type(self, gt_type):
-        type = gt_type.upper()
-        if gt_type not in DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES:
-            raise Exception(f"The ground-truth type {gt_type} is not acceptable, must be one of {DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES}")
-        else:
-            self._ground_truth_type = type
+        if gt_type is None:
+            self._ground_truth_type = None
+            return
+        given_type = str(gt_type).upper()
+        if given_type not in DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES:
+            raise ValueError(
+                f"The ground-truth type {gt_type} is not acceptable, "
+                f"must be one of {DataPoint.ACCEPTABLE_GROUND_TRUTH_TYPES}"
+            )
+        self._ground_truth_type = given_type
 
     @property
     def reactivities(self):
-        if self.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+        if self.ground_truth_data is not None and self.ground_truth_data in DataPoint.CHEMICAL_MAPPING_TYPES:
             return self.ground_truth_data
         else:
             raise Exception(f"Datapoint {self.name} does not have reactivities")
 
     @property
     def structure(self):
-        if self.ground_truth_type == "dbn":
+        if self.ground_truth_type == "DBN":
             return self.ground_truth_data
         else:
             raise Exception(f"Datapoint {self.name} does not have a DBN string")
@@ -73,7 +79,7 @@ class DataPoint:
         return -entropy_value
 
     def evaluate_prediction(self, prediction, lenience=0):
-        if self.ground_truth_type == "dbn":
+        if self.ground_truth_type == "DBN":
             return self.evaluate_prediction_with_known_dbn(prediction, lenience)
         else:
             return self.evaluate_prediction_with_mapping_data(prediction)
@@ -100,7 +106,7 @@ class DataPoint:
                 self.sequence,
                 prediction,
                 self.ground_truth_data,
-                DMS=True
+                SHAPE=True
             )
         else:
             raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")
@@ -220,7 +226,7 @@ class DataPoint:
             ground_truth_type = dict_object.get("experiment_type", "DMS") # default to DMS since it is the least harmful assumption
             ground_truth_data = reactivities
         elif dbn_string:
-            ground_truth_type = "dbn"
+            ground_truth_type = "DBN"
             ground_truth_data = dbn_string
 
         dp = DataPoint(name, seq, ground_truth_type, ground_truth_data, cohort, reads)
