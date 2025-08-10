@@ -130,6 +130,46 @@ class TestDSCI:
         assert(scorer.accuracy == static_scorer["accuracy"])
         assert(scorer.p_value == static_scorer["p"])
 
+class TestDSCIWithReactivityMap:
+    datum = DataPoint.init_from_dict(
+        {
+            "name": "DataPointMock",
+            "sequence": "ACUGACUGAAAAAAAA",
+            # Points 1 and 3
+            "data": {
+                0: 10,
+                1: 10,
+                5: 0,
+                6: 0,
+                11: 10,
+                12: 11
+            },
+            "reads": 1
+        }
+    )
+
+    def test_scorer(self):
+        prediction = ".(.)............"
+        scorer = DSCI(self.datum, prediction, "mock algo", evaluate_immediately=True, DMS=True)
+        testable_reactivities = []
+        testable_seq = ""
+        testable_dbn = ""
+        reactivity_map = self.datum.reactivity_map
+        for p, r in reactivity_map.items():
+            testable_reactivities.append(r)
+            testable_seq += self.datum.sequence[p]
+            testable_dbn += prediction[p]
+
+        static_scorer = DSCI.score(
+            testable_seq,
+            testable_dbn,
+            testable_reactivities,
+            DMS=True
+        )
+
+        assert(static_scorer["accuracy"] == scorer.accuracy)
+        assert(static_scorer["p"] == scorer.p_value)
+
 
 class TestBasePairScorer:
     real = ".(..)..(.(..))."

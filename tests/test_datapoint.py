@@ -57,3 +57,46 @@ class TestConstructFrom:
         assert dp.name == self.name
         assert dp.sequence == self.seq
         assert dp.structure == self.data
+
+class TestReactivityMap:
+    name = "test"
+    seq = "AACCUUGG"
+    full_reactivity_map = {
+        0: 0.4,
+        1: 0.5,
+        2: 0.7,
+        3: 0.6,
+        4: 0.0,
+        5: 0.1,
+        6: 0.2,
+        7: 0.3,
+    }
+
+    partial_reactivit_map = {3: 0.9, 4: 0.0, 7: 0.1}
+
+    def test_reactivities_from_map(self):
+        dp = DataPoint(self.name, self.seq, "DMS", self.full_reactivity_map)
+        expected_reactivities = [0.4, 0.5, 0.7, 0.6, 0.0, 0.1, 0.2, 0.3]
+        assert dp.reactivities == expected_reactivities
+        assert dp.reactivity_map == self.full_reactivity_map
+
+    def test_partial_reactivity_map(self):
+        dp = DataPoint(self.name, self.seq, "DMS", self.partial_reactivit_map)
+        expected_reactivities = [0.9, 0.0, 0.1]
+        assert dp.reactivities == expected_reactivities
+        assert dp.reactivity_map == self.partial_reactivit_map
+
+    def test_bad_list(self):
+        with pytest.raises(Exception) as exception_info:
+            DataPoint(self.name, self.seq, "DMS", [1,2,3])
+
+        expected_error_info = f"DataPoint: {self.name}\nSequence: {self.seq}\nProvided reactivities: [1, 2, 3]"
+        assert expected_error_info in str(exception_info.value)
+
+    def test_bad_dict(self):
+        with pytest.raises(Exception) as exception_info:
+            DataPoint(self.name, self.seq, "DMS", {0: 1, 1:2, 10: 4})
+
+        expected_error_info = f"Encountered position 10 for sequence of length {len(self.seq)}"
+        assert expected_error_info in str(exception_info.value)
+
