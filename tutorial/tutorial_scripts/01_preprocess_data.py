@@ -100,6 +100,7 @@ for f in files:
     datapoint = {
         "name": name,
         "sequence": sequence,
+        "ground_truth_type": experiment_type
     }
 
     reactivity_map = {}

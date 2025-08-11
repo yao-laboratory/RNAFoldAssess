@@ -28,3 +28,13 @@ As something of a combination of the previous two use cases, perhaps you have de
 # Setting up an Evaluation Pipeline
 
 In this section, we will use the example data in `/tutorial` to set up an example pipeline.
+
+## Step 1 - Data preprocessing
+
+RNAFoldAssess provides a class called `DataPoint`; objects of this class represent single RNAs and should contain at the very least a name, nucleotide sequence, ground-truth data, and an indication of the kind of ground-truth data in the datapoint.
+
+The `DataPoint` class provides methods for instantiating objects from a variety of sources. However, the most reliable and standardized source for the `DataPoint` class is JSON. In the file `tutorial/tutorial_scripts/01_preprocess_data.py`, we convert some raw chemical mapping data into a suitable JSON file that can be ingested by the `DataPoint` class for future use.
+
+In `tutorial/unprocessed_data`, we provide two .rdat files, files that represent chemical mapping readings from the EternaBench project. This kind of data provides a useful example because the rdat files contain RNA sequences and chemical probing reactivities. In the example script, we parse both .rdat files and build a list of dictionary objects from them. The list is then used to write a JSON file that can be used later by the `DataPoint` method, `factory_from_json`.
+
+The example shows how to work with chemical mapping data--specifically, SHAPE data. For chemical mapping data, RNAFoldAssess can also work with DMS and CMCT data. Additionally, RNAFoldAssess can work with a ground-truth data of a given structure. In such cases, the standardized format for a `DataPoint` object is a dot-bracket notation (DBN) string. This package comes with utitlity functions for generating DBN strings from various sources such as .bpseq files and .ct files.
