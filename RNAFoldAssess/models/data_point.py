@@ -14,6 +14,8 @@ class DataPoint:
         self._ground_truth_data = None
         self.ground_truth_data = ground_truth_data
         self.cohort = cohort
+        if cohort:
+            self.name = f"{cohort}_{name}"
         self.reads = reads
 
     @property
@@ -69,7 +71,7 @@ class DataPoint:
                         raise Exception(err_msg)
                 new_gt_data = {}
                 for p in positions:
-                    new_gt_data[p] = gt_data[p]
+                    new_gt_data[p] = gt_data[str(p)]
                 self._ground_truth_data = new_gt_data
 
     @property
@@ -286,10 +288,10 @@ class DataPoint:
             name = f"{cohort}_{name}"
         seq = dict_object.get("sequence", None)
         reads = dict_object.get("reads", None)
-        reactivities = dict_object.get("data", None)
+        reactivities = dict_object.get("reactivity_map", None)
         dbn_string = dict_object.get("dbn", None)
         if reactivities:
-            ground_truth_type = dict_object.get("experiment_type", "DMS") # default to DMS since it is the least harmful assumption
+            ground_truth_type = dict_object.get("ground_truth_type", "DMS") # default to DMS since it is the least harmful assumption
             ground_truth_data = reactivities
         elif dbn_string:
             ground_truth_type = "DBN"
