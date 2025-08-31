@@ -1,4 +1,4 @@
-import pytest
+import pytest, os
 
 from RNAFoldAssess.models import DataPoint
 
@@ -100,3 +100,34 @@ class TestReactivityMap:
         expected_error_info = f"Encountered position 10 for sequence of length {len(self.seq)}"
         assert expected_error_info in str(exception_info.value)
 
+class TestFileMethodsChemicalMapping:
+    rdat_path = "fixtures/rdat_files"
+    first_expected_name = "test_cohort_ETERNA_R48_0001"
+    second_expected_name = "test_cohort_ETERNA_R49_0001"
+    first_expected_seq = "GGAAAGCUACGAGGAUAUGCGUAUCACAAAAGUGAUACGGUGGCAUCAAAAGAUGGCACCGAUGAUCAAAAGAUCAUCGCAGAAGGCGUAGCAAAGAAACAACAACAACAAC"
+    second_expected_seq = "GGAAAGCGUGAAGGAUAUCGCUGCUACGCAAGUAGCAGACUGGCAUGGAAACAUGGCAGUGCGUCACGAAAGUGACGUCGAGAAGGUCACGCAAAGAAACAACAACAACAAC"
+
+    def test_init_from_rdat_file(self):
+        dp = DataPoint.init_from_rdat_file(f"{self.rdat_path}/ETERNA_R48_0001.rdat", "test_cohort")
+        expected_reactivity_locations = list(range(6, 86))
+        assert(dp.name == self.first_expected_name)
+        assert(dp.sequence == self.first_expected_seq)
+        assert(dp.ground_truth_type == "SHAPE")
+        assert(list(dp.reactivity_map.keys()) == expected_reactivity_locations)
+
+    def test_init_from_rdat_files(self):
+        dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
+        dp1 = dps[0]
+        dp2 = dps[1]
+        assert(dp1.name == self.first_expected_name)
+        assert(dp2.name == self.second_expected_name)
+        assert(dp1.sequence == self.first_expected_seq)
+        assert(dp2.sequence == self.second_expected_seq)
+
+    def test_json_methods(self):
+        dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
+        json_file = DataPoint.to_json_file(dps, "fixtures/test_eterna.json")
+        test_dps = DataPoint.factory_from_json(json_file)
+        for i, dp in enumerate(dps):
+            assert dp == test_dps[i]
+        os.remove("fixtures/test_eterna.json")
