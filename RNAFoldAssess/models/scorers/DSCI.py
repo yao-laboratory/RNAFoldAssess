@@ -103,9 +103,10 @@ class DSCI(Scorer):
             self.evaluate()
 
     @staticmethod
-    def score(sequence, secondary_structure, reactivities, DMS=False, SHAPE=False):
-        if not DMS != SHAPE:
-            raise DSCIException("Please specify if reactivity data is DMS or SHAPE")
+    def score(sequence, secondary_structure, reactivities, DMS=False, SHAPE=False, CMCT=False):
+        reactivity_types = [DMS, SHAPE, CMCT]
+        if reactivity_types.count(True) != 1:
+            raise DSCIException("Please specify if reactivity data is DMS, SHAPE, or CMCT")
 
         if len(sequence) != len(secondary_structure):
             raise DSCIException(f"Sequence length ({len(sequence)}) and secondary structure length ({len(secondary_structure)}) don't match.")
@@ -113,7 +114,13 @@ class DSCI(Scorer):
         if len(reactivities) != len(secondary_structure):
             raise DSCIException(f"Reactivities length ({len(reactivities)}) and secondary structure length ({len(secondary_structure)}) don't match.")
 
-        experiment_type = "DMS" if DMS else "SHAPE"
+        if DMS:
+            experiment_type = "DMS"
+        elif SHAPE:
+            experiment_type = "SHAPE"
+        elif CMCT:
+            experiment_type = "CMCT"
+
         paired, unpaired = DSCI.get_paired_and_unpaired_nucleotides(
             sequence,
             secondary_structure,
@@ -122,6 +129,10 @@ class DSCI(Scorer):
         )
 
         try:
+            if not paired:
+                paired = [0]
+            if not unpaired:
+                unpaired = [1.0]
             result = mannwhitneyu(unpaired, paired, alternative="greater")
             denominator = len(paired) * len(unpaired)
             metrics = (result.statistic / denominator, result.pvalue)
@@ -152,6 +163,8 @@ class DSCI(Scorer):
 
 
     def evaluate(self, precision=4):
+        if not self.secondary_structure:
+            raise DSCIException(f"Can't score: No secondary structure prediction provided for {self.data_point.name}.")
         reactivity_map = self.data_point.reactivity_map
         testable_reactivities = []
         testable_seq = ""
