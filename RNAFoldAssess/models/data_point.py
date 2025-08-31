@@ -336,6 +336,8 @@ class DataPoint:
         seq = dict_object.get("sequence", None)
         reads = dict_object.get("reads", None)
         reactivities = dict_object.get("reactivity_map", None)
+        if not reactivities:
+            reactivities = dict_object.get("data", None)
         dbn_string = dict_object.get("dbn", None)
         if reactivities:
             ground_truth_type = dict_object.get("ground_truth_type", "DMS") # default to DMS since it is the least harmful assumption
