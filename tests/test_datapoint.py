@@ -1,7 +1,10 @@
-import pytest, os
+import pytest, os, pathlib
 
 from RNAFoldAssess.models import DataPoint
 
+
+TESTS_DIR = pathlib.Path(__file__).parent
+FIXTURES_DIR = TESTS_DIR / "fixtures"
 
 class TestConstructorGetterSetters:
     name = "test_sequence1"
@@ -101,7 +104,7 @@ class TestReactivityMap:
         assert expected_error_info in str(exception_info.value)
 
 class TestFileMethodsChemicalMapping:
-    rdat_path = "fixtures/rdat_files"
+    rdat_path = FIXTURES_DIR / "rdat_files"
     first_expected_name = "test_cohort_ETERNA_R48_0001"
     second_expected_name = "test_cohort_ETERNA_R49_0001"
     first_expected_seq = "GGAAAGCUACGAGGAUAUGCGUAUCACAAAAGUGAUACGGUGGCAUCAAAAGAUGGCACCGAUGAUCAAAAGAUCAUCGCAGAAGGCGUAGCAAAGAAACAACAACAACAAC"
@@ -126,8 +129,8 @@ class TestFileMethodsChemicalMapping:
 
     def test_json_methods(self):
         dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
-        json_file = DataPoint.to_json_file(dps, "fixtures/test_eterna.json")
+        json_file = DataPoint.to_json_file(dps, FIXTURES_DIR / "test_eterna.json")
         test_dps = DataPoint.factory_from_json(json_file)
         for i, dp in enumerate(dps):
             assert dp == test_dps[i]
-        os.remove("fixtures/test_eterna.json")
+        os.remove(FIXTURES_DIR / "test_eterna.json")

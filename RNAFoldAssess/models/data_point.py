@@ -1,5 +1,8 @@
 import math, json, os
 
+from pathlib import Path
+from typing import Union
+
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
@@ -304,7 +307,7 @@ class DataPoint:
 
 
     @staticmethod
-    def to_json_file(dp_list, path="./datapoints.json"):
+    def to_json_file(dp_list, path:Union[str, Path]="./datapoints.json"):
         dict_list = []
         for dp in dp_list:
             dict_list.append(dp.to_dictionary())
