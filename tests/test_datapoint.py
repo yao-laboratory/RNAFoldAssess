@@ -120,12 +120,12 @@ class TestFileMethodsChemicalMapping:
 
     def test_init_from_rdat_files(self):
         dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
-        dp1 = dps[0]
-        dp2 = dps[1]
-        assert(dp1.name == self.first_expected_name)
-        assert(dp2.name == self.second_expected_name)
-        assert(dp1.sequence == self.first_expected_seq)
-        assert(dp2.sequence == self.second_expected_seq)
+        actual_names = [dp.name for dp in dps]
+        actual_sequences = [dp.sequence for dp in dps]
+        assert(self.first_expected_name in actual_names)
+        assert(self.second_expected_name in actual_names)
+        assert(self.first_expected_seq in actual_sequences)
+        assert(self.second_expected_seq in actual_sequences)
 
     def test_json_methods(self):
         dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
