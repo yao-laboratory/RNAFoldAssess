@@ -6,8 +6,8 @@ from typing import Union
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
-    CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
-    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN"]
+    CHEMICAL_MAPPING_TYPES = ["DMS", "dms", "SHAPE", "shape", "CMCT", "cmct"]
+    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN", "dbn"]
 
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
@@ -144,6 +144,9 @@ class DataPoint:
             return self.evaluate_prediction_with_mapping_data(prediction)
 
     def evaluate_prediction_with_known_dbn(self, prediction, lenience=0):
+        if self.ground_truth_type != "DBN":
+            raise Exception("Cannot evaluate datapoint without DBN ground-truth data")
+
         scorer = BasePairScorer(self.ground_truth_data, prediction, lenience)
         scorer.evaluate()
         return {
@@ -370,8 +373,23 @@ class DataPoint:
         name = name_line.replace(">", "").replace(" ", "_")
         seq = data[1]
         dbn = data[2]
-        dp = DataPoint(name, seq, cohort=cohort, ground_truth_type="dbn", ground_truth_data=dbn)
+        dp = DataPoint(name, seq, cohort=cohort, ground_truth_type="DBN", ground_truth_data=dbn)
         return dp
+
+    @staticmethod
+    def init_from_dbn_files(directory_with_dbns, cohort=None):
+        files = [f for f in os.listdir(directory_with_dbns) if f.endswith(".dbn")]
+
+        if len(files) == 0:
+            return []
+
+        datapoints = []
+        for f in files:
+            path = f"{directory_with_dbns}/{f}"
+            dp = DataPoint.init_from_dbn_file(path, cohort)
+            datapoints.append(dp)
+
+        return datapoints
 
 
     @staticmethod
@@ -487,7 +505,6 @@ class DataPoint:
             datapoints.append(dp)
 
         return datapoints
-
 
     @staticmethod
     def extract_data_from_file(file_path):
