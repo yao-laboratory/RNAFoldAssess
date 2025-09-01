@@ -105,6 +105,7 @@ class TestReactivityMap:
 
 class TestFileMethodsChemicalMapping:
     rdat_path = FIXTURES_DIR / "rdat_files"
+    csv_path = FIXTURES_DIR / "csv_files/test_data.csv"
     first_expected_name = "test_cohort_ETERNA_R48_0001"
     second_expected_name = "test_cohort_ETERNA_R49_0001"
     first_expected_seq = "GGAAAGCUACGAGGAUAUGCGUAUCACAAAAGUGAUACGGUGGCAUCAAAAGAUGGCACCGAUGAUCAAAAGAUCAUCGCAGAAGGCGUAGCAAAGAAACAACAACAACAAC"
@@ -134,3 +135,9 @@ class TestFileMethodsChemicalMapping:
         for i, dp in enumerate(dps):
             assert dp == test_dps[i]
         os.remove(FIXTURES_DIR / "test_eterna.json")
+
+    def test_csv_method(self):
+        real_dps = DataPoint.init_from_rdat_files(self.rdat_path)
+        test_dps = DataPoint.init_from_csv_file(self.csv_path)
+        for dp in test_dps:
+            assert(dp in real_dps)

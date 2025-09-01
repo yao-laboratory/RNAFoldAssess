@@ -1,4 +1,4 @@
-import math, json, os
+import math, json, os, csv
 
 from pathlib import Path
 from typing import Union
@@ -308,6 +308,27 @@ class DataPoint:
 
         return obj
 
+    @staticmethod
+    def to_csv_file(dp_list, path:Union[str, Path]="./datapoitns.csv"):
+        headers = "name,sequence,ground_truth_type,ground_truth_data\n"
+        lines = []
+        for dp in dp_list:
+            line = f"{dp.name},{dp.sequence},{dp.ground_truth_type},"
+            if dp.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+                reactivity_map = dp.reactivity_map
+                ground_truth_data = ";".join([f"{p}:{r}" for p, r in reactivity_map.items()])
+            elif dp.ground_truth_type in ["DBN", "dbn"]:
+                ground_truth_data = dp.ground_truth_data
+            else:
+                ground_truth_data = None
+            line += f"{ground_truth_data}"
+            lines.append(line)
+
+        fstring = headers + "\n".join(lines)
+        with open(path, "w") as fh:
+            fh.write(fstring)
+
+        return path
 
     @staticmethod
     def to_json_file(dp_list, path:Union[str, Path]="./datapoints.json"):
@@ -505,6 +526,36 @@ class DataPoint:
             datapoints.append(dp)
 
         return datapoints
+
+    @staticmethod
+    def init_from_csv_file(csv_path:Union[str,Path], cohort=None):
+        if type(csv_path) != Path:
+            csv_path = Path(csv_path)
+
+        with csv_path.open(newline='', encoding='utf-8') as fh:
+            reader = csv.DictReader(fh)
+            rows = [row for row in reader]
+
+        datapoints = []
+        for row in rows:
+            name = row["name"]
+            sequence = row["sequence"]
+            ground_truth_type = row["ground_truth_type"]
+            ground_truth_data = row["ground_truth_data"]
+            if ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+                spl = ground_truth_data.split(";")
+                mapping = {}
+                for item in spl:
+                    pos, reactivity = item.split(":")
+                    pos = int(pos)
+                    reactivity = float(reactivity)
+                    mapping[pos] = reactivity
+                ground_truth_data = mapping
+            datapoint = DataPoint(name, sequence, ground_truth_type, ground_truth_data, cohort)
+            datapoints.append(datapoint)
+
+        return datapoints
+
 
     @staticmethod
     def extract_data_from_file(file_path):
