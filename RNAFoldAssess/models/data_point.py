@@ -3,6 +3,7 @@ import math, json, os, csv
 from pathlib import Path
 from typing import Union
 
+from RNAFoldAssess.models.predictors.predictor import Predictor
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
@@ -323,6 +324,40 @@ class DataPoint:
             else:
                 ground_truth_data = None
             line += f"{ground_truth_data}"
+            lines.append(line)
+
+        fstring = headers + "\n".join(lines)
+        with open(path, "w") as fh:
+            fh.write(fstring)
+
+        return path
+
+    @staticmethod
+    def to_csv_file_with_prediction(dp_list, model:Predictor, path:Union[str, Path]="./predictions.csv"):
+        dbn_headers = "name,sequence,ground_truth_type,ground_truth_data,prediction,sensitivity,ppv,f1\n"
+        chem_map_headers = "name,sequence,ground_truth_type,ground_truth_data,prediction,DSCI_score,p_value\n"
+        lines = []
+        for dp in dp_list:
+            model.execute(dp)
+            prediction = model.get_ss_prediction()
+            score = dp.evaluate_prediction(prediction)
+
+            if "F1" in score.keys():
+                headers = dbn_headers
+                score_string = f"{score['sensitivity']},{score['PPV']},{score['F1']}"
+            else:
+                headers = chem_map_headers
+                score_string = f"{score['accuracy']},{score['p']}"
+
+            line = f"{dp.name},{dp.sequence},{dp.ground_truth_type},"
+            if dp.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+                reactivity_map = dp.reactivity_map
+                ground_truth_data = ";".join([f"{p}:{r}" for p, r in reactivity_map.items()])
+            elif dp.ground_truth_type in ["DBN", "dbn"]:
+                ground_truth_data = dp.ground_truth_data
+            else:
+                ground_truth_data = None
+            line += f"{ground_truth_data},{prediction},{score_string}"
             lines.append(line)
 
         fstring = headers + "\n".join(lines)
