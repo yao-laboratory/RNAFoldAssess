@@ -66,6 +66,7 @@ class DataPoint:
                     if int(p) > seq_len:
                         err_msg = f"Reactivitiy map is out of range. Encountered position {p} for " \
                                   f"sequence of length {seq_len}.\nSequence: {self.sequence}\n" \
+                                  f"Positions: {positions}\nDatapoint: {self.name}\n" \
                                   f"Note that DataPoint expects 0-indexed reactivities"
                         raise Exception(err_msg)
                     elif int(p) < 0:
@@ -355,10 +356,10 @@ class DataPoint:
                 name = list(dict_object.keys())[0]
                 dict_object = dict_object[name]
 
-        if cohort:
-            name = f"{cohort}_{name}"
-        elif "cohort" in dict_object.keys():
-            cohort = dict_object["cohort"]
+        # if cohort:
+        #     name = f"{cohort}_{name}"
+        # elif "cohort" in dict_object.keys():
+        #     cohort = dict_object["cohort"]
 
         seq = dict_object.get("sequence", None)
         reads = dict_object.get("reads", None)
@@ -434,7 +435,7 @@ class DataPoint:
 
         datapoints = []
         for datum in json_data:
-            datapoints.append(DataPoint.init_from_dict(datum, name_prefix))
+            datapoints.append(DataPoint.init_from_dict(datum, cohort=name_prefix))
 
         return datapoints
 
