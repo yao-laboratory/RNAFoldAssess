@@ -29,7 +29,7 @@ As something of a combination of the previous two use cases, perhaps you have de
 
 In this section, we will use the example data in `/tutorial` to set up an example pipeline.
 
-## Step 0 - Preparing your data
+## Preparing your data
 
 RNAFoldAssess can accomplish a variety of analysis tasks but requires that the RNA data be formatted in a specific way. There are two acceptable file types for RNA data: JSON and CSV.
 
@@ -63,10 +63,10 @@ There are some utility methods that will convert RNA data into acceptable file f
 
 TODO: explain JSON shape requirements
 
-## Step 1 - Loading the Data
+## Mode 1 - Generating Predictions with no Score
 
 TODO: Record/explain steps in tutorial script 1
 
-## Step 2 - Generate Predictions
+## Mode 2 - Generating Predictions with Score
 
 TODO: Record/explain steps in tutorial script 2
