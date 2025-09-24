@@ -333,7 +333,19 @@ class DataPoint:
         return path
 
     @staticmethod
-    def to_csv_file_with_prediction(dp_list, model:Predictor, path:Union[str, Path]="./predictions.csv"):
+    def to_csv_file_with_prediction(dp_list, model:Predictor, path:Union[str, Path]="./predictions_no_score.csv"):
+        lines = ["name,sequence,prediction"]
+        for dp in dp_list:
+            model.execute(dp)
+            prediction = model.get_ss_prediction()
+            lines.append(f"{dp.name},{dp.sequence},{prediction}")
+
+        with open(path, "w") as fh:
+            fh.write("\n".join(lines))
+        return path
+
+    @staticmethod
+    def to_csv_file_with_prediction_and_score(dp_list, model:Predictor, path:Union[str, Path]="./predictions.csv"):
         dbn_headers = "name,sequence,ground_truth_type,ground_truth_data,prediction,sensitivity,ppv,f1\n"
         chem_map_headers = "name,sequence,ground_truth_type,ground_truth_data,prediction,DSCI_score,p_value\n"
         lines = []
