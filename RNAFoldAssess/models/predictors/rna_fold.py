@@ -23,7 +23,6 @@ class RNAFold(Predictor):
                `RNAFoldExecutionException`
     """
 
-    RNA_INPUT_SOURCE_TYPES = ["input", "fasta"]
     def __int__(self):
         self.output = ""
 

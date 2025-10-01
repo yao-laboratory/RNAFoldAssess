@@ -11,19 +11,10 @@ class TestRNAFold:
     # Testing with C009C
     datum = DataPoint.factory_from_json(FIXTURES_DIR / 'C009C.json')[0]
     model = RNAFold()
-    def test_prediction_with_fasta_file(self):
-        input_file_path = self.datum.to_fasta_file()
-        self.model.execute(input_file_path, source_type="fasta")
-        prediction = self.model.get_ss_prediction()
-        scorer = DSCI(self.datum, prediction, 'RNAFold', evaluate_immediately=True, DMS=True)
-        metrics = scorer.metrics
-        assert(metrics['accuracy'] > 0.7)
-        os.remove(input_file_path)
 
-    def test_prediction_with_string_input(self):
+    def test_prediction(self):
         datum = DataPoint.factory_from_json(FIXTURES_DIR / 'C009C.json')[0]
-        sequence = datum.sequence
-        self.model.execute(sequence)
+        self.model.execute(datum)
         prediction = self.model.get_ss_prediction()
         scorer = DSCI(self.datum, prediction, 'RNAFold', evaluate_immediately=True, DMS=True)
         metrics = scorer.metrics
