@@ -10,17 +10,20 @@ given the RNA's sequence. Once all predictions have been generated,
 RNAFoldAssess writes them to a CSV file.
 """
 
-raw_data_path = "../processed_data"
+# Change this path to a CSV file containing your own RNA sequences
+raw_data_path = "../processed_data/example_data_structure.csv"
+# Chagne this path to where you want the predictions to be saved
+output_path = "mode1_output.csv"
 
 # Import the RNA data into a List of DataPoint objects
-datapoints = DataPoint.init_from_csv_file(f"{raw_data_path}/example_data_structure.csv")
+datapoints = DataPoint.init_from_csv_file(raw_data_path)
 
-# Create a predictor object
+# Create a predictor object. If you have your own model, you can initialize it here.
 rnaFold = RNAFold()
 
 # Now we generate predictions only (no score)
 # Default output path is ./predictions_no_score.csv
-PredictionPipeline.run_prediction(dp_list=datapoints, model=rnaFold, output_path="mode1_output.csv")
+PredictionPipeline.run_prediction(dp_list=datapoints, model=rnaFold, output_path=output_path)
 
-# Now open the CSV file in this directory called
-# predictions_no_score.csv to see the structure predictions
+# Now open the CSV file in the path recorded in the
+# output_path variable to see the predictions.

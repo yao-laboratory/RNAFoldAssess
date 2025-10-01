@@ -65,8 +65,11 @@ TODO: explain JSON shape requirements
 
 ## Mode 1 - Generating Predictions with no Score
 
-TODO: Record/explain steps in tutorial script 1
+Mode 1, the default mode, takes your RNA data along with a prediction model and generates a prediction only. That is, there is no scoring involved in this mode. This is most useful for when you have the RNA's sequence data, but not any ground truth data (such as chemical reactivities or structure information) yet. See `tutorial/tutorial_scripts/mode1_generate_predictions_only.py` for example usage.
 
-## Mode 2 - Generating Predictions with Score
+## Mode 2 - Calculating Score from Previous Predictions
 
-TODO: Record/explain steps in tutorial script 2
+Mode 2 takes the output from Mode 1 and calculates a score for the prediction. The `run_prediction` method determines from your RNA ground-truth data whether to score with DSCI or confusion-matrix-based scoring. See `tutorial/tutorial_scripts/mode2_generate_scores_from_preds.py` for example usage.
+
+## Mode 3 - Generating Predictions and Score
+Mode 3 combines Mode 1 and Mode 2 into one step. If your RNA data already has ground-truth data, use that data along with a prediction model to generate predictions for your RNA's secondarty structure as well as scores for those predictions based on your recorded ground-truth data. See `tutorial/tutorial_scripts/mode3_generate_preds_and_scores.py` for example usage.
