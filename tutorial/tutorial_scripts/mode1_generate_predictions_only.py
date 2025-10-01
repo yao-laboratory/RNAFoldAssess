@@ -1,6 +1,5 @@
-from RNAFoldAssess.models import DataPoint
+from RNAFoldAssess.models import DataPoint, PredictionPipeline
 from RNAFoldAssess.models.predictors import *
-from RNAFoldAssess.utils import *
 
 
 """
@@ -20,7 +19,8 @@ datapoints = DataPoint.init_from_csv_file(f"{raw_data_path}/example_data_structu
 rnaFold = RNAFold()
 
 # Now we generate predictions only (no score)
-DataPoint.to_csv_file_with_prediction(datapoints, rnaFold)
+# Default output path is ./predictions_no_score.csv
+PredictionPipeline.run_prediction(dp_list=datapoints, model=rnaFold, output_path="mode1_output.csv")
 
 # Now open the CSV file in this directory called
 # predictions_no_score.csv to see the structure predictions

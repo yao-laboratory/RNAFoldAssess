@@ -17,7 +17,7 @@ rnaFold = RNAFold()
 
 # We call the to_csv_file_with_prediction method on DataPoint
 # to create a CSV file with the model's predictions and scores
-DataPoint.to_csv_file_with_prediction_and_score(datapoints, rnaFold, "../generated_data/rna_fold_predictions.csv")
+PredictionPipeline.run_prediction(datapoints, rnaFold, output_path="mode3_output.csv", prediction_mode=3)
 
 # Now open the CSV in generated_data/rna_fold_predictions.csv
 # to see the predictions and prediction scores
