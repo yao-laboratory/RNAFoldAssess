@@ -548,6 +548,8 @@ class DataPoint:
                 mapping = {}
                 for item in spl:
                     pos, reactivity = item.split(":")
+                    if reactivity == "":
+                        continue
                     pos = int(pos)
                     reactivity = float(reactivity)
                     mapping[pos] = reactivity
