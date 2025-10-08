@@ -3,13 +3,15 @@ from RNAFoldAssess.models.predictors import *
 from RNAFoldAssess.utils import *
 
 """
-Mode 2 involves generating RNA secondary structure predictions from
+Mode 3 involves generating RNA secondary structure predictions from
 one prediction model given a list of RNAs, and then scoring the
 prediction. This works with a collection of `DataPoint` objects.
+Note that in this script, we are using JSON represetnation of the
+RNA objects, whereas in other examples, we used CSV.
 """
 
-# Change this path to a CSV file containing your own RNA sequences
-raw_data_path = "../processed_data/example_data_structure.csv"
+# Change this path to a JSON path containing your data
+raw_data_path = "../processed_data/example_data.json"
 # Change this path to where you want the predictions to be saved
 output_path = "mode3_output.csv"
 
