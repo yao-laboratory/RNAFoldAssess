@@ -8,7 +8,7 @@ from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
     CHEMICAL_MAPPING_TYPES = ["DMS", "dms", "SHAPE", "shape", "CMCT", "cmct"]
-    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN", "dbn"]
+    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN", "dbn", "NONE"]
 
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
@@ -177,14 +177,14 @@ class DataPoint:
                 testable_reactivities,
                 DMS=True
             )
-        elif self.ground_truth_data == "SHAPE":
+        elif self.ground_truth_type == "SHAPE":
             return DSCI.score(
                 testable_seq,
                 testable_dbn,
                 testable_reactivities,
                 SHAPE=True
             )
-        elif self.ground_truth_data == "CMCT":
+        elif self.ground_truth_type == "CMCT":
             return DSCI.score(
                 testable_seq,
                 testable_dbn,
@@ -192,7 +192,7 @@ class DataPoint:
                 CMCT=True
             )
         else:
-            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")
+            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_type} chemical mapping")
 
 
     # ---------------------------------------------------------------
@@ -554,6 +554,8 @@ class DataPoint:
                     reactivity = float(reactivity)
                     mapping[pos] = reactivity
                 ground_truth_data = mapping
+            if not ground_truth_type:
+                ground_truth_type = "NONE"
             datapoint = DataPoint(name, sequence, ground_truth_type, ground_truth_data, cohort)
             datapoints.append(datapoint)
 
