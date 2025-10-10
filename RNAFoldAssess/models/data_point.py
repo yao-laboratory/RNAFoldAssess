@@ -3,8 +3,8 @@ import math, json, os, csv
 from pathlib import Path
 from typing import Union
 
-from RNAFoldAssess.models.predictors.predictor import Predictor
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
+from RNAFoldAssess.utils.sequence_tools import SequenceTools
 
 class DataPoint:
     CHEMICAL_MAPPING_TYPES = ["DMS", "dms", "SHAPE", "shape", "CMCT", "cmct"]
@@ -112,32 +112,11 @@ class DataPoint:
     # ---------------------------------------------------------------
 
     def get_gc_content(self):
-        g_count = self.sequence.upper.count("G")
-        c_count = self.sequence.upper.count("C")
-        return (g_count + c_count) / len(self.sequence)
+        return SequenceTools.get_gc_content(self.sequence)
 
 
     def get_sequence_entropy(self, log_base=4):
-        sequence = self.sequence.upper()
-
-        if len(sequence) == 0:
-            return 0
-
-        nt_counts = {"A": 0, "C": 0, "U": 0, "G": 0}
-
-        for nt in sequence:
-            if nt in nt_counts:
-                nt_counts[nt] += 1
-
-        seq_len = len(sequence)
-        nt_values = nt_counts.values()
-
-        entropy_value = sum(
-            (count / seq_len) * math.log(count / seq_len, log_base)
-            for count in nt_values if count > 0
-        )
-
-        return -entropy_value
+        return SequenceTools.get_sequence_entropy(self.sequence, log_base)
 
     def evaluate_prediction(self, prediction, lenience=0):
         if self.ground_truth_type == "DBN":
