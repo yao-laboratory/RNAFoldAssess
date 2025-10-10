@@ -1,7 +1,10 @@
-import pytest
+import pytest, os, pathlib
 
 from RNAFoldAssess.models import DataPoint
 
+
+TESTS_DIR = pathlib.Path(__file__).parent
+FIXTURES_DIR = TESTS_DIR / "fixtures"
 
 class TestConstructorGetterSetters:
     name = "test_sequence1"
@@ -100,3 +103,41 @@ class TestReactivityMap:
         expected_error_info = f"Encountered position 10 for sequence of length {len(self.seq)}"
         assert expected_error_info in str(exception_info.value)
 
+class TestFileMethodsChemicalMapping:
+    rdat_path = FIXTURES_DIR / "rdat_files"
+    csv_path = FIXTURES_DIR / "csv_files/test_data.csv"
+    first_expected_name = "test_cohort_ETERNA_R48_0001"
+    second_expected_name = "test_cohort_ETERNA_R49_0001"
+    first_expected_seq = "GGAAAGCUACGAGGAUAUGCGUAUCACAAAAGUGAUACGGUGGCAUCAAAAGAUGGCACCGAUGAUCAAAAGAUCAUCGCAGAAGGCGUAGCAAAGAAACAACAACAACAAC"
+    second_expected_seq = "GGAAAGCGUGAAGGAUAUCGCUGCUACGCAAGUAGCAGACUGGCAUGGAAACAUGGCAGUGCGUCACGAAAGUGACGUCGAGAAGGUCACGCAAAGAAACAACAACAACAAC"
+
+    def test_init_from_rdat_file(self):
+        dp = DataPoint.init_from_rdat_file(f"{self.rdat_path}/ETERNA_R48_0001.rdat", "test_cohort")
+        expected_reactivity_locations = list(range(6, 86))
+        assert(dp.name == self.first_expected_name)
+        assert(dp.sequence == self.first_expected_seq)
+        assert(dp.ground_truth_type == "SHAPE")
+        assert(list(dp.reactivity_map.keys()) == expected_reactivity_locations)
+
+    def test_init_from_rdat_files(self):
+        dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
+        actual_names = [dp.name for dp in dps]
+        actual_sequences = [dp.sequence for dp in dps]
+        assert(self.first_expected_name in actual_names)
+        assert(self.second_expected_name in actual_names)
+        assert(self.first_expected_seq in actual_sequences)
+        assert(self.second_expected_seq in actual_sequences)
+
+    def test_json_methods(self):
+        dps = DataPoint.init_from_rdat_files(self.rdat_path, "test_cohort")
+        json_file = DataPoint.to_json_file(dps, FIXTURES_DIR / "test_eterna.json")
+        test_dps = DataPoint.factory_from_json(json_file)
+        for i, dp in enumerate(dps):
+            assert dp == test_dps[i]
+        os.remove(FIXTURES_DIR / "test_eterna.json")
+
+    def test_csv_method(self):
+        real_dps = DataPoint.init_from_rdat_files(self.rdat_path)
+        test_dps = DataPoint.init_from_csv_file(self.csv_path)
+        for dp in test_dps:
+            assert(dp in real_dps)

@@ -1,10 +1,14 @@
-import math, json
+import math, json, os, csv
 
+from pathlib import Path
+from typing import Union
+
+from RNAFoldAssess.models.predictors.predictor import Predictor
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 
 class DataPoint:
-    CHEMICAL_MAPPING_TYPES = ["DMS", "SHAPE", "CMCT"]
-    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN"]
+    CHEMICAL_MAPPING_TYPES = ["DMS", "dms", "SHAPE", "shape", "CMCT", "cmct"]
+    ACCEPTABLE_GROUND_TRUTH_TYPES = CHEMICAL_MAPPING_TYPES + ["DBN", "dbn", "NONE"]
 
     def __init__(self, name, sequence, ground_truth_type=None, ground_truth_data=None, cohort=None, reads=None):
         self.name = name
@@ -14,6 +18,8 @@ class DataPoint:
         self._ground_truth_data = None
         self.ground_truth_data = ground_truth_data
         self.cohort = cohort
+        if cohort:
+            self.name = f"{cohort}_{name}"
         self.reads = reads
 
     @property
@@ -55,21 +61,22 @@ class DataPoint:
                               f"DataPoint: {self.name}\nSequence: {self.sequence}\nProvided reactivities: {gt_data}"
                     raise Exception(err_msg)
             elif type(gt_data) == dict:
-                positions = [int (i) for i in list(gt_data.keys())]
+                positions = list(gt_data.keys())
                 seq_len = len(self.sequence)
                 for p in positions:
-                    if p > seq_len:
+                    if int(p) > seq_len:
                         err_msg = f"Reactivitiy map is out of range. Encountered position {p} for " \
                                   f"sequence of length {seq_len}.\nSequence: {self.sequence}\n" \
+                                  f"Positions: {positions}\nDatapoint: {self.name}\n" \
                                   f"Note that DataPoint expects 0-indexed reactivities"
                         raise Exception(err_msg)
-                    elif p < 0:
+                    elif int(p) < 0:
                         err_msg = f"Provided a negative position for reactivity map ({p}). " \
                                    "Please provide a zero-indexed reactivity map"
                         raise Exception(err_msg)
                 new_gt_data = {}
                 for p in positions:
-                    new_gt_data[p] = gt_data[p]
+                    new_gt_data[int(p)] = gt_data[p]
                 self._ground_truth_data = new_gt_data
 
     @property
@@ -92,6 +99,13 @@ class DataPoint:
             return self.ground_truth_data
         else:
             raise Exception(f"Datapoint {self.name} does not have a DBN string")
+
+    def __eq__(self, other):
+        name = self.name == other.name
+        cohort = self.cohort == other.cohort
+        seq = self.sequence == other.sequence
+        gtd = self.ground_truth_data == other.ground_truth_data
+        return name and cohort and seq and gtd
 
     # ---------------------------------------------------------------
     # Utility methods
@@ -132,6 +146,9 @@ class DataPoint:
             return self.evaluate_prediction_with_mapping_data(prediction)
 
     def evaluate_prediction_with_known_dbn(self, prediction, lenience=0):
+        if self.ground_truth_type != "DBN":
+            raise Exception("Cannot evaluate datapoint without DBN ground-truth data")
+
         scorer = BasePairScorer(self.ground_truth_data, prediction, lenience)
         scorer.evaluate()
         return {
@@ -160,14 +177,14 @@ class DataPoint:
                 testable_reactivities,
                 DMS=True
             )
-        elif self.ground_truth_data == "SHAPE":
+        elif self.ground_truth_type == "SHAPE":
             return DSCI.score(
                 testable_seq,
                 testable_dbn,
                 testable_reactivities,
                 SHAPE=True
             )
-        elif self.ground_truth_data == "CMCT":
+        elif self.ground_truth_type == "CMCT":
             return DSCI.score(
                 testable_seq,
                 testable_dbn,
@@ -175,7 +192,7 @@ class DataPoint:
                 CMCT=True
             )
         else:
-            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_data} chemical mapping")
+            raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_type} chemical mapping")
 
 
     # ---------------------------------------------------------------
@@ -236,39 +253,97 @@ class DataPoint:
 
         return file_name
 
-    def to_constraint_file(self, path=None, reactivities=None):
-        if self.ground_truth_data not in self.CHEMICAL_MAPPING_TYPES and not reactivities:
-            raise Exception(f"Cannot write constraint file for {self.name}: no reactivities given")
+    # def to_constraint_file(self, path=None, reactivities=None):
+    #     TODO: Uncomment and fix problems here
+    #     if self.ground_truth_data not in self.CHEMICAL_MAPPING_TYPES and not reactivities:
+    #         raise Exception(f"Cannot write constraint file for {self.name}: no reactivities given")
 
-        if not reactivities:
-            reactivities = self.ground_truth_data
+    #     if not reactivities:
+    #         reactivities = self.ground_truth_data
 
-        file_name = f"{self.name}.cf"
-        if path:
-            file_name = f"{path}/{file_name}"
+    #     file_name = f"{self.name}.cf"
+    #     if path:
+    #         file_name = f"{path}/{file_name}"
 
-        is_dms = self.ground_truth_type == "DMS"
-        is_cmct = self.ground_truth_type = "CMCT"
+    #     is_dms = self.ground_truth_type == "DMS"
+    #     is_cmct = self.ground_truth_type = "CMCT"
 
-        if is_dms:
-            non_reactants = ["G", "T", "U"]
-        elif is_cmct:
-            non_reactants = ["A", "C", "G"]
+    #     if is_dms:
+    #         non_reactants = ["G", "T", "U"]
+    #     elif is_cmct:
+    #         non_reactants = ["A", "C", "G"]
+    #     else:
+    #         # Otherwise, it's SHAPE
+    #         non_reactants = []
+
+    #     fstring = ""
+    #     for i in range(len(reactivities)):
+    #         mu = str(reactivities[i])
+    #         if self.sequence[i] in non_reactants:
+    #             mu = "-999"
+    #         fstring += str(i + 1) + "\t" + mu + "\n"
+
+    #     with open(file_name, "w") as fh:
+    #         fh.write(fstring)
+
+    #     return file_name
+
+    def to_dictionary(self):
+        obj = {
+            "name": self.name,
+            "sequence": self.sequence,
+            "ground_truth_type": self.ground_truth_type
+        }
+
+        if self.ground_truth_type == "DBN":
+            obj["dbn"] = self.structure
         else:
-            # Otherwise, it's SHAPE
-            non_reactants = []
+            obj["reactivity_map"] = self.ground_truth_data
 
-        fstring = ""
-        for i in range(len(reactivities)):
-            mu = str(reactivities[i])
-            if self.sequence[i] in non_reactants:
-                mu = "-999"
-            fstring += str(i + 1) + "\t" + mu + "\n"
+        if self.cohort:
+            name = self.name.replace(f"{self.cohort}_", "")
+            obj["name"] = name
+            obj["cohort"] = self.cohort
 
-        with open(file_name, "w") as fh:
+        if self.reads:
+            obj["reads"] = self.reads
+
+        return obj
+
+    @staticmethod
+    def to_csv_file(dp_list, path:Union[str, Path]="./datapoitns.csv"):
+        headers = "name,sequence,ground_truth_type,ground_truth_data\n"
+        lines = []
+        for dp in dp_list:
+            line = f"{dp.name},{dp.sequence},{dp.ground_truth_type},"
+            if dp.ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+                reactivity_map = dp.reactivity_map
+                ground_truth_data = ";".join([f"{p}:{r}" for p, r in reactivity_map.items()])
+            elif dp.ground_truth_type in ["DBN", "dbn"]:
+                ground_truth_data = dp.ground_truth_data
+            else:
+                ground_truth_data = None
+            line += f"{ground_truth_data}"
+            lines.append(line)
+
+        fstring = headers + "\n".join(lines)
+        with open(path, "w") as fh:
             fh.write(fstring)
 
-        return file_name
+        return path
+
+
+    @staticmethod
+    def to_json_file(dp_list, path:Union[str, Path]="./datapoints.json"):
+        dict_list = []
+        for dp in dp_list:
+            dict_list.append(dp.to_dictionary())
+
+        with open(path, "w") as fh:
+            json.dump(dict_list, fh)
+
+        return path
+
 
     # ---------------------------------------------------------------
     # Initialization methods
@@ -282,14 +357,18 @@ class DataPoint:
             else:
                 name = list(dict_object.keys())[0]
                 dict_object = dict_object[name]
-        if cohort:
-            name = f"{cohort}_{name}"
+
+        if "cohort" in dict_object.keys():
+            cohort = dict_object["cohort"]
+
         seq = dict_object.get("sequence", None)
         reads = dict_object.get("reads", None)
-        reactivities = dict_object.get("data", None)
+        reactivities = dict_object.get("reactivity_map", None)
+        if not reactivities:
+            reactivities = dict_object.get("data", None)
         dbn_string = dict_object.get("dbn", None)
         if reactivities:
-            ground_truth_type = dict_object.get("experiment_type", "DMS") # default to DMS since it is the least harmful assumption
+            ground_truth_type = dict_object.get("ground_truth_type", "DMS") # default to DMS since it is the least harmful assumption
             ground_truth_data = reactivities
         elif dbn_string:
             ground_truth_type = "DBN"
@@ -316,8 +395,23 @@ class DataPoint:
         name = name_line.replace(">", "").replace(" ", "_")
         seq = data[1]
         dbn = data[2]
-        dp = DataPoint(name, seq, cohort=cohort, ground_truth_type="dbn", ground_truth_data=dbn)
+        dp = DataPoint(name, seq, cohort=cohort, ground_truth_type="DBN", ground_truth_data=dbn)
         return dp
+
+    @staticmethod
+    def init_from_dbn_files(directory_with_dbns, cohort=None):
+        files = [f for f in os.listdir(directory_with_dbns) if f.endswith(".dbn")]
+
+        if len(files) == 0:
+            return []
+
+        datapoints = []
+        for f in files:
+            path = f"{directory_with_dbns}/{f}"
+            dp = DataPoint.init_from_dbn_file(path, cohort)
+            datapoints.append(dp)
+
+        return datapoints
 
 
     @staticmethod
@@ -341,7 +435,129 @@ class DataPoint:
 
         datapoints = []
         for datum in json_data:
-            datapoints.append(DataPoint.init_from_dict(datum, name_prefix))
+            datapoints.append(DataPoint.init_from_dict(datum, cohort=name_prefix))
+
+        return datapoints
+
+    @staticmethod
+    def init_from_rdat_file(path, cohort=None):
+        name = path.split("/")[-1].replace(".rdat", "")
+        with open(path) as fh:
+            rdat_data = fh.readlines()
+
+        # Find the first "ANNOTATION_DATA" entry
+        annotation_data_line = ""
+        for line in rdat_data:
+            if line.startswith("ANNOTATION_DATA"):
+                annotation_data_line = line
+                break
+
+        # The line is delimted by tabs
+        annotation_data = annotation_data_line.split("\t")
+
+        # The chemical type is in an item that starts with "modifier"
+        # It's written as "modifier:type"
+        for ad in annotation_data:
+            if "modifier" in ad:
+                experiment_type = ad.split(":")[1]
+                break
+
+        # The sequence is in an item that starts with "sequence"
+        # It's written as "sequence:XXXX..XX"
+        for ad in annotation_data:
+            if "sequence" in ad:
+                sequence = ad.split(":")[1].strip() # Remove \n character
+                break
+
+        # The positions for which the readings are available are annotated
+        # in a line that starts with SEQPOS
+        seqpos_line = ""
+        for line in rdat_data:
+            if line.startswith("SEQPOS"):
+                seqpos_line = line
+                break
+
+        # SEQPOS annotates the positions in a 1-indexed list like this:
+        # X1, X2, X3
+        # We will split the line, remove the X's, and subtract 1 from the number
+        positions = []
+        for pos in seqpos_line.split("\t")[1:]: # Ignore the first item that is "SEQPOS"
+            pos = pos.replace("X", "") # remove the X
+            pos = int(pos) - 1
+            positions.append(pos)
+
+        # Now we get the first line of reactivities. Since we used ANNOTATION_DATA:1,
+        # we will use the REACTIVITY:1 line.
+        reactivity_line = ""
+        for line in rdat_data:
+            if line.startswith("REACTIVITY:1"):
+                reactivity_line = line
+                break
+
+        # Reactivities are separated by tabs, we just need to make them into floats
+        reactivities = []
+        for r in reactivity_line.split("\t")[1:]:
+            reactivities.append(float(r))
+
+        reactivity_map = {}
+        for i, p in enumerate(positions):
+            reactivity_map[p] = reactivities[i]
+
+        dp = DataPoint(
+            name=name,
+            sequence=sequence,
+            ground_truth_type=experiment_type,
+            ground_truth_data=reactivity_map,
+            cohort=cohort
+        )
+
+        return dp
+
+    @staticmethod
+    def init_from_rdat_files(directory_with_rdats, cohort=None):
+        files = [f for f in os.listdir(directory_with_rdats) if f.endswith(".rdat")]
+
+        if len(files) == 0:
+            return []
+
+        datapoints = []
+        for f in files:
+            path = f"{directory_with_rdats}/{f}"
+            dp = DataPoint.init_from_rdat_file(path, cohort)
+            datapoints.append(dp)
+
+        return datapoints
+
+    @staticmethod
+    def init_from_csv_file(csv_path:Union[str,Path], cohort=None):
+        if type(csv_path) != Path:
+            csv_path = Path(csv_path)
+
+        with csv_path.open(newline='', encoding='utf-8') as fh:
+            reader = csv.DictReader(fh)
+            rows = [row for row in reader]
+
+        datapoints = []
+        for row in rows:
+            name = row["name"]
+            sequence = row["sequence"]
+            ground_truth_type = row["ground_truth_type"]
+            ground_truth_data = row["ground_truth_data"]
+            if ground_truth_type in DataPoint.CHEMICAL_MAPPING_TYPES:
+                spl = ground_truth_data.split(";")
+                mapping = {}
+                for item in spl:
+                    pos, reactivity = item.split(":")
+                    if reactivity == "":
+                        continue
+                    pos = int(pos)
+                    reactivity = float(reactivity)
+                    mapping[pos] = reactivity
+                ground_truth_data = mapping
+            if not ground_truth_type:
+                ground_truth_type = "NONE"
+            datapoint = DataPoint(name, sequence, ground_truth_type, ground_truth_data, cohort)
+            datapoints.append(datapoint)
 
         return datapoints
 
