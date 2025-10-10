@@ -71,6 +71,12 @@ class SecondaryStructureTools:
                         break
         return bps
 
+    @staticmethod
+    def get_pairings(sequence: str, structure: str) -> list[str]:
+        pair_coords = SecondaryStructureTools.parse_structure(structure)
+        nts = [f"{sequence[x]}{sequence[y]}" for x, y in pair_coords]
+        return nts
+
 
 class SecondaryStructureToolsException(Exception):
     pass
