@@ -17,8 +17,8 @@ class Predictor:
         executable in the `__init__` parameters.
         """
         self.output = ""
-    
-    def execute(self):
+
+    def execute(self, datapoint) -> None:
         """
         This method should encapsulate the requirments for running a
         tool's prediction algorithm given an RNA sequence, and
@@ -55,8 +55,8 @@ class Predictor:
         the `output` variable to be the return value of `fold`.
         """
         raise NotImplementedError
-    
-    def get_ss_prediction(self):
+
+    def get_ss_prediction(self) -> str:
         """
         This method should include the logic for parsing the class's
         `output` attribute and returning a dot-bracket notation of
@@ -82,7 +82,7 @@ class Predictor:
         return the first item of the output attribute.
         """
         raise NotImplementedError
-    
+
     def get_mfe(self):
         """
         This method, while not required, may be of use to some
@@ -102,3 +102,6 @@ class Predictor:
         output attribute.
         """
         raise NotImplementedError
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
