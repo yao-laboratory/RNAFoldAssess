@@ -1,51 +1,6 @@
 class SecondaryStructureTools:
-    asterisks  = "*" * 76
-    ss_string = "Secondary structures"
-
     @staticmethod
-    def parse_structure_file(path):
-        """
-        This method parses the standard-output generated from the
-        x3dna DSSR method. Usually, we just use the files that
-        tool outputs, but sometimes we pipe the entire output to
-        a file. This method can read such a file and return an
-        object from it. The object is a Python dictionary object
-        with name, sequence, structure, and chains key-value pairs.
-        """
-        f = open(path)
-        raw_data = f.read()
-        data = raw_data.split(SecondaryStructureTools.asterisks)
-        ss_data = None
-        for d in data:
-            if SecondaryStructureTools.ss_string in d:
-                ss_data = d
-                break
-        if not ss_data:
-            raise SecondaryStructureToolsException(f"No secondary structure in {path}")
-        ss_data = ss_data.split("\n")
-        whole_seq = ""
-        whole_structure = ""
-        chains = []
-        for i in range(len(ss_data)):
-            if "[whole]" in ss_data[i]:
-                whole_seq = ss_data[i+1]
-                whole_structure = ss_data[i+2]
-            if "[chain]" in ss_data[i]:
-                chain_id = ss_data[i].split("-")[1].split(" ")[0]
-                chains.append({
-                    "chain_id": chain_id,
-                    "sequence": ss_data[i+1],
-                    "structure": ss_data[i+2]
-                })
-        return {
-            "name": path.split(".")[0].split("/")[-1],
-            "sequence": whole_seq,
-            "structure": whole_structure,
-            "chains": chains
-        }
-
-    @staticmethod
-    def symmetric_chain(dbn, count_square_brackets=False):
+    def symmetric_chain(dbn: str, count_square_brackets: bool = False) -> bool:
         """
         Returns true if the given RNA chain is symmeteric. This
         is useful because most prediction models assume an input
@@ -56,9 +11,8 @@ class SecondaryStructureTools:
 
         ...(((..&..)))...
 
-        The output of x3dna and the `parse_structure_file` method
-        above will return two chains from this secondary structure,
-        neither of which will be symmetric:
+        The output of x3dna will return two chains from this
+        secondary structure, neither of which will be symmetric:
 
         Chain 1 secondary structure:
         ...(((..
@@ -78,19 +32,45 @@ class SecondaryStructureTools:
         structure string is not symmetric so that users can filter
         out un-predictable secondary structures from their data sets.
         """
-        if count_square_brackets:
-            dbn = dbn.replace("[", "(").replace("]", ")")
         return dbn.count("(") == dbn.count(")")
 
     @staticmethod
-    def contains_pseudoknots(dbn):
+    def contains_pseudoknots(dbn: str) -> bool:
         """
         Most dot-bracket schemas tends to use square brackets to
         annotate pseudoknots. Since many secondary structure prediction
         algorithms cannot predict pseudoknots, this method allows users
         to detect pseudoknots in their data sets.
         """
-        return ("[" in dbn or "]" in dbn)
+        return ("[" in dbn or "]" in dbn or "{" in dbn or "}" in dbn)
+
+    @staticmethod
+    def parse_structure(structure: str) -> list[tuple[int, int]]:
+        """
+        Return the 0-indexed coordinates of base pairs in a given
+        secondary structure string.
+        """
+        # structure exampe: "..((((...))))..((..))."
+        bps = []
+        for i1, c1 in enumerate(structure):
+            if c1 != '(':
+                continue
+            count = 1
+            for i2, c2 in enumerate(structure[i1 + 1:]):
+                if c2 == '(':
+                    count += 1
+                elif c2 == ')':
+                    count -= 1
+                    if count == 0:
+                        bps.append((i1, i1 + i2 + 1))
+                        break
+        return bps
+
+    @staticmethod
+    def get_pairings(sequence: str, structure: str) -> list[str]:
+        pair_coords = SecondaryStructureTools.parse_structure(structure)
+        nts = [f"{sequence[x]}{sequence[y]}" for x, y in pair_coords]
+        return nts
 
 
 class SecondaryStructureToolsException(Exception):

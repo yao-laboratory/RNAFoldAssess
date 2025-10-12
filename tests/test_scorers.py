@@ -1,7 +1,7 @@
 import pytest
 
 from RNAFoldAssess.models import Scorer, DSCI, DataPoint, BasePairScorer, BasePairPseudoknotScorer
-from RNAFoldAssess.models import DSCIException, DSCIValueError
+from RNAFoldAssess.models import DSCIException
 
 class TestBaseClass:
     scorer = Scorer(

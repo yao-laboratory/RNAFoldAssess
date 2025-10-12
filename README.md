@@ -23,6 +23,8 @@ pip install -e . # Install this package
 
 NOTE: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
+## Checking the installation
+
 Now, let's make sure the installation was successful. Either run the following code a script or line by line in the Python terminal:
 
 ```python
@@ -40,15 +42,31 @@ report = scorer.report(precision=5)
 print(report) # Sensitivity: 0.33333, PPV: 0.5, F1: 0.4
 ```
 
-If the value of `report` is `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
+If printing `report` shows `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
 
 # Usage
 
-RNAFoldAssess is a framework for comparing the effectiveness of RNA secondary structure prediction tools. Let's consider an example.
+RNAFoldAssess is a framework for benchmarking RNA secondary-structure prediction tools. Given RNA sequences and ground-truth data (e.g., chemical-mapping reactivities or reference structures), it wraps a prediction model to generate structures and then scores those predictions against the ground truth.
+
+Out of the box, the framework includes:
+
+* One structure prediction tool wrapper (RNAFold) that you can use right away or as a template for other tools.
+
+* Two scoring schemes:
+
+  * Chemical-mapping scoring: DSCI (designed for reactivity-based evaluation).
+
+  * Structure scoring: Base-pair classification metrics—PPV (precision), sensitivity (recall), and F1—computed from TP/FP/FN over predicted vs. reference base pairs.
+
+The framework is necessarily extensible. Users can wrap new or existing predictors by implementing the `Predictor` interface and register custom scoring schemes if the provided ones don’t fit the task.
+
+RNAFoldAssess also provides convenience functions that allow users to run a model over an entire dataset, score the predictions, and export results to CSV for downstream analysis.
+
+Finally, the package also provides helper functions for common secondary-structure analysis tasks to streamline exploratory work.
 
 ## A Simple Example
 
-You collected SHAPE readings on an RNA with the sequence ACUGACUGAAAAAAAA and got the following readings:
+You collected SHAPE readings on an RNA with the sequence ACUGACUGAAAAAAAA and got the following reactivities:
 ```
 0.750, 0.875, 0.493, 0.280, 0.662, 0.478, 0.223, 0.360, 0.840, 0.883, 0.608, 0.988, 0.933, 0.685, 0.673, 0.673
 ```
@@ -100,11 +118,15 @@ The `DSCI.score` method returns a Python dictionary with the keys `accuracy` and
 
 ## Scorers
 
-The RNAFoldAssess package comes with three scorers, `DSCI`, `BasePairScorer`, and `BasePairPseudoknotScorer`. The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other two scorers are used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
+The RNAFoldAssess package comes with two scorers, `DSCI` and `BasePairScorer` (There is an experimental `BasePairPseudoknotScorer` for structures with pseudoknots but it has not yet been thoroughly tested). The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other scorer is used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
 
 ### DSCI
 
+*To learn more abotu this scoring scheme, please refer to the paper [Insights into the secondary structural ensembles of the full SARS-CoV-2 RNA genome in infected cells](https://www.biorxiv.org/content/10.1101/2020.06.29.178343v2.full).*
+
 The `DSCI` scorer implements the Mann-Whitney U-test and evaluates a sequence and a dbn-formatted prediction against chemical mapping data (the ground-truth for that RNA). The score is returned as a two-item dictionary with `accuracy` and `p` keys, the `accuracy` being the calculation of the U-test, and the `p` being the p-value of the test.
+
+The scoring method essentially quantifies the probability that a randomly chosen base predicted to be unpaired will have higher reactivitiy than a randomly chosen unpaired base.
 
 The `DSCI.score` method wokrs for SHAPE and DMS reactivities. In the case of DMS, reactivities aligned with guanine (G) and adenine (A) are not factored into the calculation, as DMS does not react with those nucleotides.
 
@@ -277,6 +299,28 @@ TODO:
 **`init_from_seq_file`**:
 
 **`factory_from_json`**
+
+
+## Utility Functions
+
+RNAFoldAssess comes with a variety of utility fucntions that may be helpful in working with RNA data. See the list below for a descript of each function.
+
+| Namespace and Function Name                    | Function Signature                                                                                                                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DSSR.get_ss_from_pdb`                         | `path_to_pdb`: path to a PDB file<br>`destination_dir`: the directory to write the results<br>returns a DBN string                                             | Handles the secondary structure output generated by the x3DNA tool DSSR. Returns secondary structure dot-bracket notation and writes it to a file in the destination dir; the file will be called `PDBID.dbn`, where `PDBID` is the name of the PDB file minus the file extension. For example, passing `8K1E.pdb` will generate `8K1E.dbn` in `destination_dir`. Users must set an environment variable `DSSR_PATH` that points to the `dssr` executable in the `x3dna/bin` folder locally. |
+| `Normalizers.simple_normalizer`                | `data`: collection of numeric values<br>returns a list of floats                                                                                             | Takes a collection of numeric values, finds the largest number in that list, and divides every item by that number. Ensures a list of values between 0 and 1.                                                                                                                                                                                                                                                                                                                                |
+| `Normalizers.set_neg_to_0_and_normalize`       | `data`: collection of numeric values<br>returns a list of floats                                                                                             | Similar to `simple_normalizer` except it first changes all negative numbers to 0. Useful for chemical probing data that may erroneously record negative reactivities.                                                                                                                                                                                                                                                                                                                        |
+| `PDBTools.get_pdb_file`                        | `rna_id`: a PDB ID of the RNA<br>`destination_dir`: where you want the file downloaded<br>Void function                                                        | Downloads a PDB file by ID to the provided directory. Uses `wget`; if it’s not installed, this function will not work (most operating systems include it).                                                                                                                                                                                                                                                                                                                                   |
+| `PDBTools.get_mmcif_file`                      | `rna_id`: a PDB ID of the RNA<br>`destination_dir`: where you want the file downloaded<br>Void function                                                        | Downloads an mmCIF file by ID to the provided directory. Uses `wget`; if it’s not installed, this function will not work (most operating systems include it).                                                                                                                                                                                                                                                                                                                                |
+| `PDBTools.get_molecule_from_ebi`               | `pdb_id`: the PDB ID of the RNA<br>returns JSON data                                                                                                         | Calls the PDBe API (EBI). Constructs an HTTP request for the given PDB ID and returns the JSON data.                                                                                                                                                                                                                                                                                                                                                                                         |
+| `SecondaryStructureTools.symmetric_chain`      | `dbn`: a string of dot-bracket notation<br>returns a boolean                                                                                                 | Returns true if the given DBN string is balanced—i.e., has as many open parentheses as closed parentheses. Useful for x3DNA output that may include inter-chain base pairing.                                                                                                                                                                                                                                                                                                                |
+| `SecondaryStructureTools.contains_pseudoknots` | `dbn`: a string of dot-bracket notation<br>returns a boolean                                                                                                 | Returns true if the given DBN string contains pseudoknot notation (e.g., square or curly brackets).                                                                                                                                                                                                                                                                                                                                                                                          |
+| `SecondaryStructureTools.parse_structure`      | `structure`: a string in dot-bracket notation of a secondary structure<br>returns a list of two-tuples                                                       | Returns a list of two-tuples where each tuple holds the 0-indexed positions of base-paired nucleotides. For example, the string `..(..(..)..)..` would return `[(2, 11), (5, 8)]` because the nucleotide at position 2 is base-paired to position 11, and the nucleotide at position 5 is paired with position 8.                                                                                                                                                                            |
+| `SecondaryStructureTools.get_pairings`         | `sequence`: a string of RNA nucleotides<br>`structure`: a string in dot-bracket notation of a secondary structure<br>returns a list of base-paired nucleotides | Returns a list of two-character strings, each containing the nucleotides of a base pair. For example, if the sequence is `ACAAAUGAA` and the structure is `.((..))..`, this method will return `["CG", "AU"]`.                                                                                                                                                                                                                                                                               |
+| `SequenceTools.generate_kmers`                 | `sequence`: a string of RNA nucleotides<br>`k`: an integer<br>returns a list of kmers                                                                          | Returns the list of k-mers for the given sequence and k. For example, inputting `ACUCCG` and `3` outputs `ACU`, `CUC`, `UCC`, `CCG`.                                                                                                                                                                                                                                                                                                                                                         |
+| `SequenceTools.count_homopolymers`             | `sequence`: a string of RNA nucleotides<br>`k`: an integer<br>`nucleotide`: a one-character string of A, C, U, or G<br>returns an i_                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+If you have requests for new functions, please contact the authors or feel free to open a pull request!
+
 
 
 ## Example Pipeline
