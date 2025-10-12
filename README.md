@@ -23,6 +23,8 @@ pip install -e . # Install this package
 
 NOTE: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
+## Checking the installation
+
 Now, let's make sure the installation was successful. Either run the following code a script or line by line in the Python terminal:
 
 ```python
@@ -40,15 +42,31 @@ report = scorer.report(precision=5)
 print(report) # Sensitivity: 0.33333, PPV: 0.5, F1: 0.4
 ```
 
-If the value of `report` is `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
+If printing `report` shows `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
 
 # Usage
 
-RNAFoldAssess is a framework for comparing the effectiveness of RNA secondary structure prediction tools. Let's consider an example.
+RNAFoldAssess is a framework for benchmarking RNA secondary-structure prediction tools. Given RNA sequences and ground-truth data (e.g., chemical-mapping reactivities or reference structures), it wraps a prediction model to generate structures and then scores those predictions against the ground truth.
+
+Out of the box, the framework includes:
+
+* One structure prediction tool wrapper (RNAFold) that you can use right away or as a template for other tools.
+
+* Two scoring schemes:
+
+  * Chemical-mapping scoring: DSCI (designed for reactivity-based evaluation).
+
+  * Structure scoring: Base-pair classification metrics—PPV (precision), sensitivity (recall), and F1—computed from TP/FP/FN over predicted vs. reference base pairs.
+
+The framework is necessarily extensible. Users can wrap new or existing predictors by implementing the `Predictor` interface and register custom scoring schemes if the provided ones don’t fit the task.
+
+RNAFoldAssess also provides convenience functions that allow users to run a model over an entire dataset, score the predictions, and export results to CSV for downstream analysis.
+
+Finally, the package also provides helper functions for common secondary-structure analysis tasks to streamline exploratory work.
 
 ## A Simple Example
 
-You collected SHAPE readings on an RNA with the sequence ACUGACUGAAAAAAAA and got the following readings:
+You collected SHAPE readings on an RNA with the sequence ACUGACUGAAAAAAAA and got the following reactivities:
 ```
 0.750, 0.875, 0.493, 0.280, 0.662, 0.478, 0.223, 0.360, 0.840, 0.883, 0.608, 0.988, 0.933, 0.685, 0.673, 0.673
 ```
@@ -100,11 +118,15 @@ The `DSCI.score` method returns a Python dictionary with the keys `accuracy` and
 
 ## Scorers
 
-The RNAFoldAssess package comes with three scorers, `DSCI`, `BasePairScorer`, and `BasePairPseudoknotScorer`. The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other two scorers are used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
+The RNAFoldAssess package comes with two scorers, `DSCI` and `BasePairScorer` (There is an experimental `BasePairPseudoknotScorer` for structures with pseudoknots but it has not yet been thoroughly tested). The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other scorer is used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
 
 ### DSCI
 
+*To learn more abotu this scoring scheme, please refer to the paper [Insights into the secondary structural ensembles of the full SARS-CoV-2 RNA genome in infected cells](https://www.biorxiv.org/content/10.1101/2020.06.29.178343v2.full).*
+
 The `DSCI` scorer implements the Mann-Whitney U-test and evaluates a sequence and a dbn-formatted prediction against chemical mapping data (the ground-truth for that RNA). The score is returned as a two-item dictionary with `accuracy` and `p` keys, the `accuracy` being the calculation of the U-test, and the `p` being the p-value of the test.
+
+The scoring method essentially quantifies the probability that a randomly chosen base predicted to be unpaired will have higher reactivitiy than a randomly chosen unpaired base.
 
 The `DSCI.score` method wokrs for SHAPE and DMS reactivities. In the case of DMS, reactivities aligned with guanine (G) and adenine (A) are not factored into the calculation, as DMS does not react with those nucleotides.
 
