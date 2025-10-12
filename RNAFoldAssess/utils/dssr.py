@@ -1,8 +1,8 @@
 import os
 
 
-dssr_path = "/home/yesselmanlab/ewhiting/x3dna/bin/x3dna-dssr"
-dbn_path = ""
+# Replace with the path to your own x3dna-dssr binary
+dssr_path = os.getenv("DSSR_PATH")
 
 class DSSR:
     """
@@ -21,12 +21,10 @@ class DSSR:
         try:
             os.system(cmd_string)
             # Get the ss output string
-            f = open("dssr-2ndstrs.dbn")
-            data = f.read()
-            f.close()
-            dbn_file = open(f"{destination_dir}/{name}.dbn", "w")
-            dbn_file.write(data)
-            dbn_file.close()
+            with open("dssr-2ndstrs.dbn") as fh:
+                data = fh.read()
+            with open(f"{destination_dir}/{name}.dbn", "w") as dbn_file:
+                dbn_file.write(data)
             # Remove generated files that we don't need
             os.system("rm dssr-*")
             return data

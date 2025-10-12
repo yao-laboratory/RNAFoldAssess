@@ -32,12 +32,7 @@ class SecondaryStructureTools:
         structure string is not symmetric so that users can filter
         out un-predictable secondary structures from their data sets.
         """
-        bp_sym = dbn.count("(") == dbn.count(")")
-        if count_square_brackets:
-            pseudoknot_sym = dbn.count("[") == dbn.count("]")
-            return bp_sym and pseudoknot_sym
-        else:
-            return bp_sym
+        return dbn.count("(") == dbn.count(")")
 
     @staticmethod
     def contains_pseudoknots(dbn: str) -> bool:
