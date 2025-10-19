@@ -1,3 +1,4 @@
+import logging
 import math, json, os, csv
 
 from pathlib import Path
@@ -5,6 +6,7 @@ from typing import Union
 
 from RNAFoldAssess.models.scorers import DSCI, BasePairScorer
 from RNAFoldAssess.utils.sequence_tools import SequenceTools
+from RNAFoldAssess.utils.normalizers import Normalizers
 
 class DataPoint:
     CHEMICAL_MAPPING_TYPES = ["DMS", "dms", "SHAPE", "shape", "CMCT", "cmct"]
@@ -172,6 +174,13 @@ class DataPoint:
             )
         else:
             raise Exception(f"RNAFoldAssess does not currently support scoring for {self.ground_truth_type} chemical mapping")
+
+    def has_polyA_decreasing_reactivity(self, a_length=4):
+        if self.ground_truth_type not in DataPoint.CHEMICAL_MAPPING_TYPES:
+            logging.warning(f"You are chcking {self.name} for decreasing chemical probing reactivities, but {self.name} does not have chemical reactivity data. Returning False")
+            return False
+        decreasing_spans = Normalizers.detect_reactivity_dropoff_in_polyA(self.sequence, self.reactivity_map, a_length)
+        return len(decreasing_spans) > 0
 
 
     # ---------------------------------------------------------------
