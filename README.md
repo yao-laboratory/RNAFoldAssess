@@ -1,6 +1,18 @@
 # RNAFoldAssess
 A framework for comparing RNA secondary structure prediction algorithms
 
+# Purpose
+
+The purpose of the RNAFoldAssess package is to compare the performance of multiple RNA secondary structure prediction tools. The package comes with some predictor models, evaluation schemes, and utility functions to support unbiased analysis. The package can be extended to add other predictor models or evaluation schemes and provides instructions for how to do so.
+
+## Overview
+
+A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground truth for that RNA is available (e.g., known structures or chemical-probing reactivities), predictions can be evaluated against it and assigned numerical scores.
+
+Researchers in this area are often interested in comparing how a new prediction tool performs compared to well-known existing ones, or how existing prediction tools perform on a new set of RNA data. In such cases, they gather multiple prediction tools of interest, generate a prediction for each RNA in a dataset, score the predictions, and compare the scores of the different tools.
+
+RNAFoldAssess streamlines this process by providing a framework for developing reusable and repeatable prediction evaluation pipelines. The package provides a `DataPoint` class for working with RNA data, a `Predictor` parent class for wrapping prediction tools in Python classes, and a `Scorer` parent class for defining prediction evaluation schemes. These classes together with utility methods privded in the `PredictionPipeline` class, creating reproducible pipelines for RNA secondary structure prediction analysis can be done with very few lines of code.
+
 # Installation
 
 RNAFoldAssess is not yet available on the Python Package Index. In the meantime, you can either download the package by clicking the "Code" button in the top right corner of this GitHub page and selecting "Download ZIP" and then extracting the compressed file.

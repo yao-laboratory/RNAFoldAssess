@@ -2,14 +2,6 @@
 
 This tutorial will guide users on how to use RNAFoldAssess. It will cover a brief description of the package's purpose, then run through some examples with data provided in the `./example` directory.
 
-# Purpose
-
-The purpose of the RNAFoldAssess package is to compare the performance of multiple RNA secondary structure prediction tools. The package comes with some predictor models, scoring schemes, and utility functions to support unbiased evaluation. The package is also able to be extended to add other predictor models or scoring schemes and provides instructions for how to do so.
-
-## Overview
-
-Typically, an RNAFoldAssess user will either have a new set of RNA secondary structure data, or a new secondary structure predction model. In either case, the typical goal is to evaluate two or more models against one or more set of data. In either case, the user will pick some number of prediction algorithms to run on some set of data, and then evaluate the performance of each model on each set of data. RNAFoldAssess supports prediction models by wrapping the tool in a `predictor` class. The model's prediciton of a secondary structure is then scored via some scoring scheme. Scoring schemes are supported in RNAFoldAssess via the `Scorer` base class. RNAFoldAssess comes with 3 different scoring schemes, one for chemical mapping, and two for known structure; one that accounts for pseudoknots and one that doesn't.
-
 ## Example Use Cases
 
 ### Evaluating a new model
