@@ -15,13 +15,19 @@ RNAFoldAssess streamlines this process by providing a framework for developing r
 
 # Installation
 
-RNAFoldAssess is not yet available on the Python Package Index. In the meantime, you can either download the package by clicking the "Code" button in the top right corner of this GitHub page and selecting "Download ZIP" and then extracting the compressed file.
+RNAFoldAssess is not yet available on the Python Package Index. In the meantime, follow the installation steps outlined below:
 
-You can also download the repository via Git with the following command:
+## Get the files
+
+First, you need the source code. One way you can get it is by clicking the "Code" button in the top right corner of this GitHub page and selecting "Download ZIP" and then extracting the compressed file.
+
+Alternatively, you can download the repository via Git with the following command:
 
 ```bash
 git clone git@github.com:yao-laboratory/RNAFoldAssess.git
 ```
+
+## Install dependencies and package
 
 Once you've either extracted the compressed folder or downloaded the repository from git, you install the framework with the following commands:
 
@@ -33,11 +39,11 @@ pip install -r requirements.txt # Install package's requirements
 pip install -e . # Install this package
 ```
 
-NOTE: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
+**NOTE**: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
 ## Checking the installation
 
-Now, let's make sure the installation was successful. Either run the following code a script or line by line in the Python terminal:
+Now ensure that the installation was successful. Either run the following code in a script or line by line in the Python terminal:
 
 ```python
 from RNAFoldAssess.models import BasePairScorer
@@ -55,6 +61,14 @@ print(report) # Sensitivity: 0.33333, PPV: 0.5, F1: 0.4
 ```
 
 If printing `report` shows `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
+
+## Optional: Run the tests
+
+If you want to make sure all RNAFoldAssess tests pass on your own machine, you can do so by running the following command in the project's root:
+
+```bash
+$> pytest tests/
+```
 
 # Usage
 
