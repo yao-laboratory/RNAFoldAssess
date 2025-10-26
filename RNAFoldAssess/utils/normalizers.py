@@ -57,12 +57,12 @@ class Normalizers:
         spans_with_increasing_reactivity = []
         for r_index, rtt in enumerate(reactivities_to_test):
             increases_in_a_row = 0
-            for i, r in enumerate(rtt):
+            for i, reac in enumerate(rtt):
                 if i == len(rtt) - 1:
                     break
-                if r is None or rtt[i+1] is None:
+                if reac is None or rtt[i+1] is None:
                     continue
-                if r > rtt[i+1]:
+                if reac >= rtt[i+1]:
                     break
                 else:
                     increases_in_a_row += 1

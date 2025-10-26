@@ -37,7 +37,7 @@ class TestNormalizationMethods:
         assert(expected_reactivity_map == result)
 
 
-    def test_detect_reactivity_dropoff(self):
+    def test_detect_reactivity_dropoff_happy_path(self):
         seq = "CAAAACCAAAAAAU"
         reactivity_map = {
             1: 0.1, 2: 0.2, 3: 0.4, 4: 0.45,
@@ -45,4 +45,16 @@ class TestNormalizationMethods:
         }
         spans_with_decreasing_reactivity = Normalizers.detect_reactivity_dropoff_in_polyA(seq, reactivity_map)
         expected_span = [[4, 3, 2, 1]]
+        assert(spans_with_decreasing_reactivity == expected_span)
+
+    def test_detect_reactivity_dropoff_w_no_dropoff(self):
+        seq = "CAAAACCAAAAAAU"
+        reactivity_map = {
+            1: 0, 2: 0, 3: 0,
+            4: 0, 5: 0, 6: 0,
+            7: 0, 8: 0, 9: 0
+        }
+
+        spans_with_decreasing_reactivity = Normalizers.detect_reactivity_dropoff_in_polyA(seq, reactivity_map)
+        expected_span = []
         assert(spans_with_decreasing_reactivity == expected_span)
