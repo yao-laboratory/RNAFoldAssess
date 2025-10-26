@@ -2,21 +2,6 @@
 
 This tutorial will guide users on how to use RNAFoldAssess. It will cover a brief description of the package's purpose, then run through some examples with data provided in the `./example` directory.
 
-## Example Use Cases
-
-### Evaluating a new model
-
-Say you have developed a new secondary structure prediction tool and want to compare it with existing tools such as SPOT-RNA and EternaFold. You may decide to run each tool against the PDB RNAs and compare scores. In this case, you would create a wrapper class in the `models/predictors` directory for your tool, as well as one for SPOT-RNA and EternaFold, then create a pipeline for ingesting the data, producing the predictions, scoring the predictions, and comparing the output.
-
-### Evaluating a new sest of RNA data
-
-Another use case for RNAFoldAssess is to evaluate how difficult or easy your new RNA library is to predict. For such a use case, you would likely want to collect performance information on two or more secondary structure prediction models on your new data, as well as some existing data. In this case, you would create a wrapper class for each model and create multiple pipelines to collect performance data on both your new data and existing data.
-
-## Evaluating a new training set of RNA data
-
-As something of a combination of the previous two use cases, perhaps you have developed a new set of RNA data for model training purposes and have used it to retrain an existing model. In this case, you will likely have the out-of-the-box model and the retrained model and want to compare their performance on existing RNA datasets. For such a use case, you will need one wrapper predictor class for the retrained model and one for the default model, then you will create a pipeline to predict and score their performance against another dataset.
-
-
 # Setting up an Evaluation Pipeline
 
 In this section, we will use the example data in `/tutorial` to set up an example pipeline.
@@ -53,73 +38,20 @@ There are some utility methods that will convert RNA data into acceptable file f
 
 ### JSON data
 
-TODO: explain JSON shape requirements
+Users can also encapsulate data in JSON. For JSON data, RNAFoldAssess expects a list of dictionaries, where each dictionary has at least a `name` and `sequence` key-value pair, and *either* a `reactivity_map` or `dbn` key-value pair. See the CSV Data section above for an explanation of how those ground-truth types are used.
 
-## Using the `PredictionPipeline.run_prediction` Method
+## Prediction Pipeline Modes
 
-The `PredictionPipeline` class has a static method called `run_prediction` that can run in one of three modes. Mode 1 generates predictions from RNA data without scoring the predictions. This is useful if you have RNA data without ground-truth structure information like chemical reactivities. Mode 2 will ingest the output of mode 1 and score the predictions. This is useful if you have ground-truth data that you didn't have before and wish to score existing predictions. Mode 3 is for when you have ground truth data already and want to generate both a prediction and a score in one step. For each mode, the call to `run_prediction` will be slightly different.
+Generating secondary structure predictions from some model for a number of RNAs is a "prediction pipeline." RNAFoldAssess supports three modes for prediction pipelines:
 
-### Mode 1 - Generating Predictions with no Score
+### Mode 1 - Make and Evaluate Prediction
 
-Mode 1, the default mode, takes your RNA data along with a prediction model and generates a prediction only. That is, there is no scoring involved in this mode. This is most useful for when you have the RNA's sequence data, but not any ground truth data (such as chemical reactivities or structure information) yet. See `tutorial/tutorial_scripts/mode1_generate_predictions_only.py` for example usage.
+TODO
 
-```python
-PredictionPipeline.run_prediction(
-    dp_list,
-    model,
-    output_path,
-    prediction_mode
-)
-```
+### Mode 2 - Make Prediction Only
 
-The `dp_list` parameter takes a `list` of `DataPoint` objects. `DataPoint` objects can be created in various ways, usually by feeding a CSV file to the `DataPoint` class's static `init_from_csv_file` method. See the section above for creating CSV files that work with RNAFoldAssess.
+TODO
 
-The `model` parameter has to be an object of type `Predictor`. The parent `Predictor` class enforces methods that have to be defined in order for the package to work. This package comes with an `RNAFold` class, a child of `Predictor`. See the example scripts for how to use.
+### Mode 3 - Evaluate Existing Predictions
 
-The `output_path` parameter is just a string that defines a relative path for where you want the prediction pipeline's output CSV to go.
-
-The `prediction_mode` parameter tells the `run_prediction` method which mode to run. Mode 1 is the default mode, so in this case, it does not have to be specified.
-
-### Mode 2 - Calculating Score from Previous Predictions
-
-Mode 2 takes the output from Mode 1 and calculates a score for the prediction. The `run_prediction` method determines from your RNA ground-truth data whether to score with DSCI or confusion-matrix-based scoring. See `tutorial/tutorial_scripts/mode2_generate_scores_from_preds.py` for example usage.
-
-```python
-PredictionPipeline.run_prediction(
-    dp_list,
-    output_path,
-    input_path,
-    prediction_mode
-)
-```
-
-The `dp_list` parameter takes a `list` of `DataPoint` objects. `DataPoint` objects can be created in various ways, usually by feeding a CSV file to the `DataPoint` class's static `init_from_csv_file` method. See the section above for creating CSV files that work with RNAFoldAssess.
-
-The `output_path` parameter is just a string that defines a relative path for where you want the prediction pipeline's output CSV to go.
-
-The `input_path` parameter is a string and should be a relative path to the file generated by mode 1. It is important that the CSV indicated in this parameter be generated by running a pipeline in mode 1 as the function expects the CSV to have specific columns.
-
-In this case, `prediction_mode` needs to be set to 2. Other acceptable arguments to run in mode 2 are "2" (as in, the string value of 2), `"from predictions"`, `"FROM PREDICTIONS"`, `"from preds"`, and `"FROM PREDS"`
-
-Note that we don't need a `model` input for this mode.
-
-### Mode 3 - Generating Predictions and Score
-Mode 3 combines Mode 1 and Mode 2 into one step. If your RNA data already has ground-truth data, use that data along with a prediction model to generate predictions for your RNA's secondarty structure as well as scores for those predictions based on your recorded ground-truth data. See `tutorial/tutorial_scripts/mode3_generate_preds_and_scores.py` for example usage.
-
-```python
-PredictionPipeline.run_prediction(
-    dp_list,
-    model,
-    output_path,
-    prediction_mode
-)
-```
-
-The `dp_list` parameter takes a `list` of `DataPoint` objects. `DataPoint` objects can be created in various ways, usually by feeding a CSV file to the `DataPoint` class's static `init_from_csv_file` method. See the section above for creating CSV files that work with RNAFoldAssess.
-
-The `model` parameter has to be an object of type `Predictor`. The parent `Predictor` class enforces methods that have to be defined in order for the package to work. This package comes with an `RNAFold` class, a child of `Predictor`. See the example scripts for how to use.
-
-The `output_path` parameter is just a string that defines a relative path for where you want the prediction pipeline's output CSV to go.
-
-To run mode 3, the `prediction_mode` parameter should be set to either 3,  "with score", "WITH SCORE", "score", or "SCORE".
-
+TODO
