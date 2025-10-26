@@ -7,20 +7,20 @@ from RNAFoldAssess.models.predictors import Predictor
 
 class PredictionPipeline:
     PREDICITON_MODES = {
-        'without score': 1,
-        'WITHOUT SCORE': 1,
-        'no score': 1,
-        'NO SCORE': 1,
+        'with score': 1,
+        'WITH SCORE': 1,
+        'score': 1,
+        'SCORE': 1,
         1: 1,
-        'from predictions': 2,
-        'FROM PREDICTIONS': 2,
-        'from preds': 2,
-        'FROM PREDS': 2,
+        'without evaluation': 2,
+        'WITHOUT EVALUATION': 2,
+        'no evaluation': 2,
+        'NO EVALUATION': 2,
         2: 2,
-        'with score': 3,
-        'WITH SCORE': 3,
-        'score': 3,
-        'SCORE': 3,
+        'from predictions': 3,
+        'FROM PREDICTIONS': 3,
+        'from preds': 3,
+        'FROM PREDS': 3,
         3: 3,
     }
 
@@ -33,15 +33,15 @@ class PredictionPipeline:
         if mode == 1:
             if not model:
                 raise Exception("Must provide Predictor model for mode 1")
-            PredictionPipeline.to_csv_file_with_prediction(dp_list, model, output_path)
+            PredictionPipeline.to_csv_file_with_prediction_and_score(dp_list, model, output_path)
         elif mode == 2:
+            if not model:
+                raise Exception("Must provide predictor model for mode 2")
+            PredictionPipeline.to_csv_file_with_prediction(dp_list, model, output_path)
+        elif mode == 3:
             if input_path == "":
                 raise Exception("No prediction CSV provided")
             PredictionPipeline.to_csv_from_pred_only(dp_list, input_path, output_path)
-        elif mode == 3:
-            if not model:
-                raise Exception("Must provide predictor model for mode 3")
-            PredictionPipeline.to_csv_file_with_prediction_and_score(dp_list, model, output_path)
 
 
     @staticmethod
@@ -112,6 +112,7 @@ class PredictionPipeline:
         dbn_headers = "model,name,sequence,ground_truth_type,ground_truth_data,prediction,sensitivity,ppv,f1\n"
         chem_map_headers = "model,name,sequence,ground_truth_type,ground_truth_data,prediction,DSCI_score,p_value\n"
         lines = []
+        headers = ""
         for dp in dp_list:
             model.execute(dp)
             prediction = model.get_ss_prediction()
