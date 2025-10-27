@@ -7,11 +7,11 @@ The purpose of the RNAFoldAssess package is to compare the performance of multip
 
 ## Overview
 
-A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground truth for that RNA is available (e.g., known structures or chemical-probing reactivities), predictions can be evaluated against it and assigned numerical scores.
+A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground-truth for that RNA is available (e.g., known structures or chemical-probing reactivities), the predictions can be evaluated against the ground-truth data and a variety of metrics can be derived from this evaluation; typically, we call these the prediction's "score."
 
 Researchers in this area are often interested in comparing how a new prediction tool performs compared to well-known existing ones, or how existing prediction tools perform on a new set of RNA data. In such cases, they gather multiple prediction tools of interest, generate a prediction for each RNA in a dataset, score the predictions, and compare the scores of the different tools.
 
-RNAFoldAssess streamlines this process by providing a framework for developing reusable and repeatable prediction evaluation pipelines. The package provides a `DataPoint` class for working with RNA data, a `Predictor` parent class for wrapping prediction tools in Python classes, and a `Scorer` parent class for defining prediction evaluation schemes. These classes together with utility methods privded in the `PredictionPipeline` class, creating reproducible pipelines for RNA secondary structure prediction analysis can be done with very few lines of code.
+RNAFoldAssess streamlines this process by providing a framework for developing reusable and repeatable prediction evaluation pipelines. The package provides a `DataPoint` class for working with RNA data, a `Predictor` parent class for wrapping prediction tools in Python classes, and a `Scorer` parent class for defining prediction evaluation schemes. These classes together with utility methods provided in the `PredictionPipeline` class, make creating reproducible pipelines for RNA secondary structure prediction analysis doable in just a few lines of code.
 
 # Installation
 
@@ -29,7 +29,7 @@ git clone git@github.com:yao-laboratory/RNAFoldAssess.git
 
 ## Install dependencies and package
 
-Once you've either extracted the compressed folder or downloaded the repository from git, you install the framework with the following commands:
+Once you've either extracted the compressed folder or downloaded the repository from git, you are ready to install the framework and its dependencies. There are multiple ways to install this package, the following is a script that uses `venv` to install the package:
 
 ```bash
 cd RNAFoldAssess
@@ -39,7 +39,7 @@ pip install -r requirements.txt # Install package's requirements
 pip install -e . # Install this package
 ```
 
-**NOTE**: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
+**NOTE**: The exact commands may be different for different operating systems and setups. For example, you may need to use `py` instead of `python` or `pip3` instead of `pip`. You are also not required to use `venv` if you prefer to install 3rd party packages directly into your global Python environment.
 
 ## Checking the installation
 
