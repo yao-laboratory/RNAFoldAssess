@@ -1,3 +1,5 @@
+from Bio import Seq
+
 class SecondaryStructureTools:
     @staticmethod
     def symmetric_chain(dbn: str, count_square_brackets: bool = False) -> bool:
@@ -71,6 +73,40 @@ class SecondaryStructureTools:
         pair_coords = SecondaryStructureTools.parse_structure(structure)
         nts = [f"{sequence[x]}{sequence[y]}" for x, y in pair_coords]
         return nts
+
+    @staticmethod
+    def get_au_helix_end_pairs(motif):
+        # Example: HELIX_GUGGC&GUCAC_(((((&)))))
+        m_id, m_seq, m_stc = motif.split("_")
+        if m_id != "HELIX":
+            raise SecondaryStructureToolsException(f"This method only works on HELIX motifs. You passed {m_id}")
+        pairs = SecondaryStructureTools.get_pairings(m_seq, m_stc)
+        count = 0
+        for pair in pairs:
+            if pair not in ["AU", "UA"]:
+                break
+            count += 1
+
+        for pair in pairs[::-1]:
+            if pair not in ["AU", "UA"]:
+                break
+            count += 1
+
+        if count > len(pairs):
+            count = len(pairs)
+
+        return count
+
+    @staticmethod
+    def helix_is_self_complementary_duplex(motif):
+        # Example: HELIX_GUGGC&GUCAC_(((((&)))))
+        m_id, m_seq, _m_stc = motif.split("_")
+        if m_id != "HELIX":
+            raise SecondaryStructureToolsException(f"This method only works on HELIX motifs. You passed {m_id}")
+
+        seq1, seq2 = m_seq.split("&")
+        reverse_complement = Seq.reverse_complement(seq2).replace("T", "U")
+        return seq1 == reverse_complement
 
 
 class SecondaryStructureToolsException(Exception):
