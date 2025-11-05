@@ -71,7 +71,7 @@ pip install -e . # Install this package
 
 ## Basic Tutorial
 
-See the tutorial README for a runnable example.
+See the [tutorial README](tutorial/README.md) for a runnable example.
 
 
 
