@@ -7,18 +7,18 @@ This tutorial will guide users on how to use RNAFoldAssess. It will cover a brie
 If you have not yet installed RNAFoldAssess, please follow these instructions:
 
 ```
-> git clone git@github.com:yao-laboratory/RNAFoldAssess.git
-> cd RNAFoldAssess
-> pip isntall -r requirements.txt
-> pip install -e .
+git clone git@github.com:yao-laboratory/RNAFoldAssess.git
+cd RNAFoldAssess
+pip isntall -r requirements.txt
+pip install -e .
 ```
 
 Alternatively, you can download the [RNAFoldAssess code in a .zip file](https://github.com/yao-laboratory/RNAFoldAssess/archive/refs/heads/package-only.zip0) and extract it on your local computer. From the directory in which you extracted it, run the following commands:
 
 ```
-> cd RNAFoldAssess
-> pip install -r requirements.txt
-> pip install -e .
+cd RNAFoldAssess
+pip install -r requirements.txt
+pip install -e .
 ```
 
 # Tutorial Scripts
