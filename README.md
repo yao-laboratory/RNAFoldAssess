@@ -13,6 +13,34 @@ Researchers in this area are often interested in comparing how a new prediction 
 
 RNAFoldAssess streamlines this process by providing a framework for developing reusable and repeatable prediction evaluation pipelines. The package provides a `DataPoint` class for working with RNA data, a `Predictor` parent class for wrapping prediction tools in Python classes, and a `Scorer` parent class for defining prediction evaluation schemes. These classes together with utility methods privded in the `PredictionPipeline` class, creating reproducible pipelines for RNA secondary structure prediction analysis can be done with very few lines of code.
 
+## Usage
+
+The RNAFoldAssess framework essentially supports the construction of pipelines for comparing the performance of multiple secondary structure prediction tools against large collections of data. There are several utility functions and extendable classes available to users, but the main power is in the `PredictionPipeline` class. This class provides static methods for running pipelines by taking in RNA data in a standardized format and a Python object wrapping a prediction tool. Consider the following example:
+
+```python
+# This is not runnable code, it is just an example
+
+from RNAFoldAssess.models import DataPoint, PredictionPipeline
+from RNAFoldAssess.models.predictors import RNAFold, RNAStructure, IPKnot
+
+
+# initialize predictor models
+models = [RNAFold(), RNAStructure(), IPKnot()]
+
+datapoints = DataPoint.init_from_csv_file("path/to/rna_data.csv")
+
+for m in models:
+    PredictionPipeline.run_prediction(
+        datapoints,
+        m,
+        output_path=f"path/to/analysis_path/{m}_predictions_and_evaluations.csv"
+    )
+```
+
+The above code initializes three `predictor` objects, one wrapping RNAFold, one wrapping RNAStructure, and one wrapping IPKnot, and puts them in a Python list. Then, the code imports RNA data via the `DataPoint.init_from_csv_file` method. Then, the code loops through the list of models and kicks off a pipeline for each. The pipeline is using the given model to predict the secondary structure of each RNA in the `datapoints` list, evaluating the accuracy of that prediction, and then writing the predictions and evaluations to the file specified in `output_path`.
+
+When the above example has cmopleted, the user will have 3 CSV files--one for each model--each containing the RNA name, sequence, secondary structure prediction, and evaluation. The user can then do additional analysis between the 3 files to evaluate which models are better at what.
+
 # Installation
 
 RNAFoldAssess is not yet available on the Python Package Index. In the meantime, follow the installation steps outlined below:
@@ -41,54 +69,11 @@ pip install -e . # Install this package
 
 **NOTE**: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
-## Checking the installation
+## Basic Tutorial
 
-Now ensure that the installation was successful. Either run the following code in a script or line by line in the Python terminal:
+See the tutorial README for a runnable example.
 
-```python
-from RNAFoldAssess.models import BasePairScorer
 
-# Simulated "real" and "predicted" secondary
-# structures in dot-bracket notation
-real_structure =      ".(..)..(.(..))."
-predicted_structure = ".(...)...(..).."
-
-scorer = BasePairScorer(real_structure, predicted_structure)
-scorer.evaluate()
-report = scorer.report(precision=5)
-
-print(report) # Sensitivity: 0.33333, PPV: 0.5, F1: 0.4
-```
-
-If printing `report` shows `Sensitivity: 0.33333, PPV: 0.5, F1: 0.4` then everything installed successfully!
-
-## Optional: Run the tests
-
-If you want to make sure all RNAFoldAssess tests pass on your own machine, you can do so by running the following command in the project's root:
-
-```bash
-$> pytest tests/
-```
-
-# Usage
-
-RNAFoldAssess is a framework for benchmarking RNA secondary-structure prediction tools. Given RNA sequences and ground-truth data (e.g., chemical-mapping reactivities or reference structures), it wraps a prediction model to generate structures and then scores those predictions against the ground truth.
-
-Out of the box, the framework includes:
-
-* One structure prediction tool wrapper (RNAFold) that you can use right away or as a template for other tools.
-
-* Two scoring schemes:
-
-  * Chemical-mapping scoring: DSCI (designed for reactivity-based evaluation).
-
-  * Structure scoring: Base-pair classification metrics—PPV (precision), sensitivity (recall), and F1—computed from TP/FP/FN over predicted vs. reference base pairs.
-
-The framework is necessarily extensible. Users can wrap new or existing predictors by implementing the `Predictor` interface and register custom scoring schemes if the provided ones don’t fit the task.
-
-RNAFoldAssess also provides convenience functions that allow users to run a model over an entire dataset, score the predictions, and export results to CSV for downstream analysis.
-
-Finally, the package also provides helper functions for common secondary-structure analysis tasks to streamline exploratory work.
 
 ## A Simple Example
 
