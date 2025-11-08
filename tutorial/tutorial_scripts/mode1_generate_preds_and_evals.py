@@ -5,17 +5,15 @@ from RNAFoldAssess.models.predictors import *
 Mode 1 involves generating RNA secondary structure predictions from
 one prediction model given a list of RNAs, and then evaluating the
 prediction. This works with a collection of `DataPoint` objects.
-Note that in this script, we are using JSON representation of the
-RNA objects, whereas in other examples, we will use CSV.
 """
 
 # Change this path to a JSON path containing your data
-raw_data_path = "../processed_data/example_data.json"
+raw_data_path = "../processed_data/example_data_structure.csv"
 # Change this path to where you want the predictions to be saved
 output_path = "mode1_output.csv"
 
 # Import the RNA data into a List of DataPoint objects
-datapoints = DataPoint.factory_from_json(raw_data_path)
+datapoints = DataPoint.init_from_csv_file(raw_data_path)
 
 # Create a predictor object. If you have your own model, you can initialize it here.
 rnaFold = RNAFold()

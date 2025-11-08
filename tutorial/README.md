@@ -41,6 +41,8 @@ python mode1_generate_preds_and_evals.py
 
 Upon running this, you should see a new CSV called `mode1_output.csv`. Open this to see what mode 1's output looks like.
 
+Alternatively, you can check out `mode1_generate_preds_and_evals_json_example.py` to see how to use mode1 with JSON input data rather than CSV data. The output file will be called `mode1_output_json_example.csv`
+
 ## Mode 2 - Make Prediction Only
 
 Mode 2 takes RNA data and a model and generates only a prediction for each RNA in the data; that is, there is no evaluation of the prediction. This is useful if you don't yet have ground truth data, like the data in `processed_data/example_data_no_ground_truth.csv`. To see this mode in action, run the following command from your terminal:
