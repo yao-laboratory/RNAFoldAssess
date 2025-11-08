@@ -1,49 +1,19 @@
 # RNAFoldAssess
 A framework for comparing RNA secondary structure prediction algorithms
 
-# Purpose
+# Purpose and Overview
 
-The purpose of the RNAFoldAssess package is to compare the performance of multiple RNA secondary structure prediction tools. The package comes with some predictor models, evaluation schemes, and utility functions to support unbiased analysis. The package can be extended to add other predictor models or evaluation schemes and provides instructions for how to do so.
+The purpose of the RNAFoldAssess package is to compare the performance of multiple RNA secondary structure prediction tools. A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground truth for that RNA is available (e.g., known structures or chemical-probing reactivities), predictions can be evaluated against it and assigned numerical scores.
 
-## Overview
+The RNAFoldAssess package offers a framework for building secondary structure prediction tool evaluation pipelines. That is, the components of this package support the evaluation of multiple prediction tools against large quantities of data. The package comes with one wrapped secondary structure prediction tool (RNAFold) ready to use out of the box, and advanced installation instructions for other tools. Additionally, the framework is extendable and has directions on adding your own secondary structure prediction tool to the package. Fianlly, the framework contains scorers for the two main types of RNA ground-truth data (chemical probing readings and dont-bracket notation strings) and instructions for adding your own.
 
-A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground truth for that RNA is available (e.g., known structures or chemical-probing reactivities), predictions can be evaluated against it and assigned numerical scores.
+# Quickstart Tutorial
 
-Researchers in this area are often interested in comparing how a new prediction tool performs compared to well-known existing ones, or how existing prediction tools perform on a new set of RNA data. In such cases, they gather multiple prediction tools of interest, generate a prediction for each RNA in a dataset, score the predictions, and compare the scores of the different tools.
-
-RNAFoldAssess streamlines this process by providing a framework for developing reusable and repeatable prediction evaluation pipelines. The package provides a `DataPoint` class for working with RNA data, a `Predictor` parent class for wrapping prediction tools in Python classes, and a `Scorer` parent class for defining prediction evaluation schemes. These classes together with utility methods privded in the `PredictionPipeline` class, creating reproducible pipelines for RNA secondary structure prediction analysis can be done with very few lines of code.
-
-## Usage
-
-The RNAFoldAssess framework essentially supports the construction of pipelines for comparing the performance of multiple secondary structure prediction tools against large collections of data. There are several utility functions and extendable classes available to users, but the main power is in the `PredictionPipeline` class. This class provides static methods for running pipelines by taking in RNA data in a standardized format and a Python object wrapping a prediction tool. Consider the following example:
-
-```python
-# This is not runnable code, it is just an example
-
-from RNAFoldAssess.models import DataPoint, PredictionPipeline
-from RNAFoldAssess.models.predictors import RNAFold, RNAStructure, IPKnot
-
-
-# initialize predictor models
-models = [RNAFold(), RNAStructure(), IPKnot()]
-
-datapoints = DataPoint.init_from_csv_file("path/to/rna_data.csv")
-
-for m in models:
-    PredictionPipeline.run_prediction(
-        datapoints,
-        m,
-        output_path=f"path/to/analysis_path/{m}_predictions_and_evaluations.csv"
-    )
-```
-
-The above code initializes three `predictor` objects, one wrapping RNAFold, one wrapping RNAStructure, and one wrapping IPKnot, and puts them in a Python list. Then, the code imports RNA data via the `DataPoint.init_from_csv_file` method. Then, the code loops through the list of models and kicks off a pipeline for each. The pipeline is using the given model to predict the secondary structure of each RNA in the `datapoints` list, evaluating the accuracy of that prediction, and then writing the predictions and evaluations to the file specified in `output_path`.
-
-When the above example has cmopleted, the user will have 3 CSV files--one for each model--each containing the RNA name, sequence, secondary structure prediction, and evaluation. The user can then do additional analysis between the 3 files to evaluate which models are better at what.
+If you want to quickly get up and running to see what RNAFoldAssess can do, check out the [tutorial page](tutorial/README.md). The tutorial page contains installation instructions in addition to this README.
 
 # Installation
 
-RNAFoldAssess is not yet available on the Python Package Index. In the meantime, follow the installation steps outlined below:
+RNAFoldAssess is not yet available on PyPI. In the meantime, follow the installation steps outlined below:
 
 ## Get the files
 
@@ -69,69 +39,82 @@ pip install -e . # Install this package
 
 **NOTE**: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
-## Basic Tutorial
+# Pipeline Modes
 
-See the [tutorial README](tutorial/README.md) for a runnable example.
+RNAFoldAssess supports the creation of evaluation pipelines with just a few lines of code. Pipelines can run in one of three different modes, summarized in this section.
+
+## Mode 1 - Prediction + Evaluation
+
+A pipeline in Mode 1 takes a prediction tool and generates a prediction and evaluation for each RNA in a given dataset. The RNA data needs to include sequence and ground-truth data for this mode to work. The pipeline will take the sequence from each RNA in the data, pass it to the secondary structure prediction tool, extract the prediction, and evaluate that prediction from the given ground-truth data of the RNA. Therefore, for Mode 1 to work, the RNA data has to include ground-truth data (chemical probing reactivities or a dot-bracket notation string of the known structure). Upon completion, the pipeline will write the results to a CSV file.
+
+## Mode 2 - Prediction only
+
+A pipeline in Mode 2 takes a prediction tool and generates a prediction for each RNA in a given dataset. This is useful if you have RNA sequence data but don't yet have ground-truth data, or you just want to generate predictions for a large set of data. The pipeline takes the sequence from each RNA in the dataset, passes it to the secondary structure prediction tool, and extracts the prediction. The results are written to a CSV file.
+
+## Mode 3 - Evaluation from existing predictions
+
+A pipeline in Mode 3 takes an RNA dataset with ground-truth data and generates evaluations from the predictions generated in Mode 2. This pipeline requires the CSV output from Mode 2 as input as well as RNA data with ground-truth data. It extracts the prediction from the Mode 2 CSV and evaluates it against the ground-truth data and calculates a score. The ***outputs*** from Mode 1 and Mode 3 are the same.
 
 
+# Advanced Information
 
-## A Simple Example
+## Installing Other Secondary Structure Prediction Tools
 
-You collected SHAPE readings on an RNA with the sequence ACUGACUGAAAAAAAA and got the following reactivities:
-```
-0.750, 0.875, 0.493, 0.280, 0.662, 0.478, 0.223, 0.360, 0.840, 0.883, 0.608, 0.988, 0.933, 0.685, 0.673, 0.673
-```
+RNAFoldAssess comes with support for several secondary structure prediction tools, but each individual user needs to install the tools and then update the relevant `Predcitor` class in the package. Please note that while RNAFoldAssess can work on any operating system, some operating systems are not supported by all prediction tools.
 
-And you have three secondary structure prediction tools that you want to evaluate: RNAFold, MXFold2, and ContraFold. Assuming you have a `Predictor` class for each tool, we create an object of each class, then run each object's `execute` method:
+***NOTE:*** RNAFold is already supported by this package.
 
-```python
-from RNAFoldAssess.models import *
+### ContextFold
 
-sequence = "ACUGACUGAAAAAAAA"
+Follow the [ContextFold download instructions](https://mybiosoftware.com/context-fold-1-0-rna-secondary-structure-prediction-tool.html) to install the tool. You also need to make sure `java` is in your path. From there, you can use the `ContextFold` class to wrap the tool and use it within this framework. Examle script:
 
-rna_fold = RNAFold()
-mxfold2 = MXFold2()
-contra_fold = ContraFold()
 
-rna_fold.execute(sequence)
-mxfold2.execute(sequence, "path/to/mxfold2")
-contra_fold.execute(sequence, "path/to/contrafold")
-```
+### ContraFold
 
-The `execute` method sets each object's `output` attribute, from which we extract the secondary structure predition with the method `get_ss_prediction`:
+To use ContraFold, we used the EternaFold package, but with the ContraFold parameters. To do this, follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `ContraFold` class.
 
-```python
-rf_pred = rna_fold.get_ss_prediction()
-mx_pred = mxfold2.get_ss_prediction()
-cf_pred = contra_fold.get_ss_prediction()
-```
+### EternaFold
 
-Let's see what the different tools predicted
+To use EternaFold, simply follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `Eterna` class.
 
-```python
-print(rf_pred) # ................
-print(mx_pred) # ..(......)......
-print(cf_pred) # ..(.......).....
-```
+### IPKnot
 
-We have three distinct predictions, now to evaluate which prediction tool had the best prediction, we see which predicted structure most agrees with the SHAPE data. To do this, we use the DSCI scorer.
+To use IPKnot, follow the [IPKnot installation instructions](https://github.com/satoken/ipknot) and use the `IPKnot` class. Note that IPKnot has an optional `remove_file_when_done` parameter that defaults to `False`. If you set this to true, the fasta file will be deleted after the prediction is made.
 
-```python
-from RNAFoldAssess.models.scorers import DSCI
+### MXFold
 
-reactivities = [0.750, 0.875, 0.493, 0.280, 0.662, 0.478, 0.223, 0.360, 0.840, 0.883, 0.608, 0.988, 0.933, 0.685, 0.673, 0.673]
+For MXFold, follow the [MXFold installation instructions](https://github.com/mxfold/mxfold) and use the `MXFold` class.
 
-rf_score = DSCI.score(sequence, rf_pred, reactivities, SHAPE=True)
-mx_score = DSCI.score(sequence, mx_pred, reactivities, SHAPE=True)
-cf_score = DSCI.score(sequence, cf_pred, reactivities, SHAPE=True)
-```
-The `DSCI.score` method returns a Python dictionary with the keys `accuracy` and `p`. The value with `accuracy` is the AROC from Mann-Whitney U-test, and the value with `p` is the p-value from the test. The higher the `accuracy` value, the more the predicted structure agrees with the SHAPE reactivities. Therefore, whichever score variable has the highest `accuracy` value is the most-correct prediction.
+### MXFold2
 
-## Scorers
+To use MXFold2, you need pytorch and possibly a GPU. Follow the [installation instructions for MXFold2](https://github.com/mxfold/mxfold2) and use the `MXFold2` class. Note that unlike most of the other preictor classes, `MXFold2` does not require you to pass it an executable path.
+
+### NeuralFold
+
+TODO
+
+### NUPACK
+
+TODO
+
+### RNAStructure
+
+To use RNAStructure, follow [the installation guide](https://rna.urmc.rochester.edu/RNAstructure.html) and make sure the `Fold` command is in your path.
+
+### pKnots
+
+### Simfold
+
+### SPOT-RNA
+
+
+### Framework Components
+
+### Scorers
 
 The RNAFoldAssess package comes with two scorers, `DSCI` and `BasePairScorer` (There is an experimental `BasePairPseudoknotScorer` for structures with pseudoknots but it has not yet been thoroughly tested). The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other scorer is used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
 
-### DSCI
+#### DSCI
 
 *To learn more abotu this scoring scheme, please refer to the paper [Insights into the secondary structural ensembles of the full SARS-CoV-2 RNA genome in infected cells](https://www.biorxiv.org/content/10.1101/2020.06.29.178343v2.full).*
 
@@ -143,7 +126,7 @@ The `DSCI.score` method wokrs for SHAPE and DMS reactivities. In the case of DMS
 
 Users can extract a DSCI score by either instantiating a `DSCI` object with a `DataPoint` object (discussed later) and call the `evaluate` method, or with the static `score` methd, which takes a sequence, dbn prediction, reactivities list, and experiment-indication parameters (either `DMS=True` or `SHAPE=True`).
 
-### BasePairScorer
+#### BasePairScorer
 
 The `BasePairScorer` class calculates the sensitivity, postiive predicted value (PPv) and F1 score of a predicted secondary structure. To extract the scores, users have to instantiate a `BasePairScorer` class with the true structure and predicted structure as dbn strings. Users can optionally provide a lenience allowance (discussed later).
 
@@ -200,15 +183,12 @@ The predicted structure is then evaluated in the same way, but instead of checki
 
 Note, the scorer ignores all characters that are not either a period (`.`) or parentehses (`(` or `)`). Pseudoknot symbols and other wildcard symbols (such as `{`, `[`, `X`, and so on) are ignored.
 
-### BasePairPseudoknotScorer
+#### BasePairPseudoknotScorer
 
 Some secondary structure prediction tools are capable of predicting pseudoknots. To score the accuracy of such tools, RNAFoldAssess provides the `BasePairPseudoknotScorer` class. This class behaves idenitcally to the `BasePairScorer` class, except that it also gathers coordinate information for pseudoknots that are desginated in the dbn string with square brackets (`[` and `]`)
 
-### Adding a Custom Scorer
 
-Some researchers may want to customize the scoring method while still using the RNAFoldAssess framework. To do so, add a `.py` file to the `models/scorers` directory and create a class that inherits `Scorer`. The `Scorer` class is a base class that defines the two methods a scorer class needs to plug into the framework: `evaluate` and `report`. The `scorer.py` class has more detailed instructions for implementing a new scorer. Scoring methods should base their calculations on a prediction in dbn format, as these are what the `Predictor` models output.
-
-## Predictors
+### Predictors
 
 The classes present in the `models/predictors` directory are wrapper classes for the RNA secondary structure prediction tools to be evaluated. Each class inherits the base `Predictor` model which declares `execute` and `get_ss_prediction` methods. Any tool that will be evaluated within the RNAFoldAssess framework must be accessed through a `Predictor` class. This is because during the evaluation portion of a benchmarking pipeline, the framework will call `execute` and `get_ss_prediction` to extract the tool's secodary structure prediction and (if necessary) transform it into a dbn string for scoring. More detailed tips for creating new `Predictor` classes can be found in the docstrings in `models/predictors/predictor.py`.
 
@@ -342,49 +322,46 @@ TODO
 
 Several of the tools used in our analysis require specialized installation. This repository ships with the tool `RNAFold` ready to be used right away. However, many tools require installation beyond a simple `pip install` command and some tools used in our benchmarking project conflict with each other. As such, we provide installation instruction for each specific tool below:
 
-## ContextFold
-
-Follow the [ContextFold download instructions](https://mybiosoftware.com/context-fold-1-0-rna-secondary-structure-prediction-tool.html) to install the tool. You also need to make sure `java` is in your path. From there, you can use the `ContextFold` class to wrap the tool and use it within this framework. Examle script:
-
-
-## ContraFold
-
-To use ContraFold, we used the EternaFold package, but with the ContraFold parameters. To do this, follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `ContraFold` class.
-
-## EternaFold
-
-To use EternaFold, simply follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `Eterna` class.
-
-## IPKnot
-
-To use IPKnot, follow the [IPKnot installation instructions](https://github.com/satoken/ipknot) and use the `IPKnot` class. Note that IPKnot has an optional `remove_file_when_done` parameter that defaults to `False`. If you set this to true, the fasta file will be deleted after the prediction is made.
-
-## MXFold
-
-For MXFold, follow the [MXFold installation instructions](https://github.com/mxfold/mxfold) and use the `MXFold` class.
-
-## MXFold2
-
-To use MXFold2, you need pytorch and possibly a GPU. Follow the [installation instructions for MXFold2](https://github.com/mxfold/mxfold2) and use the `MXFold2` class. Note that unlike most of the other preictor classes, `MXFold2` does not require you to pass it an executable path.
-
-## NeuralFold
-
-TODO
-
-## NUPACK
-
-TODO make NUPACK supported out of the box
-
-## RNAStructure
-
-To use RNAStructure, follow [the installation guide](https://rna.urmc.rochester.edu/RNAstructure.html) and make sure the `Fold` command is in your path.
-
-## pKnots
-
-## Simfold
-
-## SPOT-RNA
 
 # Contact
 
-For any questions, please contact Erik Whiting at `ewhiting4@unl.edu`
+For any questions, please contact Erik Whiting at `ewhiting4@huskers.unl.edu`
+
+<!--
+Will find a better section for this later
+
+## Usage
+
+The RNAFoldAssess framework essentially supports the construction of pipelines for comparing the performance of multiple secondary structure prediction tools against large collections of data. There are several utility functions and extendable classes available to users, but the main power is in the `PredictionPipeline` class. This class provides static methods for running pipelines by taking in RNA data in a standardized format and a Python object wrapping a prediction tool. Consider the following example:
+
+```python
+# This is not runnable code, it is just an example
+
+from RNAFoldAssess.models import DataPoint, PredictionPipeline
+from RNAFoldAssess.models.predictors import RNAFold, RNAStructure, IPKnot
+
+
+# initialize predictor models
+models = [RNAFold(), RNAStructure(), IPKnot()]
+
+datapoints = DataPoint.init_from_csv_file("path/to/rna_data.csv")
+
+for m in models:
+    PredictionPipeline.run_prediction(
+        datapoints,
+        m,
+        output_path=f"path/to/analysis_path/{m}_predictions_and_evaluations.csv"
+    )
+```
+
+The above code initializes three `predictor` objects, one wrapping RNAFold, one wrapping RNAStructure, and one wrapping IPKnot, and puts them in a Python list. Then, the code imports RNA data via the `DataPoint.init_from_csv_file` method. Then, the code loops through the list of models and kicks off a pipeline for each. The pipeline is using the given model to predict the secondary structure of each RNA in the `datapoints` list, evaluating the accuracy of that prediction, and then writing the predictions and evaluations to the file specified in `output_path`.
+
+When the above example has cmopleted, the user will have 3 CSV files--one for each model--each containing the RNA name, sequence, secondary structure prediction, and evaluation. The user can then do additional analysis between the 3 files to evaluate which models are better at what. -->
+
+
+
+<!-- ### Adding a Custom Scorer
+
+Need to find a home for this
+
+Some researchers may want to customize the scoring method while still using the RNAFoldAssess framework. To do so, add a `.py` file to the `models/scorers` directory and create a class that inherits `Scorer`. The `Scorer` class is a base class that defines the two methods a scorer class needs to plug into the framework: `evaluate` and `report`. The `scorer.py` class has more detailed instructions for implementing a new scorer. Scoring methods should base their calculations on a prediction in dbn format, as these are what the `Predictor` models output. -->
