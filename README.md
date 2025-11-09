@@ -1,21 +1,21 @@
 # RNAFoldAssess
 A framework for comparing RNA secondary structure prediction algorithms
 
-# Purpose and Overview
+# 1 Purpose and Overview
 
 The purpose of the RNAFoldAssess package is to compare the performance of multiple RNA secondary structure prediction tools. A secondary structure prediction tool typically takes an RNA sequence as input, and outputs a prediction of what basepairs that RNA sequence will form; this is called the secondary structure. When ground truth for that RNA is available (e.g., known structures or chemical-probing reactivities), predictions can be evaluated against it and assigned numerical scores.
 
 The RNAFoldAssess package offers a framework for building secondary structure prediction tool evaluation pipelines. That is, the components of this package support the evaluation of multiple prediction tools against large quantities of data. The package comes with one wrapped secondary structure prediction tool (RNAFold) ready to use out of the box, and advanced installation instructions for other tools. Additionally, the framework is extendable and has directions on adding your own secondary structure prediction tool to the package. Fianlly, the framework contains scorers for the two main types of RNA ground-truth data (chemical probing readings and dont-bracket notation strings) and instructions for adding your own.
 
-# Quickstart Tutorial
+# 2 Quickstart Tutorial
 
 If you want to quickly get up and running to see what RNAFoldAssess can do, check out the [tutorial page](tutorial/README.md). The tutorial page contains installation instructions in addition to this README.
 
-# Installation
+# 3 Installation
 
 RNAFoldAssess is not yet available on PyPI. In the meantime, follow the installation steps outlined below:
 
-## Get the files
+## 3.1 Get the files
 
 First, you need the source code. One way you can get it is by clicking the "Code" button in the top right corner of this GitHub page and selecting "Download ZIP" and then extracting the compressed file.
 
@@ -25,7 +25,7 @@ Alternatively, you can download the repository via Git with the following comman
 git clone git@github.com:yao-laboratory/RNAFoldAssess.git
 ```
 
-## Install dependencies and package
+## 3.2 Install dependencies and package
 
 Once you've either extracted the compressed folder or downloaded the repository from git, you install the framework with the following commands:
 
@@ -39,82 +39,77 @@ pip install -e . # Install this package
 
 **NOTE**: You may have to use `python3` or `py` or another command instead of `python` from the example above. Use the same command you use to open a python terminal.
 
-# Pipeline Modes
+# 4 Pipeline Modes
 
 RNAFoldAssess supports the creation of evaluation pipelines with just a few lines of code. Pipelines can run in one of three different modes, summarized in this section.
 
-## Mode 1 - Prediction + Evaluation
+## 4.1 Mode 1 - Prediction + Evaluation
 
 A pipeline in Mode 1 takes a prediction tool and generates a prediction and evaluation for each RNA in a given dataset. The RNA data needs to include sequence and ground-truth data for this mode to work. The pipeline will take the sequence from each RNA in the data, pass it to the secondary structure prediction tool, extract the prediction, and evaluate that prediction from the given ground-truth data of the RNA. Therefore, for Mode 1 to work, the RNA data has to include ground-truth data (chemical probing reactivities or a dot-bracket notation string of the known structure). Upon completion, the pipeline will write the results to a CSV file.
 
-## Mode 2 - Prediction only
+## 4.2 Mode 2 - Prediction only
 
 A pipeline in Mode 2 takes a prediction tool and generates a prediction for each RNA in a given dataset. This is useful if you have RNA sequence data but don't yet have ground-truth data, or you just want to generate predictions for a large set of data. The pipeline takes the sequence from each RNA in the dataset, passes it to the secondary structure prediction tool, and extracts the prediction. The results are written to a CSV file.
 
-## Mode 3 - Evaluation from existing predictions
+## 4.3 Mode 3 - Evaluation from existing predictions
 
 A pipeline in Mode 3 takes an RNA dataset with ground-truth data and generates evaluations from the predictions generated in Mode 2. This pipeline requires the CSV output from Mode 2 as input as well as RNA data with ground-truth data. It extracts the prediction from the Mode 2 CSV and evaluates it against the ground-truth data and calculates a score. The ***outputs*** from Mode 1 and Mode 3 are the same.
 
 
-# Advanced Information
+# 5 Advanced Information
 
-## Installing Other Secondary Structure Prediction Tools
+## 5.1 Installing Other Secondary Structure Prediction Tools
 
 RNAFoldAssess comes with support for several secondary structure prediction tools, but each individual user needs to install the tools and then update the relevant `Predcitor` class in the package. Please note that while RNAFoldAssess can work on any operating system, some operating systems are not supported by all prediction tools.
 
 ***NOTE:*** RNAFold is already supported by this package.
 
-### ContextFold
+### 5.1.1 ContextFold
 
-Follow the [ContextFold download instructions](https://mybiosoftware.com/context-fold-1-0-rna-secondary-structure-prediction-tool.html) to install the tool. You also need to make sure `java` is in your path. From there, you can use the `ContextFold` class to wrap the tool and use it within this framework. Examle script:
+Follow the [ContextFold download instructions](https://mybiosoftware.com/context-fold-1-0-rna-secondary-structure-prediction-tool.html) to install the tool. You also need to make sure `java` is in your path. From there, you can use the `ContextFold` class to wrap the tool and use it within this framework.
+
+***NOTE:*** As of November 9th, 2025, it seems the download link to ContextFold is no longer available.
 
 
-### ContraFold
+### 5.1.2 ContraFold
 
 To use ContraFold, we used the EternaFold package, but with the ContraFold parameters. To do this, follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `ContraFold` class.
 
-### EternaFold
+### 5.1.3 EternaFold
 
-To use EternaFold, simply follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `Eterna` class.
+To use EternaFold, simply follow the [EternaFold installation instructions](https://github.com/eternagame/EternaFold) and then use the `Eterna` class. Please note that EternaFold uses the ContraFold program with its own specific parameters, so the execution string has `contrafold` in it.
 
-### IPKnot
+### 5.1.4 IPKnot
 
 To use IPKnot, follow the [IPKnot installation instructions](https://github.com/satoken/ipknot) and use the `IPKnot` class. Note that IPKnot has an optional `remove_file_when_done` parameter that defaults to `False`. If you set this to true, the fasta file will be deleted after the prediction is made.
 
-### MXFold
+### 5.1.5 MXFold
 
 For MXFold, follow the [MXFold installation instructions](https://github.com/mxfold/mxfold) and use the `MXFold` class.
 
-### MXFold2
+### 5.1.6 MXFold2
 
-To use MXFold2, you need pytorch and possibly a GPU. Follow the [installation instructions for MXFold2](https://github.com/mxfold/mxfold2) and use the `MXFold2` class. Note that unlike most of the other preictor classes, `MXFold2` does not require you to pass it an executable path.
+To use MXFold2, you need pytorch and possibly a GPU. Follow the [installation instructions for MXFold2](https://github.com/mxfold/mxfold2) and use the `MXFold2` class.
 
-### NeuralFold
+### 5.1.7 NUPACK
 
-TODO
+To install NUPACK, please visit the [NUPACK downloads page](https://www.nupack.org/download/overview) and follow the installation instructions. For our research, we built the project from source and then included it into the project as a Python module. As such, the `NUPACK` class doesn't need a path to an executable like the other prediction algorithms.
 
-### NUPACK
+### 5.1.8 RNAStructure
 
-TODO
+To use RNAStructure, follow [the installation guide](https://rna.urmc.rochester.edu/RNAstructure.html) installation instructions and use the `RNAStructure` class. Note that the RNAStructure tool creates a `.ct` file that RNAFoldAssess then uses to extract a dot-bracket notation string. As such, users need to also pass an `output_path_base` to the `execute` method.
 
-### RNAStructure
+### 5.1.9 pKnots
 
-To use RNAStructure, follow [the installation guide](https://rna.urmc.rochester.edu/RNAstructure.html) and make sure the `Fold` command is in your path.
+To install pKnots, see [the INSTALL script on the project's GitHub](https://github.com/EddyRivasLab/PKNOTS/blob/master/INSTALL). You can then use the `pKnots` class. Note that, like RNAStructure, the pKnots tool outputs a `.ct` file. Therefore, the user needs to supply a `ct_dir` to indicate where the `.ct` files should go. There is also an optional `output_subfolder` parameter in the `execute` method to indicate a subfolder for the `.ct` files to go.
 
-### pKnots
+## 5.2 Framework Components
 
-### Simfold
-
-### SPOT-RNA
-
-
-### Framework Components
-
-### Scorers
+### 5.2.1 Scorers
 
 The RNAFoldAssess package comes with two scorers, `DSCI` and `BasePairScorer` (There is an experimental `BasePairPseudoknotScorer` for structures with pseudoknots but it has not yet been thoroughly tested). The `DSCI` scorer is used for RNA predictions where the ground-truth of the structure is chemical mapping data, the other scorer is used for RNA predictions where the ground-truth of the structure is a dot-bracket notation (dbn) string.
 
-#### DSCI
+#### 5.2.1.1 DSCI
 
 *To learn more abotu this scoring scheme, please refer to the paper [Insights into the secondary structural ensembles of the full SARS-CoV-2 RNA genome in infected cells](https://www.biorxiv.org/content/10.1101/2020.06.29.178343v2.full).*
 
@@ -126,7 +121,7 @@ The `DSCI.score` method wokrs for SHAPE and DMS reactivities. In the case of DMS
 
 Users can extract a DSCI score by either instantiating a `DSCI` object with a `DataPoint` object (discussed later) and call the `evaluate` method, or with the static `score` methd, which takes a sequence, dbn prediction, reactivities list, and experiment-indication parameters (either `DMS=True` or `SHAPE=True`).
 
-#### BasePairScorer
+#### 5.2.1.2 BasePairScorer
 
 The `BasePairScorer` class calculates the sensitivity, postiive predicted value (PPv) and F1 score of a predicted secondary structure. To extract the scores, users have to instantiate a `BasePairScorer` class with the true structure and predicted structure as dbn strings. Users can optionally provide a lenience allowance (discussed later).
 
@@ -183,12 +178,12 @@ The predicted structure is then evaluated in the same way, but instead of checki
 
 Note, the scorer ignores all characters that are not either a period (`.`) or parentehses (`(` or `)`). Pseudoknot symbols and other wildcard symbols (such as `{`, `[`, `X`, and so on) are ignored.
 
-#### BasePairPseudoknotScorer
+#### 5.2.1.3 BasePairPseudoknotScorer
 
 Some secondary structure prediction tools are capable of predicting pseudoknots. To score the accuracy of such tools, RNAFoldAssess provides the `BasePairPseudoknotScorer` class. This class behaves idenitcally to the `BasePairScorer` class, except that it also gathers coordinate information for pseudoknots that are desginated in the dbn string with square brackets (`[` and `]`)
 
 
-### Predictors
+### 5.2.2 Predictors
 
 The classes present in the `models/predictors` directory are wrapper classes for the RNA secondary structure prediction tools to be evaluated. Each class inherits the base `Predictor` model which declares `execute` and `get_ss_prediction` methods. Any tool that will be evaluated within the RNAFoldAssess framework must be accessed through a `Predictor` class. This is because during the evaluation portion of a benchmarking pipeline, the framework will call `execute` and `get_ss_prediction` to extract the tool's secodary structure prediction and (if necessary) transform it into a dbn string for scoring. More detailed tips for creating new `Predictor` classes can be found in the docstrings in `models/predictors/predictor.py`.
 
@@ -232,11 +227,11 @@ Conversely, the `RNAStructure` class wraps the `Fold` program from the RNAStruct
 
 The `RNAStructure` class is provided as an example to users who wish to evaluate command-line tools. It is important to note that such tools must be installed and configured before a `Predictor` class wrapping them is usable.
 
-## DataPoint
+### 5.2.3 DataPoint
 
 The `DataPoint` class is meant to encapsulate different representations of RNAs and provide several convenience features to users.
 
-### Attributes
+#### 5.2.3.1 Attributes
 
 **`name`**: What an RNA is referred to. For example, 5NXT_chain_A might be the name of a datapoint.
 
@@ -254,7 +249,7 @@ The `DataPoint` class is meant to encapsulate different representations of RNAs 
 
 **`structure`**: If the `ground_truth_type` is "dbn", the `structure` attribute will return the same thing as the `ground_truth_data`, which should be a dot-brack notation string. e.g., `...(((...)))...`. If not, trying to access this attribute will raise an exception.
 
-### Initialization methods
+#### 5.2.3.2 Initialization methods
 
 A `DataPoint` object can be initialized in many ways, the only required attributes at initialization are a name and nucleotide sequence. You can initialize it with the default constructor method such as:
 
@@ -292,38 +287,9 @@ TODO:
 **`factory_from_json`**
 
 
-## Utility Functions
-
-RNAFoldAssess comes with a variety of utility fucntions that may be helpful in working with RNA data. See the list below for a descript of each function.
-
-| Namespace and Function Name                    | Function Signature                                                                                                                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DSSR.get_ss_from_pdb`                         | `path_to_pdb`: path to a PDB file<br>`destination_dir`: the directory to write the results<br>returns a DBN string                                             | Handles the secondary structure output generated by the x3DNA tool DSSR. Returns secondary structure dot-bracket notation and writes it to a file in the destination dir; the file will be called `PDBID.dbn`, where `PDBID` is the name of the PDB file minus the file extension. For example, passing `8K1E.pdb` will generate `8K1E.dbn` in `destination_dir`. Users must set an environment variable `DSSR_PATH` that points to the `dssr` executable in the `x3dna/bin` folder locally. |
-| `Normalizers.simple_normalizer`                | `data`: collection of numeric values<br>returns a list of floats                                                                                             | Takes a collection of numeric values, finds the largest number in that list, and divides every item by that number. Ensures a list of values between 0 and 1.                                                                                                                                                                                                                                                                                                                                |
-| `Normalizers.set_neg_to_0_and_normalize`       | `data`: collection of numeric values<br>returns a list of floats                                                                                             | Similar to `simple_normalizer` except it first changes all negative numbers to 0. Useful for chemical probing data that may erroneously record negative reactivities.                                                                                                                                                                                                                                                                                                                        |
-| `PDBTools.get_pdb_file`                        | `rna_id`: a PDB ID of the RNA<br>`destination_dir`: where you want the file downloaded<br>Void function                                                        | Downloads a PDB file by ID to the provided directory. Uses `wget`; if it’s not installed, this function will not work (most operating systems include it).                                                                                                                                                                                                                                                                                                                                   |
-| `PDBTools.get_mmcif_file`                      | `rna_id`: a PDB ID of the RNA<br>`destination_dir`: where you want the file downloaded<br>Void function                                                        | Downloads an mmCIF file by ID to the provided directory. Uses `wget`; if it’s not installed, this function will not work (most operating systems include it).                                                                                                                                                                                                                                                                                                                                |
-| `PDBTools.get_molecule_from_ebi`               | `pdb_id`: the PDB ID of the RNA<br>returns JSON data                                                                                                         | Calls the PDBe API (EBI). Constructs an HTTP request for the given PDB ID and returns the JSON data.                                                                                                                                                                                                                                                                                                                                                                                         |
-| `SecondaryStructureTools.symmetric_chain`      | `dbn`: a string of dot-bracket notation<br>returns a boolean                                                                                                 | Returns true if the given DBN string is balanced—i.e., has as many open parentheses as closed parentheses. Useful for x3DNA output that may include inter-chain base pairing.                                                                                                                                                                                                                                                                                                                |
-| `SecondaryStructureTools.contains_pseudoknots` | `dbn`: a string of dot-bracket notation<br>returns a boolean                                                                                                 | Returns true if the given DBN string contains pseudoknot notation (e.g., square or curly brackets).                                                                                                                                                                                                                                                                                                                                                                                          |
-| `SecondaryStructureTools.parse_structure`      | `structure`: a string in dot-bracket notation of a secondary structure<br>returns a list of two-tuples                                                       | Returns a list of two-tuples where each tuple holds the 0-indexed positions of base-paired nucleotides. For example, the string `..(..(..)..)..` would return `[(2, 11), (5, 8)]` because the nucleotide at position 2 is base-paired to position 11, and the nucleotide at position 5 is paired with position 8.                                                                                                                                                                            |
-| `SecondaryStructureTools.get_pairings`         | `sequence`: a string of RNA nucleotides<br>`structure`: a string in dot-bracket notation of a secondary structure<br>returns a list of base-paired nucleotides | Returns a list of two-character strings, each containing the nucleotides of a base pair. For example, if the sequence is `ACAAAUGAA` and the structure is `.((..))..`, this method will return `["CG", "AU"]`.                                                                                                                                                                                                                                                                               |
-| `SequenceTools.generate_kmers`                 | `sequence`: a string of RNA nucleotides<br>`k`: an integer<br>returns a list of kmers                                                                          | Returns the list of k-mers for the given sequence and k. For example, inputting `ACUCCG` and `3` outputs `ACU`, `CUC`, `UCC`, `CCG`.                                                                                                                                                                                                                                                                                                                                                         |
-| `SequenceTools.count_homopolymers`             | `sequence`: a string of RNA nucleotides<br>`k`: an integer<br>`nucleotide`: a one-character string of A, C, U, or G<br>returns an i_                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-If you have requests for new functions, please contact the authors or feel free to open a pull request!
 
 
-
-## Example Pipeline
-
-TODO
-
-# Specialized Installation Instructions
-
-Several of the tools used in our analysis require specialized installation. This repository ships with the tool `RNAFold` ready to be used right away. However, many tools require installation beyond a simple `pip install` command and some tools used in our benchmarking project conflict with each other. As such, we provide installation instruction for each specific tool below:
-
-
-# Contact
+# 6 Contact
 
 For any questions, please contact Erik Whiting at `ewhiting4@huskers.unl.edu`
 

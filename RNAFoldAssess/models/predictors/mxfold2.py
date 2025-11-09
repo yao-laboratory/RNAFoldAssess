@@ -6,8 +6,6 @@ class MXFold2:
         self.output = ""
 
     def execute(self, fasta_file, path="", remove_file_when_done=False):
-        if path == "":
-            path = "/common/yesselmanlab/ewhiting/.conda/envs/mxfold2_env/bin/mxfold2"
         exec_string = f"{path} predict {fasta_file}"
         self.output = os.popen(exec_string).read()
         if remove_file_when_done:
