@@ -1,4 +1,4 @@
-![RNAFoldAssess Logo](RNAFoldAssess_logo_v1.png)
+[RNAFoldAssess Logo](RNAFoldAssess_logo_v1.png)
 
 # RNAFoldAssess
 A framework for comparing RNA secondary structure prediction algorithms
