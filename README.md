@@ -316,6 +316,406 @@ print(dbn_str)
 # .(((((.....(....)....))))).
 ```
 
+## Normalizers
+
+The methods in the `Normalizers` class are meant to help with normalizing chemical mapping reactivity data.
+
+### simple_normalizer
+
+Given a list of numeric items, returns a list of floats in which all numbers in the given data are divided by the highest number in the given data. This ensures a list of floats in which all items are between 0 and 1.
+
+**Inputs**
+
+A list of items that can respond to Python's `float` function. For example, all the following lists are valid input:
+```
+[1, 2, 3]
+[1.0, "2", 3.1]
+[1000]
+```
+
+**Outputs**
+
+A normalized list of floats
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.normalizers import *
+
+some_list = [1.0, "2", 3.1]
+normalized_list = Normalizers.simple_normalizer(some_list)
+print(normalized_list)
+# Will output: [0.3225806451612903, 0.6451612903225806, 1.0]
+```
+
+### set_neg_to_0_and_normalize
+
+Identical to `simple_normalizer` but sets all negative values in the given list to 0.
+
+### normalize_from_reactivity_map
+
+Given a reactivity map, sets negative values to zero then normalizes reactivities then returns the reactivity map with updated normalized values. Note that a reactivity map is a data structure that maps chemical probing reactivity readings to their 0-indexed position in an RNA sequence. The dictionary keys are the RNA sequence positions and the values are reactivity readings.
+
+**Inputs**
+
+A reactivity map
+
+**Outputs**
+
+A reactivity map but with the normalized values
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.normalizers import *
+
+reactivity_map = {0: 0.3, 1: -2.5, 2: 5, 10: 2.3, 11: 4, 12: 1.2, 13: -4}
+normalized_map = Normalizers.normalize_from_reactivity_map(reactivity_map)
+print(normalized_map)
+# Will output: {0: 0.06, 1: 0.0, 2: 1.0, 10: 0.45999999999999996, 11: 0.8, 12: 0.24, 13: 0.0}
+```
+
+### align_sequence_with_reactivities
+
+Given a sequence and reactivity map, this method returns a normalized reactivity map and fills in missing values. For example, if a sequence is 20 nucleotides long, but only positions 0 - 3 and 12 - 19 have reacitivty data, this method returns a reactivity map with the normalized data in positions 0 - 3 and 12 - 19, but also fills in a "0" for the positions 4 - 11.
+
+**Inputs**
+
+An RNA sequence and a reactivity map.
+
+**Outputs**
+
+A reactivity map with number of items equal to the number of nucleotides in the given RNA sequence
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.normalizers import *
+
+sequence = "AACCUUGGAACCUUGGGGAAUUCC"
+reactivity_map = {0: 0.3, 1: -2.5, 2: 5, 10: 2.3, 11: 4, 12: 1.2, 13: -4}
+aligned_map = Normalizers.align_sequence_with_reactivities(sequence, reactivity_map)
+print(aligned_map)
+# Will output: {0: 0.06, 1: 0.0, 2: 1.0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0.45999999999999996, 11: 0.8, 12: 0.24, 13: 0.0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}
+```
+
+### detect_reactivity_dropoff_in_polyA
+
+This method helps detect the the poly(A) anomaly: progressive suppression of apparent reactivity across consecutive A’s in poly(A) stretches consistent with RTase bypass rather than true chemical protection. It returns a list of lists in which the inner lists are 0-indexed locations in the sequence in which the anomaly was detected.
+
+**Inputs**
+
+A sequence and reactivity_map are required. An option input `a_length` can be provided to indicate how many consectuive adenine's must have decreasing reactivity data for the data to be considered anomalous; the default value is 4.
+
+**Outputs**
+
+A list of lists in which each inner list is a range in the given sequence in which multiple adenine nucleotides show decreasing chemical mapping readings.
+
+**Example Usage**
+
+```python
+seq = "CAAAACCAAAAAAU"
+reactivity_map = {
+    1: 0.1, 2: 0.2, 3: 0.4, 4: 0.45,
+    5: 0.5, 6: 1, 7: 1, 8: 1, 9: 1
+}
+anomalous_spans = Normalizers.detect_reactivity_dropoff_in_polyA(seq, reactivity_map)
+print(anomalous_spans)
+# Will output: [[4, 3, 2, 1]]
+```
+
+## PDBTools
+
+The methods in `PDBTools` found in `utils/pdb_tools.py` provide some convenience functions for working with the protein databank.
+
+### get_pdb_file
+
+This method takes a PDB ID and downloads its `.pdb` file from the protein databank.
+
+**Inputs**
+
+A protein databnk ID (e.g., 1EHZ). Users can optionally add a `destination_dir` to indicate where the pdb file should be downloaded; the default value is the current working directory.
+
+**Outputs**
+
+None
+
+**Side Effects**
+
+A PDB file is downloaded to the given destination directory.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.pdb_tools import *
+
+PDBTools.get_pdb_file("1EHZ")
+# The file 1EHZ.pdb is downloaded to the working directory.
+```
+
+### get_mmcif_file
+
+This method is identical to the `get_pdb_file` except that it downloads a `.cif` file instead of a `.pdb` file.
+
+### get_molecule_from_ebi
+
+Returns molecule data from ChEMBL given a PDB Id.
+
+**Inputs**
+
+A PDB ID
+
+**Outputs**
+
+A list of dictionaries with molecule data from EBI.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.pdb_tools import *
+
+molecule_data = PDBTools.get_molecule_from_ebi("1EHZ")
+print(molecule_data)
+# Will output:
+# [{'molecule_type': 'polyribonucleotide', 'entity_id': 1, 'sample_preparation': 'Natural source', 'length': 76, 'number_of_copies': 1, 'in_chains': ['A'], 'in_struct_asyms': ['A'], 'mutation_flag': None, 'weight': 24890.121, 'ca_p_only': False, 'synonym': 'TRANSFER RNA (PHE)', 'molecule_name': ['TRANSFER RNA (PHE)'], 'gene_name': None, 'source': [{'organism_scientific_name': 'Saccharomyces cerevisiae', 'expression_host_scientific_name': None, 'tax_id': 4932, 'expression_host_tax_id': None, 'mappings': [{'start': {'residue_number': 1}, 'end': {'residue_number': 76}}]}], 'sequence': 'GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA', 'pdb_sequence': 'GCGGAUUUA(2MG)CUCAG(H2U)(H2U)GGGAGAGC(M2G)CCAGA(OMC)U(OMG)AA(YYG)A(PSU)(5MC)UGGAG(7MG)UC(5MC)UGUG(5MU)(PSU)CG(1MA)UCCACAGAAUUCGCACCA', 'pdb_sequence_indices_with_multiple_residues': ..., 'ca_p_only': False, 'molecule_name': ['water']}]
+```
+
+*Note that the above output data is truncated*
+
+## SecondaryStructureTools
+
+The `SecondaryStructureTools` class found in `utils/secondary_structure_tools.py` provides several methods for working with and analyzing secondary structure data.
+
+### symmetric_chain
+
+Given a dot-bracket string, return a boolean based on if the chain is symmetric (has as many open parentheses as closed ones). This may be useful when working with output from DSSR and structures are split between multiple chains.
+
+**Inputs**
+
+A dot-bracket notation string
+
+**Outputs**
+
+True/False value
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+SecondaryStructureTools.symmetric_chain("((....))")
+# True
+SecondaryStructureTools.symmetric_chain("((....))...)")
+# False
+```
+
+### contains_pseudoknots
+
+Given a dot-bracket notation string, returns True if pseudoknot syntax is found (square or curly brackets).
+
+**Inputs**
+
+A dot-bracket notation string
+
+**Outputs**
+
+True/False value
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+SecondaryStructureTools.symmetric_chain("([....])")
+# True
+SecondaryStructureTools.symmetric_chain("((....))")
+# False
+```
+
+### parse_structure
+
+This method returns the 0-indexed coordinates of all base pairs in a given dot-brakcet notation string. The coorinates are recorded in tuples where the first value is the 5' nucleotide position and the second value is the 3' nucleotide position. All coordinate tuples are returned in a list.
+
+**Inputs**
+
+A dot-bracket notation string
+
+**Outputs**
+
+A list of 2-tuples containing coordinates of basepairs.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+bn = "((...(....)..)..)..."
+SecondaryStructureTools.parse_structure(dbn)
+# [(0, 16), (1, 13), (5, 10)]
+```
+
+### get_pairings
+
+This method returns a list of basepaired nucleotides in a secondary structure. This can be helpful for detecting non-canonical base pairs in a given secondary structure. i.e., the secondary structure from sequence AAAA and dbn-string (..) indicates a base-pairing between two adenine nucleotides, which is not a Watson-Crick base pairing.
+
+**Inputs**
+
+An RNA sequence and dot-bracket notation string.
+
+**Outputs**
+
+A list of base-paired nucleotides.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+SecondaryStructureTools.get_pairings("CCAAAAGG", "((....))")
+# ['CG', 'CG']
+```
+
+### get_au_helix_end_pairs
+
+Counts the number of consecutive AU pairs in the end of a given helix. This value is a parameter in the Turner 2004 model.
+
+**Inputs**
+
+A helix motif string. Note that a motif string follows the pattern of `{motif_type}_{sequence}_{dbn_string}`. For example: `HELIX_GUGGC&GUCAC_(((((&)))))`.
+
+**Outputs**
+
+Integer value of longest consecutive AU pairing at the end of the given helix (the "end" is defined as either the 5' or 3' side).
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+motif = "HELIX_GAAAA&UUUUC_(((((&)))))"
+SecondaryStructureTools.get_au_helix_end_pairs(motif)
+# 4
+```
+
+### helix_is_self_complementary_duplex
+
+Takes a helix and returns a boolean value based on if the given helix is a self-complementary duplex. This value is a parameter in the Turner 2004 model.
+
+**Inputs**
+
+A helix motif string. Note that a motif string follows the pattern of `{motif_type}_{sequence}_{dbn_string}`. For example: `HELIX_GUGGC&GUCAC_(((((&)))))`.
+
+**Outputs**
+
+True/False value
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.secondary_structure_tools import *
+
+motif = "HELIX_GAAAA&UUUUC_(((((&)))))"
+SecondaryStructureTools.helix_is_self_complementary_duplex(motif)
+# True
+motif = "HELIX_AGCU&AGUU_((((&))))" # Note the GU pair
+SecondaryStructureTools.helix_is_self_complementary_duplex(motif)
+# False
+```
+
+## SequenceTools
+
+The `SequenceTools` class found in `utils/sequence_tools.py` provides several methods for analyzing sequence data.
+
+### generate_kmers
+
+Given a sequence and k value, returns a list of all k-mers in the given sequence.
+
+**Inputs**
+
+An RNA sequence and integer for k
+
+**Outputs**
+
+List of all k-mers from the given sequence.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.sequence_tools import *
+
+SequenceTools.generate_kmers("AGCAGCAGCAGC", 3)
+# ['AGC', 'GCA', 'CAG', 'AGC', 'GCA', 'CAG', 'AGC', 'GCA', 'CAG', 'AGC']
+```
+
+### count_homopolymers
+
+Given a sequence, condsecutive nucleotide length, and target nucleotide, returns the number of homopolymers of the given nucleotide in the given sequence.
+
+**Inputs**
+
+An RNA sequence, k. value (number of consecutive nucleotides to count as a hit), nucleotide.
+
+**Outputs**
+
+Number of target homopolymers in the given sequence.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.sequence_tools import *
+
+SequenceTools.count_homopolymers("GAAGAAGAAA", 2, "A")
+# 4
+SequenceTools.count_homopolymers("GAAGAAGAAA", 3, "A")
+# 1
+```
+
+### get_gc_content
+
+Returns the GC-content of a given sequence
+
+**Inputs**
+
+An RNA sequence
+
+**Outputs**
+
+A float value from 0 to 1
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.sequence_tools import *
+
+SequenceTools.get_gc_content("CCCCAAAAUUUUGGGG")
+# 0.5
+```
+
+### get_sequence_entropy
+
+Returns the Shannon Entropy value of a sequence (using log base 4). This value may be useful for some analysis tasks and is used in the original study for which this framework was developed. As such, it is provided for convenience.
+
+**Inputs**
+
+An RNA sequence and optionally a log base. The default value for the log base is 4 since there are 4 nucelotides, but users may find value in using different bases.
+
+**Outputs**
+
+A float value of the sequence's Shannon Entropy
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.sequence_tools import *
+
+SequenceTools.get_sequence_entropy("AAAAAAAA")
+# 0.0
+SequenceTools.get_sequence_entropy("AAAAGGGG")
+# 0.5
+SequenceTools.get_sequence_entropy("ACGUACGU")
+# 1.0
+```
+
 # 7 Contact
 
 For any questions, please contact Erik Whiting at `ewhiting4@huskers.unl.edu`
