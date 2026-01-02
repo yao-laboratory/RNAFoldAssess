@@ -6,7 +6,7 @@ class PDBTools:
     Utility class for getting PDB files
     """
     @staticmethod
-    def get_pdb_file(rna_id, destination_dir):
+    def get_pdb_file(rna_id, destination_dir="."):
         url = f"https://files.rcsb.org/download/{rna_id}.pdb"
         destination_dir = os.path.abspath(destination_dir)
         cmd = f"wget -O {destination_dir}/{rna_id}.pdb {url}"
@@ -14,7 +14,7 @@ class PDBTools:
 
 
     @staticmethod
-    def get_mmcif_file(rna_id, destination_dir):
+    def get_mmcif_file(rna_id, destination_dir="."):
         url = f"https://files.rcsb.org/view/{rna_id}.cif"
         destination_dir = os.path.abspath(destination_dir)
         cmd = f"wget -O {destination_dir}/{rna_id}.cif {url}"

@@ -10,11 +10,13 @@ class Normalizers:
 
     @staticmethod
     def simple_normalizer(data=[]):
+        data = [float(d) for d in data]
         m = max(data)
         return [float(d) / m for d in data]
 
     @staticmethod
     def set_neg_to_0_and_normalize(data=[]):
+        data = [float(d) for d in data]
         for i, v in enumerate(data):
             if v < 0:
                 data[i] = 0
