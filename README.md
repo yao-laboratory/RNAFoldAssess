@@ -279,11 +279,11 @@ data = {
 ```
 
 
-# Utility Functions
+# 6 Utility Functions
 
 The RNAFoldAssess package comes with several utility functions for working with chemical mapping data and secondary structure data. While these functions are not part of the core benchmark pipeline building tools, they may be useful to researchers for enriched analysis.
 
-## DSSR
+## 6.1 DSSR
 
 The `DSSR` class found in `utils/dssr.py` provides a method called `get_ss_from_pdb` that wraps the [x3DNA DSSR](https://x3dna.org/) tool. The tool assumes you have an environment variable called `DSSR_PATH` that points to the x3na-dssr binary.
 
@@ -316,11 +316,11 @@ print(dbn_str)
 # .(((((.....(....)....))))).
 ```
 
-## Normalizers
+## 6.2 Normalizers
 
 The methods in the `Normalizers` class are meant to help with normalizing chemical mapping reactivity data.
 
-### simple_normalizer
+### 6.2.1 simple_normalizer
 
 Given a list of numeric items, returns a list of floats in which all numbers in the given data are divided by the highest number in the given data. This ensures a list of floats in which all items are between 0 and 1.
 
@@ -348,11 +348,11 @@ print(normalized_list)
 # Will output: [0.3225806451612903, 0.6451612903225806, 1.0]
 ```
 
-### set_neg_to_0_and_normalize
+### 6.2.2 set_neg_to_0_and_normalize
 
 Identical to `simple_normalizer` but sets all negative values in the given list to 0.
 
-### normalize_from_reactivity_map
+### 6.2.3 normalize_from_reactivity_map
 
 Given a reactivity map, sets negative values to zero then normalizes reactivities then returns the reactivity map with updated normalized values. Note that a reactivity map is a data structure that maps chemical probing reactivity readings to their 0-indexed position in an RNA sequence. The dictionary keys are the RNA sequence positions and the values are reactivity readings.
 
@@ -375,7 +375,7 @@ print(normalized_map)
 # Will output: {0: 0.06, 1: 0.0, 2: 1.0, 10: 0.45999999999999996, 11: 0.8, 12: 0.24, 13: 0.0}
 ```
 
-### align_sequence_with_reactivities
+### 6.2.4 align_sequence_with_reactivities
 
 Given a sequence and reactivity map, this method returns a normalized reactivity map and fills in missing values. For example, if a sequence is 20 nucleotides long, but only positions 0 - 3 and 12 - 19 have reacitivty data, this method returns a reactivity map with the normalized data in positions 0 - 3 and 12 - 19, but also fills in a "0" for the positions 4 - 11.
 
@@ -399,7 +399,7 @@ print(aligned_map)
 # Will output: {0: 0.06, 1: 0.0, 2: 1.0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0.45999999999999996, 11: 0.8, 12: 0.24, 13: 0.0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0}
 ```
 
-### detect_reactivity_dropoff_in_polyA
+### 6.2.5 detect_reactivity_dropoff_in_polyA
 
 This method helps detect the the poly(A) anomaly: progressive suppression of apparent reactivity across consecutive A’s in poly(A) stretches consistent with RTase bypass rather than true chemical protection. It returns a list of lists in which the inner lists are 0-indexed locations in the sequence in which the anomaly was detected.
 
@@ -424,11 +424,11 @@ print(anomalous_spans)
 # Will output: [[4, 3, 2, 1]]
 ```
 
-## PDBTools
+## 6.3 PDBTools
 
 The methods in `PDBTools` found in `utils/pdb_tools.py` provide some convenience functions for working with the protein databank.
 
-### get_pdb_file
+### 6.3.1 get_pdb_file
 
 This method takes a PDB ID and downloads its `.pdb` file from the protein databank.
 
@@ -453,11 +453,11 @@ PDBTools.get_pdb_file("1EHZ")
 # The file 1EHZ.pdb is downloaded to the working directory.
 ```
 
-### get_mmcif_file
+### 6.3.2 get_mmcif_file
 
 This method is identical to the `get_pdb_file` except that it downloads a `.cif` file instead of a `.pdb` file.
 
-### get_molecule_from_ebi
+### 6.3.3 get_molecule_from_ebi
 
 Returns molecule data from ChEMBL given a PDB Id.
 
@@ -482,11 +482,11 @@ print(molecule_data)
 
 *Note that the above output data is truncated*
 
-## SecondaryStructureTools
+## 6.4 SecondaryStructureTools
 
 The `SecondaryStructureTools` class found in `utils/secondary_structure_tools.py` provides several methods for working with and analyzing secondary structure data.
 
-### symmetric_chain
+### 6.4.1 symmetric_chain
 
 Given a dot-bracket string, return a boolean based on if the chain is symmetric (has as many open parentheses as closed ones). This may be useful when working with output from DSSR and structures are split between multiple chains.
 
@@ -509,7 +509,7 @@ SecondaryStructureTools.symmetric_chain("((....))...)")
 # False
 ```
 
-### contains_pseudoknots
+### 6.4.2 contains_pseudoknots
 
 Given a dot-bracket notation string, returns True if pseudoknot syntax is found (square or curly brackets).
 
@@ -532,7 +532,7 @@ SecondaryStructureTools.symmetric_chain("((....))")
 # False
 ```
 
-### parse_structure
+### 6.4.3 parse_structure
 
 This method returns the 0-indexed coordinates of all base pairs in a given dot-brakcet notation string. The coorinates are recorded in tuples where the first value is the 5' nucleotide position and the second value is the 3' nucleotide position. All coordinate tuples are returned in a list.
 
@@ -554,7 +554,7 @@ SecondaryStructureTools.parse_structure(dbn)
 # [(0, 16), (1, 13), (5, 10)]
 ```
 
-### get_pairings
+### 6.4.4 get_pairings
 
 This method returns a list of basepaired nucleotides in a secondary structure. This can be helpful for detecting non-canonical base pairs in a given secondary structure. i.e., the secondary structure from sequence AAAA and dbn-string (..) indicates a base-pairing between two adenine nucleotides, which is not a Watson-Crick base pairing.
 
@@ -575,7 +575,7 @@ SecondaryStructureTools.get_pairings("CCAAAAGG", "((....))")
 # ['CG', 'CG']
 ```
 
-### get_au_helix_end_pairs
+### 6.4.5 get_au_helix_end_pairs
 
 Counts the number of consecutive AU pairs in the end of a given helix. This value is a parameter in the Turner 2004 model.
 
@@ -597,7 +597,7 @@ SecondaryStructureTools.get_au_helix_end_pairs(motif)
 # 4
 ```
 
-### helix_is_self_complementary_duplex
+### 6.4.6 helix_is_self_complementary_duplex
 
 Takes a helix and returns a boolean value based on if the given helix is a self-complementary duplex. This value is a parameter in the Turner 2004 model.
 
@@ -622,11 +622,11 @@ SecondaryStructureTools.helix_is_self_complementary_duplex(motif)
 # False
 ```
 
-## SequenceTools
+## 6.5 SequenceTools
 
 The `SequenceTools` class found in `utils/sequence_tools.py` provides several methods for analyzing sequence data.
 
-### generate_kmers
+### 6.5.1 generate_kmers
 
 Given a sequence and k value, returns a list of all k-mers in the given sequence.
 
@@ -647,7 +647,7 @@ SequenceTools.generate_kmers("AGCAGCAGCAGC", 3)
 # ['AGC', 'GCA', 'CAG', 'AGC', 'GCA', 'CAG', 'AGC', 'GCA', 'CAG', 'AGC']
 ```
 
-### count_homopolymers
+### 6.5.2 count_homopolymers
 
 Given a sequence, condsecutive nucleotide length, and target nucleotide, returns the number of homopolymers of the given nucleotide in the given sequence.
 
@@ -670,7 +670,7 @@ SequenceTools.count_homopolymers("GAAGAAGAAA", 3, "A")
 # 1
 ```
 
-### get_gc_content
+### 6.5.3 get_gc_content
 
 Returns the GC-content of a given sequence
 
@@ -691,7 +691,7 @@ SequenceTools.get_gc_content("CCCCAAAAUUUUGGGG")
 # 0.5
 ```
 
-### get_sequence_entropy
+### 6.5.4 get_sequence_entropy
 
 Returns the Shannon Entropy value of a sequence (using log base 4). This value may be useful for some analysis tasks and is used in the original study for which this framework was developed. As such, it is provided for convenience.
 
