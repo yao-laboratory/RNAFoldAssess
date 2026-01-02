@@ -278,20 +278,45 @@ data = {
 }
 ```
 
-TODO:
 
-**`init_from_fasta`**:
+# Utility Functions
 
-**`init_from_dbn_file`**:
+The RNAFoldAssess package comes with several utility functions for working with chemical mapping data and secondary structure data. While these functions are not part of the core benchmark pipeline building tools, they may be useful to researchers for enriched analysis.
 
-**`init_from_seq_file`**:
+## DSSR
 
-**`factory_from_json`**
+The `DSSR` class found in `utils/dssr.py` provides a method called `get_ss_from_pdb` that wraps the [x3DNA DSSR](https://x3dna.org/) tool. The tool assumes you have an environment variable called `DSSR_PATH` that points to the x3na-dssr binary.
 
+**Inputs**
 
+`path_to_pdb` (required) - The path to a `.pdb` or `.cif` file.
+`destination_dir` (optional) - Where to you want the output files written to. The default value is the current working directory.
 
+**Outputs**
 
-# 6 Contact
+The file contents of the `.dbn` file output by the DSSR tool. The return value is a `str` data type.
+
+**Side Effects**
+
+Auxiliary files output by the DSSR tool will be written to the `destination_dir` path. All files will be prefixed with the PDB ID of the file in `path_to_pdb`. For example, running the tool agains `1ehz.pdb` will output `1ehz-2ndstr.dbn` to the destination directory.
+
+**Example Usage**
+
+```python
+from RNAFoldAssess.utils.dssr import DSSR
+
+dbn_str = DSSR.get_ss_from_pdb('pdb_files/1msy.pdb', 'dssr_file_outputs')
+print(dbn_str)
+# Will output:
+# >1msy nts =27 [ whole ]
+# UGCUCCUAGUACGUAAGGACCGGAGUG
+# .(((((.....(....)....))))).
+# >1msy -A #1 nts =27 0.30(2.47) [ chain ] RNA
+# UGCUCCUAGUACGUAAGGACCGGAGUG
+# .(((((.....(....)....))))).
+```
+
+# 7 Contact
 
 For any questions, please contact Erik Whiting at `ewhiting4@huskers.unl.edu`
 

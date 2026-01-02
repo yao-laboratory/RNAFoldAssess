@@ -17,16 +17,12 @@ class DSSR:
         if file_extension not in ["pdb", "cif"]:
             raise Exception("File must be pdb or cif type")
         # Run X3DNA-DSSR
-        cmd_string = f"{dssr_path} -i={path_to_pdb}"
+        cmd_string = f"{dssr_path} -i={path_to_pdb} --prefix={destination_dir}/{name}"
         try:
             os.system(cmd_string)
             # Get the ss output string
-            with open("dssr-2ndstrs.dbn") as fh:
+            with open(f"{destination_dir}/{name}-2ndstrs.dbn") as fh:
                 data = fh.read()
-            with open(f"{destination_dir}/{name}.dbn", "w") as dbn_file:
-                dbn_file.write(data)
-            # Remove generated files that we don't need
-            os.system("rm dssr-*")
             return data
         except Exception as e:
             print(f"DSSR Exception: {e}")
