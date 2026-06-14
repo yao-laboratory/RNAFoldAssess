@@ -22,18 +22,26 @@ ribo_experiment_map = {
 }
 
 dp_base = {
-    "EternaBench": "/common/yesselmanlab/ewhiting/data/translated_eterna_data/eterna.json",
+    "EternaBench": "/mnt/nrdstor/yesselmanlab/ewhiting/data/translated_eterna_data/eterna.json",
     "Ribonanza": "/mnt/nrdstor/yesselmanlab/ewhiting/rna_data/ribonanza/rmdb_data.v1.3.0.csv",
-    "RNAndria-miRNA": "/common/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/pri_miRNA_datapoints.json",
-    "RNAndria-mRNA": "/common/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/human_mRNA_datapoints.json",
-    "YData": "/common/yesselmanlab/ewhiting/ss_deeplearning_data/data",
-    "PDB": "/common/yesselmanlab/ewhiting/data/crystal_all/release_2024/long_dbns",
+    "RNAndria-miRNA": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/pri_miRNA_datapoints.json",
+    "RNAndria-mRNA": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/human_mRNA_datapoints.json",
+    "YData": "/mnt/nrdstor/yesselmanlab/ewhiting/ss_deeplearning_data/data",
+    "PDB": "/mnt/nrdstor/yesselmanlab/ewhiting/data/crystal_all/release_2024/long_dbns",
     "bp-RNA": "/work/yesselmanlab/ewhiting/data/bprna/dbnFiles",
-    "RASP-Arabidopsis": "/common/yesselmanlab/ewhiting/data/rasp_data/ara-tha/json_files",
-    "RASP-COVID": "/common/yesselmanlab/ewhiting/data/rasp_data/processed/covid/rasp_covid_chromosome_NC_045512.2.json",
-    "RASP-ecoli": "/common/yesselmanlab/ewhiting/data/rasp_data/processed/ecoli/round_2/rasp_ecoli_chromosome_U00096.2.json",
-    "RASP-HIV": "/common/yesselmanlab/ewhiting/data/rasp_data/processed/HIV",
-    "RASP-Human": "/common/yesselmanlab/ewhiting/data/rasp_data/human/json_files",
+    "RASP-Arabidopsis": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data/ara-tha/json_files",
+    "RASP-COVID": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data/processed/covid/rasp_covid_chromosome_NC_045512.2.json",
+    "RASP-ecoli": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data/processed/ecoli/round_2/rasp_ecoli_chromosome_U00096.2.json",
+    "RASP-HIV": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data/processed/HIV",
+    "RASP-Human": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rasp_data/human/json_files",
+}
+
+dp_base_chem_map = {
+    "EternaBench": "/mnt/nrdstor/yesselmanlab/ewhiting/data/translated_eterna_data/eterna.json",
+    "Ribonanza": "/mnt/nrdstor/yesselmanlab/ewhiting/rna_data/ribonanza/rmdb_data.v1.3.0.csv",
+    "RNAndria-miRNA": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/pri_miRNA_datapoints.json",
+    "RNAndria-mRNA": "/mnt/nrdstor/yesselmanlab/ewhiting/data/rnandria/rnandria_data_JSON/processed/human_mRNA_datapoints.json",
+    "YData": "/mnt/nrdstor/yesselmanlab/ewhiting/ss_deeplearning_data/data"
 }
 
 gt_map = {
@@ -186,7 +194,7 @@ def return_rasp_datapoints(location, species):
     return dps
 
 
-headers = "dataset,rna_id,sequence,ground_truth\n"
+headers = "dataset;rna_id;sequence;ground_truth\n"
 def write_report():
     all_datapoints = {}
     for ds, loc in dp_base.items():
@@ -201,7 +209,7 @@ def write_report():
             counter += 1
             if counter % 2500 == 0:
                 print(f"Writing {counter} of {len_dp} in {ds} ...")
-            line = f"{ds},{dp['name']},{dp['sequence']},{dp[ground_truth_key]}\n"
+            line = f"{ds};{dp['name']};{dp['sequence']};{dp[ground_truth_key]}\n"
             f.write(line)
         f.close()
 

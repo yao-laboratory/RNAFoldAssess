@@ -32,7 +32,8 @@ models = [
 with open(dp_file_path) as fh:
     datapoints = [line.split(", ") for line in fh.readlines()]
 
-prediction_path = f"{base_dir}/pdb_canonical_matched_0.txt"
+pred_base = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/higher_level_analysis/consolidated"
+prediction_path = f"{pred_base}/pdb_matched_set_1.txt"
 with open(prediction_path) as fh:
     predictions = [line.split(", ") for line in fh.readlines()]
 
@@ -41,7 +42,7 @@ dp_pred_map = {}
 for p in predictions:
     model = p[0]
     datapoint_name = p[1]
-    pred = p[4]
+    pred = p[5]
     try:
         dp_pred_map[datapoint_name][model] = pred
     except KeyError:
@@ -49,8 +50,12 @@ for p in predictions:
 
 
 dp_motif_data = {}
+counter = 0
 print("Building datapoint->motif map")
 for dp in datapoints:
+    counter += 1
+    if counter % 123 == 0:
+        print(f"Working {counter}")
     dp_name = dp[0]
     seq = dp[1]
     stc = dp[2].strip()
@@ -66,10 +71,6 @@ for dp in datapoints:
         continue
 
     for k, v in motif_data.motifs.items():
-        if len(v.sequence) <= 10:
-            # Skip short sequence motifs
-            continue
-
         key = v.m_type + "_" + v.sequence + "_" + v.structure
         positions = v.positions
 
@@ -85,10 +86,6 @@ for dp in datapoints:
 
         predicted_motifs = []
         for k, v in pred_motif_data.motifs.items():
-            if len(v.sequence) <= 10:
-                # Skip short sequence motifs
-                continue
-
             key = v.m_type + "_" + v.sequence + "_" + v.structure
             predicted_motifs.append(key)
 

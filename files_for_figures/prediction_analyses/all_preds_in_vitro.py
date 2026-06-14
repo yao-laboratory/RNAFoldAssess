@@ -5,10 +5,10 @@ import pandas as pd
 
 
 datasets = {
-    "EternaData": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/with_energy",
-    "Ribonanza": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/unique_preds",
-    "RNAndria": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/rnandria",
-    "YesselmanLab": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ydata"
+    "EternaData": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/eterna_data/with_energy/canonical",
+    "Ribonanza": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/canonical",
+    "RNAndria": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/rnandria/canonical",
+    "YesselmanLab": "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ydata/canonize"
 }
 ds_len = len(datasets)
 

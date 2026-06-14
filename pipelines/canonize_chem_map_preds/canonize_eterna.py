@@ -27,6 +27,21 @@ models = [
     "SPOT-RNA"
 ]
 
+def remove_pseudoknots(stc):
+    stc = list(stc)
+    for i in range(len(stc)):
+        nt = stc[i]
+        if nt in "().":
+            stc[i] = nt
+        elif nt == "<":
+            stc[i] = "("
+        elif nt == ">":
+            stc[i] = ")"
+        else:
+            stc[i] = "."
+    stc = "".join(stc)
+    return stc
+
 for m in models:
     print(f"Working {m}")
     files = [f for f in os.listdir(report_path) if f"{m}_" in f]
@@ -47,6 +62,7 @@ for m in models:
         dp_name = d[1]
         seq = d[2]
         non_canonical_structure = d[3]
+        non_canonical_structure = remove_pseudoknots(non_canonical_structure)
         canonical_structure = CanonicalBasePairScorer.transform_structure(non_canonical_structure, seq)
         dp_seq[dp_name] = canonical_structure
 

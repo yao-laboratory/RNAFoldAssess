@@ -5,7 +5,6 @@ models = [
     "ContextFold",
     "ContraFold",
     "EternaFold",
-    "RandomPredictor",
     "IPKnot",
     "NeuralFold",
     "NUPACK",
@@ -18,7 +17,7 @@ models = [
     "SPOT-RNA"
 ]
 
-source_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
+source_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/canonical"
 dest_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/unique_preds"
 
 for m in models:

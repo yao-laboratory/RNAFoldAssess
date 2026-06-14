@@ -33,6 +33,26 @@ def analysis_report_location(predictor_name, data_type):
 def pipeline_report_location(predictor_name, data_type):
     return f"/common/yesselmanlab/ewhiting/reports/{predictor_name}_{data_type}_pipeline.txt"
 
+
+def double_check_eterna_evals():
+    data_points_path="/mnt/nrdstor/yesselmanlab/ewhiting/data/translated_eterna_data/"
+    datapoints = EternaDataPoint.factory(f"{data_points_path}/eterna.json")
+    # 'name', 'rdat_version', 'annotation_number', 'mapping_method', 'sequence', 'positions', 'reactivities'
+    new_json = []
+    for dp in datapoints:
+        ndp = {
+            "name": dp.name,
+            "mapping_method": dp.mapping_method,
+            "sequence": dp.sequence,
+            "positions": dp.positions,
+            "reactivities": dp.reactivities
+        }
+        new_json.append(ndp)
+    with open(f"{data_points_path}/eterna_normalized_reactivities.json", "w") as fh:
+        json.dump(new_json, fh)
+    print("Done :)")
+    
+
 def generate_eterna_data_evaluations(model,
                                      model_name,
                                      model_path,
@@ -1395,29 +1415,33 @@ def benchmark_prediction_speed(model,
         shutil.copy(seq_file, dest)
 
     print("Starting evaluation")
-    start = time.time()
-
-    for file in sequence_files:
-        seq_file = f"{sequence_data_path}/{file}"
-        with open(seq_file) as fh:
-            data = fh.readlines()
-        seq = data[1].strip()
-        if model_name in ["ContextFold", "SeqFold"]:
-            # These models don't require an input file
-            model.execute(model_path, seq)
-        elif model_name == "NUPACK":
-            model.execute(seq)
-        elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
-            model.execute(f"{sequence_data_path}/{file}")
-        else:
-            input_file_path = f"/scratch/{file}"
-            if model_name.lower() in ["pknots"]:
-                model.execute(input_file_path)
+    report = ""
+    for i in range(10):
+        start = time.time()
+    
+        for file in sequence_files:
+            seq_file = f"{sequence_data_path}/{file}"
+            with open(seq_file) as fh:
+                data = fh.readlines()
+            seq = data[1].strip()
+            if model_name in ["ContextFold", "SeqFold"]:
+                # These models don't require an input file
+                model.execute(model_path, seq)
+            elif model_name == "NUPACK":
+                model.execute(seq)
+            elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
+                model.execute(f"{sequence_data_path}/{file}")
             else:
-                model.execute(model_path, input_file_path)
-
-    end = time.time()
-    elapsed = end - start
+                input_file_path = f"/scratch/{file}"
+                if model_name.lower() in ["pknots"]:
+                    model.execute(input_file_path)
+                else:
+                    model.execute(model_path, input_file_path)
+    
+        end = time.time()
+        elapsed = end - start
+        report += f"Run {i + 1}: {elapsed}\n"
+    report += "For 100 structures"
 
     with open(f"{model_name}_speed_test.txt", "w") as fh:
-        fh.write(f"{model_name} took {elapsed} to predict 100 structures")
+        fh.write(report)

@@ -1,4 +1,4 @@
-import os, shutil
+import os, time, shutil
 
 model_name = "Simfold"
 
@@ -13,20 +13,25 @@ sequence_files = os.listdir(sequence_data_path)
 #     shutil.copy(seq_file, dest)
 
 print("Starting evaluation")
-start = time.time()
+report = ""
+for i in range(10):
+    start = time.time()
+    
+    for f in sequence_files:
+        seq_file = f"{sequence_data_path}/{f}"
+        with open(seq_file) as fh:
+            data = fh.readlines()
+        seq = data[1].strip()
+   
+        name = f.split(".")[0]
+        cmd = f'/mnt/nrdstor/yesselmanlab/ewhiting/simfold/simfold -s "{seq}" > sim_outputs/{name}.dbn'
+        os.system(cmd)
+    
+    
+    end = time.time()
+    elapsed = end - start
+    report += f"Run {i + 1}: {elapsed}\n"
+report += "For 100 structures"
 
-for f in sequence_files:
-seq_file = f"{sequence_data_path}/{file}"
-    with open(seq_file) as fh:
-        data = fh.readlines()
-    seq = data[1].strip()
-
-    cmd = f'../simfold/simfold -s "{sequence}" > outputs/rasp/{species}/{name}.dbn'
-    os.system(cmd)
-
-
-end = time.time()
-elapsed = end - start
-
-with open(f"{Simfold}_speed_test.txt", "w") as fh:
-    fh.write(f"{model_name} took {elapsed} to predict 100 structures")
+with open(f"{model_name}_speed_test.txt", "w") as fh:
+    fh.write(report)

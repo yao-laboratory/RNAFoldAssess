@@ -54,17 +54,15 @@ for d in data:
     model = d[0]
     dp_name = d[1]
     pred = d[3]
-    
+
     seq = dp_map[dp_name]["sequence"]
     pred_motif_data = get_sec_struct_object(seq, pred)
     if not pred_motif_data:
         continue
-    
+
     predicted_motifs = []
     for k, v in pred_motif_data.motifs.items():
-        if len(v.sequence) <= 10:
-            continue
-        
+
         key = v.m_type + "_" + v.sequence + "_" + v.structure
         predicted_motifs.append(key)
         dp_map[dp_name][m][key] = v.positions

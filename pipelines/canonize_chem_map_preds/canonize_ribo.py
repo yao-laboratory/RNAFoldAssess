@@ -27,6 +27,21 @@ with open(ribo_data_csv) as fh:
 data.pop(0)
 data = [d.split(",") for d in data]
 
+def remove_pseudoknots(stc): # NOT NEEDED IN RIBO
+    stc = list(stc)
+    for i in range(len(stc)):
+        nt = stc[i]
+        if nt in "().":
+            stc[i] = nt
+        elif nt == "<":
+            stc[i] = "("
+        elif nt == ">":
+            stc[i] = ")"
+        else:
+            stc[i] = "."
+    stc = "".join(stc)
+    return stc
+
 experiment_map = {
     "BzCN_cotx": "DMS4",
     "DMS_M2_seq": "DMS4",
@@ -59,7 +74,7 @@ for d in data:
 
 existing_pred_dir = "/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/with_energies"
 dest_dir = f"/mnt/nrdstor/yesselmanlab/ewhiting/reports/ribonanza/canonical"
-
+missed = 0
 for m in models:
     print(f"Working {m}")
     fstring = ""
@@ -77,6 +92,7 @@ for m in models:
             seq = dp_map[name]["sequence"]
             reactivities = dp_map[name]["reactivities"]
             original_pred = line[3]
+            original_pred = remove_pseudoknots(original_pred)
             new_pred = CanonicalBasePairScorer.transform_structure(original_pred, seq)
             testable_seq = ""
             testable_dbn = ""
@@ -88,30 +104,35 @@ for m in models:
                         testable_dbn += new_pred[i]
                         testable_reactivities.append(float(reactivity))
                     except IndexError:
-                        breakpoint()
-                        print("aww")
+                        # breakpoint()
+                        missed += 1
+                        print(missed)
+                        continue
                 
-            sequence = testable_seq
-            reactivities = testable_reactivities
-            if len(sequence) < 2:
+            if len(testable_seq) < 2:
                 continue
             
             chemical_mapping_method = dp_map[name]["method"]
             
-            if chemical_mapping_method in ["DMS4", "SHAPE"]:
-                score = DSCI.score(
-                    sequence,
-                    testable_dbn,
-                    reactivities,
-                    SHAPE=True
-                )
-            else:
-                score = DSCI.score(
-                    sequence,
-                    testable_dbn,
-                    reactivities,
-                    CMCT=True
-                )
+            try:
+                if chemical_mapping_method in ["DMS4", "SHAPE"]:
+                    score = DSCI.score(
+                        testable_seq,
+                        testable_dbn,
+                        testable_reactivities,
+                        SHAPE=True
+                    )
+                else:
+                    score = DSCI.score(
+                        testable_seq,
+                        testable_dbn,
+                        testable_reactivities,
+                        CMCT=True
+                    )
+            except:
+                print(f"{testable_dbn}, {testable_seq}, {testable_reactivities}")
+                breakpoint()
+                print("fuck")
             
             acc = score["accuracy"]
             p = score["p"]

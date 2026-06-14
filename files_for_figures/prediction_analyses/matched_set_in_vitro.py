@@ -35,7 +35,7 @@ matched_set_file = open(f"{all_pred_dir}/chemical_mapping_matched_set.txt", "w")
 counter = 0
 for d in data:
     counter += 1
-    if counter % 150000 == 0:
+    if counter % 451000 == 0:
         print(f"Working {counter} of {len(data)}")
     dp = d.split(", ")[2]
     count = datapoints[dp]
