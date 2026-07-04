@@ -1428,6 +1428,10 @@ def benchmark_prediction_speed(model,
                 # These models don't require an input file
                 model.execute(model_path, seq)
             elif model_name == "NUPACK":
+                if "K" in seq:
+                    seq = seq.replace("K", "G")
+                if "N" in seq:
+                    seq = seq.replace("N", "C")
                 model.execute(seq)
             elif model_name in ["RandomPredictor", "RNAStructure"] or "MXFold2" in model_name:
                 model.execute(f"{sequence_data_path}/{file}")
