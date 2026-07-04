@@ -1,6 +1,8 @@
 from Bio import Seq
 
 class SecondaryStructureTools:
+    MOTIF_KEY_PREFIXES = ["HELIX", "HAIRPIN", "LOOP", "MWAY", "5PER", "3PER"]
+
     @staticmethod
     def symmetric_chain(dbn: str, count_square_brackets: bool = False) -> bool:
         """
@@ -120,6 +122,71 @@ class SecondaryStructureTools:
                 stc[bp[0]] = "."
                 stc[bp[1]] = "."
         return "".join(stc)
+    
+
+    @staticmethod
+    def get_structural_motif_data(seq, stc):
+        import forgi.graph.bulge_graph as fgb
+        bg = fgb.BulgeGraph.from_dotbracket(stc)
+        structure_data = bg.defines
+        stc_motifs = {}
+        for element, coords in structure_data.items():
+            # make coords 0-indexed
+            coords = [c - 1 for c in coords]
+            if element.startswith("s"):
+                # Helix/Stem
+                s1b, s1e, s2b, s2e = coords
+                s1_nts = "".join([seq[i] for i in range(s1b, s1e + 1)])
+                s2_nts = "".join([seq[i] for i in range(s2b, s2e + 1)])
+                s1_stc = "".join([stc[i] for i in range(s1b, s1e + 1)])
+                s2_stc = "".join([stc[i] for i in range(s2b, s2e + 1)])
+                key = f"HELIX_{s1_nts}&{s2_nts}_{s1_stc}&{s2_stc}"
+            elif element.startswith("h"):
+                # Hairpin
+                nts = "".join([seq[i] for i in range(coords[0], coords[1] + 1)])
+                structure = "".join([stc[i] for i in range(coords[0], coords[1] + 1)])
+                key = f"HAIRPIN_{nts}_{structure}"
+            elif element.startswith("i"):
+                # Interior Loop
+                s1b, s1e, s2b, s2e = coords
+                s1_nts = "".join([seq[i] for i in range(s1b, s1e + 1)])
+                s2_nts = "".join([seq[i] for i in range(s2b, s2e + 1)])
+                s1_stc = "." * ((s1e + 1) - s1b)
+                s2_stc = "." * ((s2e + 1) - s2b)
+                key = f"LOOP_{s1_nts}&{s2_nts}_{s1_stc}&{s2_stc}"
+            elif element.startswith("m"):
+                # Multiway loops
+                if coords == []:
+                    key = f"MWAY_{element}_"
+                else:
+                    nts = "".join([seq[i] for i in coords])
+                    bps = "".join([stc[i] for i in coords])
+                    key = f"MWAY_{nts}_{bps}"
+            elif element.startswith("f"):
+                # five-prime exterior region
+                nts = "".join(seq[i] for i in range(coords[0], coords[1] + 1))
+                stcs = "".join(stc[i] for i in range(coords[0], coords[1] + 1))
+                key = f"5PER_{nts}_{stcs}"
+            elif element.startswith("t"):
+                # three-prime exterior region
+                nts = "".join(seq[i] for i in range(coords[0], coords[1] + 1))
+                stcs = "".join(stc[i] for i in range(coords[0], coords[1] + 1))
+                key = f"3PER_{nts}_{stcs}"
+            
+            stc_motifs[key] = coords
+        
+        return stc_motifs
+    
+    def get_motif_count(motif_type, motif_data):
+        if motif_type not in SecondaryStructureTools.MOTIF_KEY_PREFIXES:
+            raise SecondaryStructureToolsException(f"Unrecognized motif type: {motif_type}. Must be one of {SecondaryStructureTools.MOTIF_KEY_PREFIXES}")
+        motifs = list(motif_data.keys())
+        count = 0
+        for m in motifs:
+            if m.startswith(motif_type):
+                count += 1
+        return count
+
 
 
 class SecondaryStructureToolsException(Exception):
