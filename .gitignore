@@ -14,5 +14,6 @@ build/*
 env/
 venv/
 ENV/
+data/
 env.bak/
 venv.bak/

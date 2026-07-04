@@ -109,5 +109,18 @@ class SecondaryStructureTools:
         return seq1 == reverse_complement
 
 
+    @staticmethod
+    def canonize_structure(seq, stc):
+        acceptable_pairings = ["AU", "UA", "GC", "CG", "GU", "UG"]
+        bps = SecondaryStructureTools.parse_structure(stc)
+        stc = list(stc)
+        for bp in bps:
+            pair = f"{seq[bp[0]]}{seq[bp[1]]}"
+            if pair not in acceptable_pairings:
+                stc[bp[0]] = "."
+                stc[bp[1]] = "."
+        return "".join(stc)
+
+
 class SecondaryStructureToolsException(Exception):
     pass
