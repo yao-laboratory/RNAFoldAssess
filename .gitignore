@@ -17,3 +17,9 @@ ENV/
 data/
 env.bak/
 venv.bak/
+
+pipelines/speed_benchmarking/params/*
+files_for_figures/hard_easy_chem_maps/*
+pipelines/get_scores/**/*.txt
+pipelines/canonize_rasp_preds/acc_dir/*.txt
+
