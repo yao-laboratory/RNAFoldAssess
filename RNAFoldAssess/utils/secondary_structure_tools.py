@@ -122,7 +122,7 @@ class SecondaryStructureTools:
                 stc[bp[0]] = "."
                 stc[bp[1]] = "."
         return "".join(stc)
-    
+
 
     @staticmethod
     def get_structural_motif_data(seq, stc):
@@ -172,11 +172,18 @@ class SecondaryStructureTools:
                 nts = "".join(seq[i] for i in range(coords[0], coords[1] + 1))
                 stcs = "".join(stc[i] for i in range(coords[0], coords[1] + 1))
                 key = f"3PER_{nts}_{stcs}"
-            
+
             stc_motifs[key] = coords
-        
+
         return stc_motifs
-    
+
+
+    def get_gu_pairs(seq, stc):
+        seq = seq.upper()
+        pairings = SecondaryStructureTools.get_pairings(seq, stc)
+        return pairings.count("GU") + pairings.count("UG")
+
+
     def get_motif_count(motif_type, motif_data):
         if motif_type not in SecondaryStructureTools.MOTIF_KEY_PREFIXES:
             raise SecondaryStructureToolsException(f"Unrecognized motif type: {motif_type}. Must be one of {SecondaryStructureTools.MOTIF_KEY_PREFIXES}")
@@ -187,6 +194,12 @@ class SecondaryStructureTools:
                 count += 1
         return count
 
+    def search_unpaired_nts_in_hairpin(hairpin, size_to_search_for=5):
+        if not hairpin.startswith("HAIRPIN"):
+            raise SecondaryStructureToolsException(f"This method only works on HAIRPIN motifs. You passed {hairpin}")
+        stc = hairpin.split("_")[2]
+        search_for = "." * size_to_search_for
+        return search_for in stc
 
 
 class SecondaryStructureToolsException(Exception):
