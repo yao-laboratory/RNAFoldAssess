@@ -215,3 +215,7 @@ def new_features(input_csv: str, output_csv: str) -> None:
         writer = csv.writer(fh)
         writer.writerow(headers)
         writer.writerows(rows)
+
+new_features("feature_data/easy_datapoints_predictions_with_features.csv", "feature_data/easy_datapoints_all_features.csv")
+new_features("feature_data/hard_datapoints_predictions_with_features.csv", "feature_data/hard_datapoints_all_features.csv")
+
