@@ -148,6 +148,8 @@ class SecondaryStructureTools:
                 key = f"HAIRPIN_{nts}_{structure}"
             elif element.startswith("i"):
                 # Interior Loop
+                if len(coords) < 4:
+                    continue
                 s1b, s1e, s2b, s2e = coords
                 s1_nts = "".join([seq[i] for i in range(s1b, s1e + 1)])
                 s2_nts = "".join([seq[i] for i in range(s2b, s2e + 1)])

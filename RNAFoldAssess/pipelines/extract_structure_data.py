@@ -43,6 +43,8 @@ def get_motif_size(motif: str) -> int:
 
 
 def new_features(input_csv: str, output_csv: str) -> None:
+    print(f"Working with {input_csv}")
+    counter = 0
     with open(input_csv, newline="") as fh:
         reader = csv.reader(fh)
         rows = list(reader)
@@ -55,6 +57,9 @@ def new_features(input_csv: str, output_csv: str) -> None:
     ]
 
     for row in rows:
+        counter += 1
+        if counter % 250 == 0:
+            print(f"...Working {counter} of {len(rows)}")
         sequence = row[1]
 
         motifs = []
